@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageType>Template</PackageType>
+    <PackageVersion>1.0.0</PackageVersion>
+    <PackageId>BenjaminMichaelis.Dotnet.Templates</PackageId>
+    <Title>Benjamin Michaelis's .NET Templates</Title>
+    <Authors>Benjamin Michaelis</Authors>
+    <Description>.NET Templates built by Benjamin Michaelis</Description>
+    <PackageTags>dotnet-new;templates</PackageTags>
+
+    <TargetFramework>net7.0</TargetFramework>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+
+    <IncludeContentInPack>true</IncludeContentInPack>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <ContentTargetFolders>content</ContentTargetFolders>
+    <NoDefaultExcludes>true</NoDefaultExcludes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="templates\**\*" Exclude="templates\**\bin\**;templates\**\obj\**" />
+    <Compile Remove="**\*" />
+  </ItemGroup>
+
+</Project>
