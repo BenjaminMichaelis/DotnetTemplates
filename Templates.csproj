@@ -8,6 +8,8 @@
     <Authors>Benjamin Michaelis</Authors>
     <Description>.NET Templates built by Benjamin Michaelis</Description>
     <PackageTags>dotnet-new;templates</PackageTags>
+    <PackageProjectUrl>https://github.com/CHANGEME_RepoOwner/CHANGEME_RepoName</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
 
     <TargetFramework>net7.0</TargetFramework>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
