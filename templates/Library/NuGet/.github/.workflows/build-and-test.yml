@@ -1,0 +1,47 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main ]
+    # Sequence of patterns matched against refs/tags
+    paths-ignore:
+      - 'README.md'
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  automerge:
+    runs-on: ubuntu-latest
+
+    permissions:
+      pull-requests: write
+      contents: write
+
+    steps:
+      - uses: fastify/github-action-merge-dependabot@v3.6.2
+        with:
+            use-github-auto-merge: true
+
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: |
+          7.x
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build -p:ContinuousIntegrationBuild=True --no-restore --configuration Release
