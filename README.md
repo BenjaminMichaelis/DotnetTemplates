@@ -10,6 +10,17 @@ Use [dotnet new install](https://learn.microsoft.com/dotnet/core/tools/dotnet-ne
 > dotnet new install BenjaminMichaelis.Dotnet.Templates
 ```
 
+To then use a template, navigate to a directory where you want to use the template and use the commaand
+```cli
+> dotnet new benjaminmichaelis.{templatename}
+```
+
+with templatename being a name of one of the included templates listed below. Ex: `dotnet new benjaminmichaelis.nuget`
+
+## Included Templates (by template name)
+
+- [nuget](./templates/Library/NuGet/README.md)
+
 ## Updating
 
 If you have previously installed the templates and want to install the latest version, you can use [dotnet new update](https://learn.microsoft.com/dotnet/core/tools/dotnet-new-update) to update your installed templates.
@@ -23,10 +34,6 @@ If you have previously installed the templates and want to install the latest ve
 ```cli
 > dotnet new uninstall BenjaminMichaelis.Dotnet.Templates
 ```
-
-## Included Templates (by template name)
-
-- [BenjaminMichaelis.Library.NuGet](./templates/Library/NuGet/README.md)
 
 ## Local testing
 
