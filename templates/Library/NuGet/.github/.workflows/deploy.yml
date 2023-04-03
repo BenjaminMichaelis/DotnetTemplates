@@ -64,9 +64,3 @@ jobs:
           echo "::set-output name=TAG_VERSION::$tagVersion"
           dotnet nuget push CHANGEME_Package_Name.$tagVersion.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
         id: tag-version
-
-      - name: Upload nupkg to Release
-        uses: softprops/action-gh-release@v1
-        with:
-          fail_on_unmatched_files: true
-          files: CHANGEME_Package_Name.${{ steps.tag-version.outputs.TAG_VERSION }}.nupkg
