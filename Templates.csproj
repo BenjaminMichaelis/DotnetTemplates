@@ -21,6 +21,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+	<None Include="./README.md" Pack="true" PackagePath="\"/>
     <Content Include="templates\**\*" Exclude="templates\**\bin\**;templates\**\obj\**" />
     <Compile Remove="**\*" />
   </ItemGroup>
