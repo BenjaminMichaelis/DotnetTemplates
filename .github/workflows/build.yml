@@ -98,7 +98,7 @@ jobs:
           Push-Location TestQuickstartBenchmarkConsole
           dotnet new bmichaelis.quickstart.benchmarkconsole
           dotnet test
-          cd BenchmarkApp
+          cd TestQuickstartBenchmarkConsole
           dotnet run -c Release
           cd ..
           dotnet pack --configuration Release -o ./NuGet

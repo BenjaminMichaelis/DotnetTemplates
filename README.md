@@ -10,7 +10,7 @@ Use [dotnet new install](https://learn.microsoft.com/dotnet/core/tools/dotnet-ne
 > dotnet new install BenjaminMichaelis.Dotnet.Templates
 ```
 
-To then use a template, navigate to a directory where you want to use the template and use the commaand
+To then use a template, navigate to a directory where you want to use the template and use the command
 
 ```cli
 > dotnet new bmichaelis.{templatename}
@@ -21,6 +21,7 @@ with templatename being a name of one of the included templates listed below. Ex
 ## Included Templates (by template name)
 
 - [nuget](./templates/Library/NuGet/README.md)
+- [quickstart.benchmarkconsole](./templates/Quickstart/BenchmarkApp/README.md)
 
 ## Updating
 
