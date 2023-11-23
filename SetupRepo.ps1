@@ -13,3 +13,4 @@ gh repo edit --enable-rebase-merge
  gh repo edit --enable-auto-merge
 
  #TODO: Setup branch protection rule for default branch
+ #TODO: Set default commit message presented when merging a pull request with squash.
