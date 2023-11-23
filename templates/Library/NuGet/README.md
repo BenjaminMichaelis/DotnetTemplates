@@ -1,6 +1,6 @@
 # NuGet Library
 
-A base template for NuGet Library Packages
+A base template for NuGet Library Packages, with unit tests, and github actions
 
 ## Startup Steps
 
@@ -13,4 +13,5 @@ A base template for NuGet Library Packages
 ### Generating Releases
 
 1. Create a release on GitHub
-2. Tag the release with a tag following a v*.*.*format, likely with*.*.* following a [Semver](https://semver.org/) format.
+2. Add your [Nuget.org](https://www.nuget.org/account/apikeys) API key to the GitHub repository secrets as `NUGET_API_KEY` with push scope permissions
+3. Tag the release with a tag following a v*.*.*format, likely with*.*.* following a [Semver](https://semver.org/) format. ex: v1.0.0

@@ -15,6 +15,11 @@ defaults:
     shell: pwsh
 
 jobs:
+  # For GitHub Auto Merge to work it must be enabled on the repo.
+  # This can be done with the script here:
+  # https://github.com/BenjaminMichaelis/DotnetTemplates/blob/main/SetupRepo.ps1
+  # See documentation here:
+  # https://docs.github.com/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/automatically-merging-a-pull-request
   automerge:
     runs-on: ubuntu-latest
 
