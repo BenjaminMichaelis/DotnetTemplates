@@ -14,9 +14,13 @@ defaults:
   run:
     shell: pwsh
 
+env:
+  DOTNET_VERSION: 8.x
+
 jobs:
   automerge:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' }}
 
     permissions:
       pull-requests: write
@@ -33,19 +37,41 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-       
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: |
-          7.x
+        dotnet-version: ${{ env.DOTNET_VERSION }}
 
     - name: Build
       run: dotnet pack --configuration Release -o . 
     
     - name: Upload Artifacts
-      if: ${{ github.event_name != 'pull_request' }}
       uses: actions/upload-artifact@v3
       with:
         name: NuGet
-        path: ${{ github.workspace }}\*.nupkg
+        path: ${{ github.workspace }}/*.nupkg
+
+  test-library:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Download NuGet Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: NuGet
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Test Template
+        run: |
+          dotnet new install $(Get-ChildItem -Path "BenjaminMichaelis.Dotnet.Templates.*.nupkg").Name
+          mkdir TestLibrary
+          Push-Location TestLibrary
+          dotnet new bmichaelis.nuget
+          dotnet test
+          dotnet pack --configuration Release -o ./NuGet

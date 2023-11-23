@@ -8,7 +8,7 @@
   ],
   "identity": "BenjaminMichaelis.Library.NuGet",
   "name": "Benjamin Michaelis's Class Library for NuGet",
-  "shortName": "benjaminmichaelis.nuget",
+  "shortName": "bmichaelis.nuget",
   "tags": {
     "language": "C#",
     "type": "solution"

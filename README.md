@@ -11,11 +11,12 @@ Use [dotnet new install](https://learn.microsoft.com/dotnet/core/tools/dotnet-ne
 ```
 
 To then use a template, navigate to a directory where you want to use the template and use the commaand
+
 ```cli
-> dotnet new benjaminmichaelis.{templatename}
+> dotnet new bmichaelis.{templatename}
 ```
 
-with templatename being a name of one of the included templates listed below. Ex: `dotnet new benjaminmichaelis.nuget`
+with templatename being a name of one of the included templates listed below. Ex: `dotnet new bmichaelis.nuget`
 
 ## Included Templates (by template name)
 
@@ -52,7 +53,7 @@ Install the locally built template package
 You can now test the template by running:
 
 ```cli
-> dotnet new benjaminmichaelis.{templatename}
+> dotnet new bmichaelis.{templatename}
 > dotnet build
 > dotent test --no-build
 > dotnet publish --no-build

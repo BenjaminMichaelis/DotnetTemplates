@@ -2,17 +2,18 @@
 
   <PropertyGroup>
     <PackageType>Template</PackageType>
-    <PackageVersion>1.0.0</PackageVersion>
+    <PackageVersion>1.1.0</PackageVersion>
     <PackageId>BenjaminMichaelis.Dotnet.Templates</PackageId>
     <Title>Benjamin Michaelis's .NET Templates</Title>
     <Authors>Benjamin Michaelis</Authors>
     <Description>.NET Templates built by Benjamin Michaelis</Description>
-    <PackageTags>dotnet-new;templates</PackageTags>
+    <PackageTags>dotnet-new;templates;nuget</PackageTags>
     <PackageProjectUrl>https://github.com/CHANGEME_RepoOwner/CHANGEME_RepoName</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
 
     <IncludeContentInPack>true</IncludeContentInPack>
     <IncludeBuildOutput>false</IncludeBuildOutput>
@@ -21,7 +22,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-	<None Include="./README.md" Pack="true" PackagePath="\"/>
+    <None Include="./README.md" Pack="true" PackagePath="\"/>
     <Content Include="templates\**\*" Exclude="templates\**\bin\**;templates\**\obj\**" />
     <Compile Remove="**\*" />
   </ItemGroup>
