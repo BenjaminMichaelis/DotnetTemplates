@@ -10,6 +10,14 @@ A base template for NuGet Library Packages, with unit tests, and github actions
 
 ## Features
 
+## Template
+
+Create a new app in your current directory by running.
+
+```cli
+ dotnet new bmichaelis.nuget
+```
+
 ### Generating Releases
 
 1. Create a release on GitHub

@@ -3,4 +3,4 @@ Remove-Item -Path "BenjaminMichaelis.Dotnet.Templates.*.nupkg"
 
 dotnet pack -o .
 
-dotnet new install $(Get-ChildItem -Path "BenjaminMichaelis.Dotnet.Templates.*.nupkg").nupkg
+dotnet new install $(Get-ChildItem -Path "BenjaminMichaelis.Dotnet.Templates.*.nupkg")
