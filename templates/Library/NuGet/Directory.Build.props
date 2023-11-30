@@ -57,7 +57,8 @@ See: https://learn.microsoft.com/visualstudio/msbuild/customize-your-build
         https://learn.microsoft.com/dotnet/core/project-sdk/msbuild-props#continuousintegrationbuild.
     The condition enables this property automatically when using Github Actions for the build, but can be removed if unused.
     This can be enabled on the command line by including the following as part of the build.
-    dotnet build -p:ContinuousIntegrationBuild=true 
+    dotnet build -p:ContinuousIntegrationBuild=true
+    If you want to use Azure Devops, change the `GITHUB_ACTIONS` to `TF_BUILD` in the Condition.
     -->
     <!-- <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
   	  <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
