@@ -9,3 +9,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly" 
+    groups:
+      artifact-dependencies:
+        dependency-type: "production"
+          patterns:
+            - "*-artifact"
