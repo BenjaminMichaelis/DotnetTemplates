@@ -10,7 +10,6 @@ updates:
     schedule:
       interval: "weekly" 
     groups:
-      artifact-dependencies:
-        dependency-type:
+       dev-dependencies:
           patterns:
             - "*-artifact"
