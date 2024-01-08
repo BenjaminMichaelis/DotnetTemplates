@@ -13,3 +13,21 @@ updates:
        dev-dependencies:
           patterns:
             - "*-artifact"
+
+  - package-ecosystem: "github-actions" 
+    directory: "/templates/Library/NuGet/.github/workflows"
+    schedule:
+      interval: "weekly" 
+    groups:
+       dev-dependencies:
+          patterns:
+            - "*-artifact"
+
+  - package-ecosystem: "github-actions" 
+    directory: "/templates/Quickstart/BenchmarkApp/.github/workflows"
+    schedule:
+      interval: "weekly" 
+    groups:
+       dev-dependencies:
+          patterns:
+            - "*-artifact"
