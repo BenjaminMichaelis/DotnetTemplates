@@ -22,3 +22,12 @@ updates:
        dev-dependencies:
           patterns:
             - "*-artifact"
+
+  - package-ecosystem: "github-actions" 
+    directory: "/templates/Quickstart/BenchmarkApp"
+    schedule:
+      interval: "weekly" 
+    groups:
+       dev-dependencies:
+          patterns:
+            - "*-artifact"
