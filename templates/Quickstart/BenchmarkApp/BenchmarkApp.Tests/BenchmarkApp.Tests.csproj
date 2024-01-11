@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BenchmarkApp.Console\BenchmarkApp.Console.csproj" />
+    <ProjectReference Include="..\BenchmarkApp\BenchmarkApp.csproj" />
   </ItemGroup>
 
   <ItemGroup>

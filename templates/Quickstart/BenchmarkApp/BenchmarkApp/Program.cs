@@ -1,17 +1,13 @@
-﻿using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Running;
+﻿namespace BenchmarkApp.Console;
 
-namespace BenchmarkApp;
-
-public class Program
+public sealed class Program
 {
     public static void Main(string[] args)
     {
-        var config = DefaultConfig.Instance;
-        var summary = BenchmarkRunner.Run<Md5VsSha256>(config, args);
-        var summary2 = BenchmarkRunner.Run<Benchmarks>(config, args);
+    }
 
-        // Use this to select benchmarks from the console:
-        // var summaries = BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args, config);
+    public int Method(int value)
+    {
+        return value + 1;
     }
 }

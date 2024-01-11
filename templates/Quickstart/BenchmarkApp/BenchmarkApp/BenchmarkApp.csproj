@@ -1,26 +1,24 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Optimize>true</Optimize>
-    <Configuration>Release</Configuration>
-    <IsPackable>false</IsPackable>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
     <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
+
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Version>0.0.1</Version>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" />
-    <PackageReference Include="BenchmarkDotNet.Annotations" />
-    <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" />
-  </ItemGroup>
+  <!-- 
+    For packaging as a dotnet global tool 
+    https://learn.microsoft.com/dotnet/core/tools/global-tools-how-to-create
+  -->
+  <!--
+  <PropertyGroup>
+    <PackageId>ConsoleApp</PackageId>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>ConsoleApp</ToolCommandName>
+  </PropertyGroup>
+  -->
 
 </Project>
