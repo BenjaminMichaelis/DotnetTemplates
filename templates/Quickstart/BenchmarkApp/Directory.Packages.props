@@ -18,7 +18,7 @@
   -->
   <ItemGroup>
     <PackageVersion Include="BenchmarkDotNet" Version="0.13.10" />
-    <PackageVersion Include="BenchmarkDotNet.Annotations" Version="0.13.10" />
+    <PackageVersion Include="BenchmarkDotNet.Annotations" Version="0.13.12" />
 	<PackageVersion Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.13.10"/>
     <PackageVersion Include="coverlet.collector" Version="6.0.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
