@@ -28,6 +28,6 @@ updates:
 
 # Quickstart.BenchmarkApp Project
   - package-ecosystem: "nuget"
-    directory: "/templates/Quickstart/BenchmarkApp
+    directory: "/templates/Quickstart/BenchmarkApp"
     schedule:
       interval: "weekly" 
