@@ -20,7 +20,7 @@
     <PackageVersion Include="BenchmarkDotNet" Version="0.13.12" />
     <PackageVersion Include="BenchmarkDotNet.Annotations" Version="0.13.12" />
 	<PackageVersion Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.13.12"/>
-    <PackageVersion Include="coverlet.collector" Version="6.0.1">
+    <PackageVersion Include="coverlet.collector" Version="6.0.2">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageVersion>
