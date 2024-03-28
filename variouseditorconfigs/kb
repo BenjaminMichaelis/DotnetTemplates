@@ -86,8 +86,8 @@ dotnet_remove_unnecessary_suppression_exclusions = none
 [*.cs]
 
 # var preferences
-csharp_style_var_elsewhere = false:warning
-csharp_style_var_for_built_in_types = false:warning
+csharp_style_var_elsewhere = false:silent
+csharp_style_var_for_built_in_types = false:silent
 csharp_style_var_when_type_is_apparent = false:silent
 
 # Expression-bodied members
@@ -112,7 +112,7 @@ csharp_style_conditional_delegate_call = true:suggestion
 
 # Modifier preferences
 csharp_prefer_static_local_function = true:warning
-csharp_preferred_modifier_order = public,private,protected,internal,file,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,required,volatile,async
+csharp_preferred_modifier_order = public,private,protected,internal,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,volatile,async:silent
 
 # Code-block preferences
 csharp_prefer_braces = true:silent
@@ -373,35 +373,6 @@ dotnet_naming_style.s_camelcase.required_prefix = s_
 dotnet_naming_style.s_camelcase.required_suffix = 
 dotnet_naming_style.s_camelcase.word_separator = 
 dotnet_naming_style.s_camelcase.capitalization = camel_case
-
-#### Roslynator Defaults ####
-
-# RCS1001: Add braces (when expression spans over multiple lines).
-dotnet_diagnostic.RCS1001.severity = error
-
-# RCS1003: Add braces to if-else (when expression spans over multiple lines).
-dotnet_diagnostic.RCS1003.severity = error
-
-# RCS1007: Add braces
-dotnet_diagnostic.RCS1007.severity = error
-
-# RCS1044: Remove original exception from throw statement
-dotnet_diagnostic.RCS1044.severity = error
-
-# RCS1123: Add parentheses according to operator precedence.
-dotnet_diagnostic.RCS1123.severity = error
-
-# RCS1037: Remove trailing white-space.
-dotnet_diagnostic.RCS1037.severity = none
-
-# RCS1036: Remove redundant empty line.
-dotnet_diagnostic.RCS1036.severity = none
-
-# RCS1170: Use read-only auto-implemented property.
-dotnet_diagnostic.RCS1170.severity = warning
-
-# RCS1213: Remove unused member declaration.
-dotnet_diagnostic.RCS1213.severity = warning
 
 ############################### 
 # Spell Check                 # 
