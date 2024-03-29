@@ -4,27 +4,12 @@ csharp_style_prefer_primary_constructors = true:suggestion
 csharp_style_prefer_null_check_over_type_check = true:suggestion
 csharp_style_prefer_local_over_anonymous_function = true:suggestion
 dotnet_style_prefer_collection_expression = true:suggestion
-# CA1827: Do not use Count() or LongCount() when Any() can be used
-# CA1827: Do not use Count() or LongCount() when Any() can be used
-dotnet_diagnostic.CA1827.severity = warning
 csharp_style_implicit_object_creation_when_type_is_apparent = true:suggestion
 csharp_style_prefer_extended_property_pattern = true:suggestion
-dotnet_diagnostic.RCS1124.severity = warning
 csharp_style_prefer_tuple_swap = true:suggestion
 csharp_style_prefer_utf8_string_literals = true:suggestion
 csharp_prefer_static_local_function = true:suggestion
 csharp_style_prefer_readonly_struct = true:suggestion
-dotnet_diagnostic.IDE0120.severity = suggestion
-dotnet_diagnostic.IDE0017.severity = warning
-dotnet_diagnostic.IDE0028.severity = warning
-dotnet_diagnostic.IDE0075.severity = suggestion
-dotnet_diagnostic.IDE0071.severity = suggestion
-dotnet_diagnostic.RCS1077.severity = warning
-dotnet_diagnostic.IDE0090.severity = warning
-dotnet_diagnostic.IDE0041.severity = suggestion
-dotnet_diagnostic.IDE0040.severity = warning
-dotnet_diagnostic.RCS1001.severity = warning
-
 dotnet_naming_rule.interface_should_be_begins_with_i.severity = suggestion
 dotnet_naming_rule.interface_should_be_begins_with_i.symbols = interface
 dotnet_naming_rule.interface_should_be_begins_with_i.style = begins_with_i
@@ -37,88 +22,20 @@ dotnet_naming_rule.non_field_members_should_be_pascal_case.style = pascal_case
 dotnet_style_prefer_auto_properties = true:silent
 dotnet_style_prefer_conditional_expression_over_assignment = true:silent
 dotnet_style_prefer_conditional_expression_over_return = true:silent
+dotnet_style_prefer_collection_expression = true:suggestion
 dotnet_style_namespace_match_folder = true:suggestion
 dotnet_style_readonly_field = true:suggestion
-dotnet_diagnostic.CA1829.severity = warning
-dotnet_diagnostic.CA1828.severity = warning
-dotnet_diagnostic.CA1836.severity = warning
-dotnet_style_prefer_collection_expression = true:suggestion
-# CA1305: Specify IFormatProvider
-# CA1305: Specify IFormatProvider
-dotnet_diagnostic.CA1305.severity = none
-# CA1310: Specify IFormatProvider
-# CA1310: Specify IFormatProvider
-dotnet_diagnostic.CA1310.severity = none
-# CA1861: Avoid constant arrays as arguments
-# CA1861: Avoid constant arrays as arguments
-dotnet_diagnostic.CA1861.severity = none
-# CA1860: Avoid using 'Enumerable.Any()' extension method
-# CA1860: Avoid using 'Enumerable.Any()' extension method
-dotnet_diagnostic.CA1860.severity = silent
+
+
+# Locale
+# Locale things
 # CA1309 Use ordinal string comparison
 # CA1309 Use ordinal string comparison
 dotnet_diagnostic.CA1309.severity = none
-# CA1062: Validate arguments of public methods
-# CA1062: Validate arguments of public methods
-dotnet_diagnostic.CA1062.severity = none
-# CA1056: Uri properties should not be strings
-# CA1056: Uri properties should not be strings
-dotnet_diagnostic.CA1056.severity = none
-# CA1054: Uri parameters should not be strings
-# CA1054: Uri parameters should not be strings
-dotnet_diagnostic.CA1054.severity = suggestion
-# CA1825: Avoid zero-length array allocations.
-# CA1825: Avoid zero-length array allocations.
-dotnet_diagnostic.CA1825.severity = suggestion
-# CA1050: Declare types in namespaces
-# CA1050: Declare types in namespaces
-dotnet_diagnostic.CA1050.severity = none
-# CA2227: Collection properties should be read only
-# CA2227: Collection properties should be read only
-dotnet_diagnostic.CA2227.severity = none
-# CA1822: Mark members as static
-# CA1822: Mark members as static
-# TODO: Remove after updating analyzers once https://github.com/IntelliTect/CodingGuidelines/issues/270 is deployed
-# TODO: Remove after updating analyzers once https://github.com/IntelliTect/CodingGuidelines/issues/270 is deployed
-dotnet_diagnostic.CA1822.severity = suggestion
-# CA1724: Type names should not match namespaces (conflicts with Microsoft.Graph type names)
-# CA1724: Type names should not match namespaces (conflicts with Microsoft.Graph type names)
-dotnet_diagnostic.CA1724.severity = none
-# Locale
-# Locale
 dotnet_diagnostic.CA1304.severity = none
 dotnet_diagnostic.CA1311.severity = none
 dotnet_diagnostic.CA1862.severity = none
 dotnet_diagnostic.CA1307.severity = none
-# Not Working with some C# features, probably remove later
-# Not Working with some C# features, probably remove later
-# Primary Constructors
-# Primary Constructors
-dotnet_diagnostic.CA1801.severity = none
-# Consider calling ConfigureAwait on the awaited task
-# Consider calling ConfigureAwait on the awaited task
-dotnet_diagnostic.CA2007.severity = none
-# Does not work with Coalesce
-# Does not work with Coalesce
-dotnet_diagnostic.CA1034.severity = none
-# Use strings from ResourceManager instead of string literal
-# Use strings from ResourceManager instead of string literal
-dotnet_diagnostic.CA1303.severity = none
-# Use URI to GetAsync instead of string
-# Use URI to GetAsync instead of string
-dotnet_diagnostic.CA2234.severity = none
-
-# INTL0059: Remove unnecessary value assignment
-# INTL0059: Remove unnecessary value assignment
-dotnet_diagnostic.INTL0059.severity = warning
-[*Tests.cs]
-# CA1707: Identifiers should not contain underscores
-# CA1707: Identifiers should not contain underscores
-dotnet_diagnostic.CA1707.severity = none
-dotnet_diagnostic.CA1801.severity = none
-# CA1825: Avoid zero-length array allocations.
-# CA1825: Avoid zero-length array allocations.
-dotnet_diagnostic.CA1825.severity = none
 
 ###### COALESCE SPECIFIC ######
 [*.g.cs]
@@ -128,3 +45,19 @@ dotnet_diagnostic.INTL0303.severity = none
 [*/Migrations/*]
 generated_code = true
 dotnet_diagnostic.IDE0005.severity = none
+
+
+# C#
+# Maybe does not work with Coalesce???
+dotnet_diagnostic.CA1034.severity = none
+
+
+
+##### LIBRARY SPECIFIC #####
+# CA1062: Validate arguments of public methods
+dotnet_diagnostic.CA1062.severity = none
+
+
+##### STC Specific #####
+# CA1724: Type names should not match namespaces (conflicts with Microsoft.Graph type names)
+dotnet_diagnostic.CA1724.severity = none

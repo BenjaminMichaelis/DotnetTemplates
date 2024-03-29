@@ -62,20 +62,20 @@ dotnet_style_require_accessibility_modifiers = for_non_interface_members:silent
 
 # Expression-level preferences
 dotnet_style_coalesce_expression = true:suggestion
-dotnet_style_collection_initializer = true:suggestion
+dotnet_style_collection_initializer = true:warning
 dotnet_style_explicit_tuple_names = true:suggestion
 dotnet_style_null_propagation = true:suggestion
-dotnet_style_object_initializer = true:suggestion
+dotnet_style_object_initializer = true:warning
 dotnet_style_operator_placement_when_wrapping = beginning_of_line
-dotnet_style_prefer_auto_properties = true:suggestion
+dotnet_style_prefer_auto_properties = true:warning
 dotnet_style_prefer_compound_assignment = true:suggestion
 dotnet_style_prefer_conditional_expression_over_assignment = true:suggestion
 dotnet_style_prefer_conditional_expression_over_return = true:suggestion
 dotnet_style_prefer_inferred_anonymous_type_member_names = true:suggestion
 dotnet_style_prefer_inferred_tuple_names = true:suggestion
-dotnet_style_prefer_is_null_check_over_reference_equality_method = true:suggestion
-dotnet_style_prefer_simplified_boolean_expressions = true:suggestion
-dotnet_style_prefer_simplified_interpolation = true:suggestion
+dotnet_style_prefer_is_null_check_over_reference_equality_method = true:warning
+dotnet_style_prefer_simplified_boolean_expressions = true:warning
+dotnet_style_prefer_simplified_interpolation = true:warning
 
 # Field preferences
 dotnet_style_readonly_field = true:warning
@@ -132,6 +132,7 @@ csharp_style_prefer_range_operator = true:suggestion
 csharp_style_throw_expression = true:suggestion
 csharp_style_unused_value_assignment_preference = discard_variable:suggestion
 csharp_style_unused_value_expression_statement_preference = discard_variable:silent
+csharp_style_implicit_object_creation_when_type_is_apparent = true:warning
 
 # 'using' directive preferences
 csharp_using_directive_placement = outside_namespace:silent
@@ -382,21 +383,48 @@ dotnet_naming_style.s_camelcase.capitalization = camel_case
 #### Microsoft Code Analysis Defaults ####
 ##########################################
 
+# IDE0040: Add accessibility modifiers
+dotnet_diagnostic.IDE0040.severity = warning
+
 # IDE0049: Simplify Names
 dotnet_diagnostic.IDE0049.severity = error
 
 # IDE0051: Remove unused private members
 dotnet_diagnostic.IDE0051.severity = warning
 
+# IDE0120: Simplify LINQ expression
+dotnet_diagnostic.IDE0120.severity = warning
+
 # CA1069: Enums values should not be duplicated
 dotnet_diagnostic.CA1069.severity = warning
+
+# CA1801: Review unused parameters
+dotnet_diagnostic.CA1801.severity = warning
+
+# CA1825: Avoid zero-length array allocations.
+dotnet_diagnostic.CA1825.severity = warning
+
+# CA1827: Do not use Count()/LongCount() when Any() can be used
+dotnet_diagnostic.CA1827.severity = warning
+
+# CA1828: Do not use CountAsync/LongCountAsync when AnyAsync can be used
+dotnet_diagnostic.CA1828.severity = warning
+
+# CA1829: CA1829: Use Length/Count property instead of Enumerable.Count method
+dotnet_diagnostic.CA1829.severity = warning
+
+# CA1836: Prefer IsEmpty over Count when available
+dotnet_diagnostic.CA1836.severity = warning
+
+# Use URI to GetAsync instead of string
+dotnet_diagnostic.CA2234.severity = none
 
 #############################
 #### Roslynator Defaults ####
 #############################
 
 # RCS1001: Add braces (when expression spans over multiple lines).
-dotnet_diagnostic.RCS1001.severity = error
+dotnet_diagnostic.RCS1001.severity = warning
 
 # RCS1003: Add braces to if-else (when expression spans over multiple lines).
 dotnet_diagnostic.RCS1003.severity = error
@@ -412,6 +440,9 @@ dotnet_diagnostic.RCS1044.severity = error
 
 # RCS1047: Non-asynchronous method name should not end with 'Async'.
 dotnet_diagnostic.RCS1047.severity = warning
+
+# RCS1077: Optimize LINQ method call
+dotnet_diagnostic.RCS1077.severity = warning
 
 # RCS1123: Add parentheses according to operator precedence.
 dotnet_diagnostic.RCS1123.severity = error
@@ -459,7 +490,7 @@ dotnet_diagnostic.VSTHRD200.severity = warning
 ##################################
 
 # xUnit1042: The member referenced by the MemberData attribute returns untyped data rows
-dotnet_diagnostic.xUnit1042.severity = error
+dotnet_diagnostic.xUnit1042.severity = warning
 
 # xUnit2024: Do not use boolean asserts for simple equality tests
 dotnet_diagnostic.xUnit2024.severity = warning
@@ -473,9 +504,9 @@ dotnet_diagnostic.VSTHRD200.severity = none
 # CA1707: Identifiers should not contain underscores
 dotnet_diagnostic.CA1707.severity = none
 
-############################### 
-# Spell Check                 # 
-###############################
+###############
+# Spell Check #
+###############
 # https://learn.microsoft.com/visualstudio/ide/text-spell-checker
 spelling_exclusion_path = .\exclusions.dic
 spelling_checkable_types = strings,identifiers,comments
