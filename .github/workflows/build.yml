@@ -102,3 +102,26 @@ jobs:
           dotnet run -c Release
           cd ..
           dotnet pack --configuration Release -o ./NuGet
+
+  test-coalesce:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Download NuGet Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: NuGet
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Test Template
+        run: |
+          dotnet new install $(Get-ChildItem -Path "BenjaminMichaelis.Dotnet.Templates.*.nupkg").Name
+          mkdir TestCoalesce
+          Push-Location TestCoalesce
+          dotnet new bmichaelis.coalesce
+          dotnet test

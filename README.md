@@ -22,6 +22,7 @@ with templatename being a name of one of the included templates listed below. Ex
 
 - [nuget](./templates/Library/NuGet/README.md)
 - [quickstart.benchmarkconsole](./templates/Quickstart/BenchmarkApp/README.md)
+- [coalesce](./templates/Coalesce/README.md)
 
 ## Updating
 
@@ -71,4 +72,5 @@ When done, you can remove the local install of the template package by running:
 - [ ] Add project under the template directory
 - [ ] Update .template.config in directory
 - [ ] Update dependabot.yml
+- [ ] Update build.yml workflow
 - [ ] Add to README

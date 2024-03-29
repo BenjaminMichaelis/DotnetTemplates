@@ -1,0 +1,45 @@
+<Project>
+  <PropertyGroup>
+    <LangVersion>12.0</LangVersion>
+    <ImplicitUsings>true</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+    <AnalysisLevel>latest-Recommended</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+    <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
+    <!--
+    https://www.typescriptlang.org/docs/handbook/compiler-options-in-msbuild.html#typescriptcompileblocked
+    -->
+    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
+    
+    <!-- 
+    If you you like to see source generated files saved to disk you can enable the following:
+    https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/source-generators-overview
+    -->
+    <!--<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>-->
+  </PropertyGroup>
+
+  <!--
+  This allows all projects to share the same user secrets file. 
+  If you want project to have their own, set it to a different GUID on each project.
+  See: https://learn.microsoft.com/dotnet/architecture/microservices/secure-net-microservices-web-applications/developer-app-secrets-storage
+  -->
+  <PropertyGroup Label="User Secrets">
+    <UserSecretsId>12345678-9abc-0123-4567-890abcdef123</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Using Include="System"/>
+    <Using Include="System.Collections.Concurrent"/>
+    <Using Include="System.Collections.Generic"/>
+    <Using Include="System.IO"/>
+    <Using Include="System.Linq"/>
+    <Using Include="System.Net.Http.Json"/>
+    <Using Include="System.Text"/>
+    <Using Include="System.Threading.Tasks"/>
+  </ItemGroup>
+</Project>
