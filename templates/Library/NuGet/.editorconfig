@@ -8,6 +8,10 @@ indent_style = space
 [*.xaml]
 indent_size = 2
 
+# TypeScript files
+[*.{vue,ts,tsx,json}]
+indent_size = 2
+
 # MSBuild files
 [*.{csproj,targets,props}]
 indent_size = 2
@@ -58,20 +62,20 @@ dotnet_style_require_accessibility_modifiers = for_non_interface_members:silent
 
 # Expression-level preferences
 dotnet_style_coalesce_expression = true:suggestion
-dotnet_style_collection_initializer = true:suggestion
+dotnet_style_collection_initializer = true:warning
 dotnet_style_explicit_tuple_names = true:suggestion
 dotnet_style_null_propagation = true:suggestion
-dotnet_style_object_initializer = true:suggestion
+dotnet_style_object_initializer = true:warning
 dotnet_style_operator_placement_when_wrapping = beginning_of_line
-dotnet_style_prefer_auto_properties = true:suggestion
+dotnet_style_prefer_auto_properties = true:warning
 dotnet_style_prefer_compound_assignment = true:suggestion
 dotnet_style_prefer_conditional_expression_over_assignment = true:suggestion
 dotnet_style_prefer_conditional_expression_over_return = true:suggestion
 dotnet_style_prefer_inferred_anonymous_type_member_names = true:suggestion
 dotnet_style_prefer_inferred_tuple_names = true:suggestion
-dotnet_style_prefer_is_null_check_over_reference_equality_method = true:suggestion
-dotnet_style_prefer_simplified_boolean_expressions = true:suggestion
-dotnet_style_prefer_simplified_interpolation = true:suggestion
+dotnet_style_prefer_is_null_check_over_reference_equality_method = true:warning
+dotnet_style_prefer_simplified_boolean_expressions = true:warning
+dotnet_style_prefer_simplified_interpolation = true:warning
 
 # Field preferences
 dotnet_style_readonly_field = true:warning
@@ -86,9 +90,9 @@ dotnet_remove_unnecessary_suppression_exclusions = none
 [*.cs]
 
 # var preferences
-csharp_style_var_elsewhere = false:silent
-csharp_style_var_for_built_in_types = false:silent
-csharp_style_var_when_type_is_apparent = false:silent
+csharp_style_var_elsewhere = false:suggestion
+csharp_style_var_for_built_in_types = false:none
+csharp_style_var_when_type_is_apparent = true:none
 
 # Expression-bodied members
 csharp_style_expression_bodied_accessors = true:silent
@@ -112,7 +116,7 @@ csharp_style_conditional_delegate_call = true:suggestion
 
 # Modifier preferences
 csharp_prefer_static_local_function = true:warning
-csharp_preferred_modifier_order = public,private,protected,internal,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,volatile,async:silent
+csharp_preferred_modifier_order = public,private,protected,internal,file,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,required,volatile,async
 
 # Code-block preferences
 csharp_prefer_braces = true:silent
@@ -128,6 +132,7 @@ csharp_style_prefer_range_operator = true:suggestion
 csharp_style_throw_expression = true:suggestion
 csharp_style_unused_value_assignment_preference = discard_variable:suggestion
 csharp_style_unused_value_expression_statement_preference = discard_variable:silent
+csharp_style_implicit_object_creation_when_type_is_apparent = true:warning
 
 # 'using' directive preferences
 csharp_using_directive_placement = outside_namespace:silent
@@ -178,9 +183,10 @@ csharp_space_between_square_brackets = false
 # Wrapping preferences
 csharp_preserve_single_line_blocks = true
 csharp_preserve_single_line_statements = true
-csharp_style_namespace_declarations = block_scoped:silent
+csharp_style_namespace_declarations = file_scoped:warning
 csharp_style_prefer_method_group_conversion = true:silent
 csharp_style_prefer_top_level_statements = true:silent
+csharp_style_prefer_primary_constructors = true:suggestion
 
 #### Naming styles ####
 [*.{cs,vb}]
@@ -233,7 +239,7 @@ dotnet_naming_rule.private_fields_should_be__camelcase.style = _camelcase
 
 dotnet_naming_rule.private_static_fields_should_be_s_camelcase.severity = suggestion
 dotnet_naming_rule.private_static_fields_should_be_s_camelcase.symbols = private_static_fields
-dotnet_naming_rule.private_static_fields_should_be_s_camelcase.style = s_camelcase
+dotnet_naming_rule.private_static_fields_should_be_s_camelcase.style = _camelcase
 
 dotnet_naming_rule.public_constant_fields_should_be_pascalcase.severity = suggestion
 dotnet_naming_rule.public_constant_fields_should_be_pascalcase.symbols = public_constant_fields
@@ -249,7 +255,7 @@ dotnet_naming_rule.public_static_readonly_fields_should_be_pascalcase.style = pa
 
 dotnet_naming_rule.private_static_readonly_fields_should_be_pascalcase.severity = suggestion
 dotnet_naming_rule.private_static_readonly_fields_should_be_pascalcase.symbols = private_static_readonly_fields
-dotnet_naming_rule.private_static_readonly_fields_should_be_pascalcase.style = pascalcase
+dotnet_naming_rule.private_static_readonly_fields_should_be_pascalcase.style = _camelcase
 
 dotnet_naming_rule.enums_should_be_pascalcase.severity = suggestion
 dotnet_naming_rule.enums_should_be_pascalcase.symbols = enums
@@ -372,7 +378,139 @@ dotnet_naming_style.s_camelcase.required_prefix = s_
 dotnet_naming_style.s_camelcase.required_suffix = 
 dotnet_naming_style.s_camelcase.word_separator = 
 dotnet_naming_style.s_camelcase.capitalization = camel_case
-tab_width = 4
-indent_size = 4
-end_of_line = crlf
 
+##########################################
+#### Microsoft Code Analysis Defaults ####
+##########################################
+
+# IDE0040: Add accessibility modifiers
+dotnet_diagnostic.IDE0040.severity = warning
+
+# IDE0049: Simplify Names
+dotnet_diagnostic.IDE0049.severity = error
+
+# IDE0051: Remove unused private members
+dotnet_diagnostic.IDE0051.severity = warning
+
+# IDE0120: Simplify LINQ expression
+dotnet_diagnostic.IDE0120.severity = warning
+
+# CA1069: Enums values should not be duplicated
+dotnet_diagnostic.CA1069.severity = warning
+
+# CA1801: Review unused parameters
+dotnet_diagnostic.CA1801.severity = warning
+
+# CA1825: Avoid zero-length array allocations.
+dotnet_diagnostic.CA1825.severity = warning
+
+# CA1827: Do not use Count()/LongCount() when Any() can be used
+dotnet_diagnostic.CA1827.severity = warning
+
+# CA1828: Do not use CountAsync/LongCountAsync when AnyAsync can be used
+dotnet_diagnostic.CA1828.severity = warning
+
+# CA1829: CA1829: Use Length/Count property instead of Enumerable.Count method
+dotnet_diagnostic.CA1829.severity = warning
+
+# CA1836: Prefer IsEmpty over Count when available
+dotnet_diagnostic.CA1836.severity = warning
+
+# Use URI to GetAsync instead of string
+dotnet_diagnostic.CA2234.severity = none
+
+#############################
+#### Roslynator Defaults ####
+#############################
+
+# RCS1001: Add braces (when expression spans over multiple lines).
+dotnet_diagnostic.RCS1001.severity = warning
+
+# RCS1003: Add braces to if-else (when expression spans over multiple lines).
+dotnet_diagnostic.RCS1003.severity = error
+
+# RCS1007: Add braces
+dotnet_diagnostic.RCS1007.severity = error
+
+# RCS1036: Remove redundant empty line.
+dotnet_diagnostic.RCS1036.severity = warning
+
+# RCS1044: Remove original exception from throw statement
+dotnet_diagnostic.RCS1044.severity = error
+
+# RCS1047: Non-asynchronous method name should not end with 'Async'.
+dotnet_diagnostic.RCS1047.severity = warning
+
+# RCS1077: Optimize LINQ method call
+dotnet_diagnostic.RCS1077.severity = warning
+
+# RCS1123: Add parentheses according to operator precedence.
+dotnet_diagnostic.RCS1123.severity = error
+
+# RCS1163: Unused parameter
+dotnet_diagnostic.RCS1163.severity = warning
+
+# RCS1170: Use read-only auto-implemented property.
+dotnet_diagnostic.RCS1170.severity = warning
+
+# RCS1213: Remove unused member declaration.
+dotnet_diagnostic.RCS1213.severity = warning
+
+# RCS1249: Unnecessary null-forgiving operator.
+dotnet_diagnostic.RCS1249.severity = warning
+
+# RCS1261: Resource can be disposed asynchronously
+dotnet_diagnostic.RCS1261.severity = warning
+
+#######################################
+#### IntelliTect.Analyzer Defaults ####
+#######################################
+
+# INTL0002: Fields should be PascalCase
+dotnet_diagnostic.INTL0001.severity = none
+
+# INTL0059: Remove unnecessary value assignment
+dotnet_diagnostic.INTL0059.severity = warning
+
+# INTL0201: Async methods must return either Task or Task<T>
+dotnet_diagnostic.INTL0201.severity = warning
+
+# INTL0303: Local variable unused
+dotnet_diagnostic.INTL0303.severity = warning
+
+#############################################################
+#### Microsoft.VisualStudio.Threading.Analyzers Defaults ####
+#############################################################
+
+# VSTHRD200: Use Async suffix for async methods
+dotnet_diagnostic.VSTHRD200.severity = warning
+
+##################################
+#### xUnit Analyzers Defaults ####
+##################################
+
+# xUnit1042: The member referenced by the MemberData attribute returns untyped data rows
+dotnet_diagnostic.xUnit1042.severity = warning
+
+# xUnit2024: Do not use boolean asserts for simple equality tests
+dotnet_diagnostic.xUnit2024.severity = warning
+
+[*Tests.cs]
+# These settings are appropriate for test projects.
+
+# VSTHRD200: Use `Async` naming convention
+dotnet_diagnostic.VSTHRD200.severity = none
+
+# CA1707: Identifiers should not contain underscores
+dotnet_diagnostic.CA1707.severity = none
+
+###############
+# Spell Check #
+###############
+# https://learn.microsoft.com/visualstudio/ide/text-spell-checker
+spelling_exclusion_path = .\exclusions.dic
+spelling_checkable_types = strings,identifiers,comments
+# Update this to match your prefered language, you will need to ensure you have the language pack installed for the language
+spelling_languages = en-us
+# This is only the level that spelling errors occur in the Error List, it is not actually a compile-time warning/error
+spelling_error_severity = information
