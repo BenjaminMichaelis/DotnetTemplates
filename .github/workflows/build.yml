@@ -125,4 +125,8 @@ jobs:
           Push-Location TestCoalesce
           dotnet new bmichaelis.coalesce
           dotnet test
-          dotnet pack --configuration Release -o ./NuGet
+
+      - name: Ensure Coalesce has been run
+        uses: benjaminmichaelis/check-intellitect-coalesce-action@v1
+        with:
+          working-directory: ./TestCoalesce.Web

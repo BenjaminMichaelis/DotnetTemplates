@@ -1,5 +1,6 @@
-using Microsoft.EntityFrameworkCore;
 using Coalesce.Starter.Vue.Data.Models;
+
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Coalesce.Starter.Vue.Data;
 
@@ -12,12 +13,12 @@ public class AppDbContext : DbContext
 
     public AppDbContext(DbContextOptions options) : base(options) { }
 
-    protected override void OnModelCreating(ModelBuilder builder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(builder);
+        base.OnModelCreating(modelBuilder);
 
         // Remove cascading deletes.
-        foreach (var relationship in builder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
+        foreach (IMutableForeignKey? relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
         {
             relationship.DeleteBehavior = DeleteBehavior.Restrict;
         }

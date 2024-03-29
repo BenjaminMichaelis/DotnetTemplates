@@ -59,6 +59,7 @@ export default defineConfig(async () => {
     test: {
       globals: true,
       environment: "jsdom",
+      globalSetup: "./src/test-globals.ts",
       coverage: {
         provider: "v8",
         exclude: ["**/*.g.ts", "**/*.spec.*", "test{,s}/**"],

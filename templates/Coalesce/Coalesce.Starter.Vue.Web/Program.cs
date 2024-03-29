@@ -1,17 +1,18 @@
-using IntelliTect.Coalesce;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging.Console;
-using Microsoft.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
-using Coalesce.Starter.Vue.Data;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 
-var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+using Coalesce.Starter.Vue.Data;
+
+using IntelliTect.Coalesce;
+
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Logging.Console;
+
+WebApplicationBuilder builder = WebApplication.CreateBuilder(new WebApplicationOptions
 {
     Args = args,
     // Explicit declaration prevents ASP.NET Core from erroring if wwwroot doesn't exist at startup:
@@ -29,7 +30,7 @@ builder.Configuration
 
 #region Configure Services
 
-var services = builder.Services;
+IServiceCollection services = builder.Services;
 
 services.AddDbContext<AppDbContext>(options => options
     .UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), opt => opt
@@ -58,16 +59,13 @@ services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
 
 #region Configure HTTP Pipeline
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 
-    app.UseViteDevelopmentServer(c =>
-    {
-        c.DevServerPort = 5002;
-    });
+    app.UseViteDevelopmentServer(c => c.DevServerPort = 5002);
 
     app.MapCoalesceSecurityOverview("coalesce-security");
 
@@ -89,7 +87,7 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 
-var containsFileHashRegex = new Regex(@"[.-][0-9a-zA-Z-_]{8}\.[^\.]*$", RegexOptions.Compiled);
+Regex containsFileHashRegex = ContainsFileHash();
 app.UseStaticFiles(new StaticFileOptions
 {
     OnPrepareResponse = ctx =>
@@ -114,7 +112,9 @@ app.Use(async (context, next) =>
 app.MapDefaultControllerRoute();
 
 // API fallback to prevent serving SPA fallback to 404 hits on API endpoints.
+#pragma warning disable ASP0018 // Unused route parameter
 app.Map("/api/{**any}", () => Results.NotFound());
+#pragma warning restore ASP0018 // Unused route parameter
 
 app.MapFallbackToController("Index", "Home");
 
@@ -123,14 +123,20 @@ app.MapFallbackToController("Index", "Home");
 #region Launch
 
 // Initialize/migrate database.
-using (var scope = app.Services.CreateScope())
+using (IServiceScope scope = app.Services.CreateScope())
 {
-    var serviceScope = scope.ServiceProvider;
+    IServiceProvider serviceScope = scope.ServiceProvider;
 
     // Run database migrations.
-    using var db = serviceScope.GetRequiredService<AppDbContext>();
+    using AppDbContext db = serviceScope.GetRequiredService<AppDbContext>();
     db.Database.Migrate();
 }
 
 app.Run();
+
+partial class Program
+{
+    [GeneratedRegex(@"[.-][0-9a-zA-Z-_]{8}\.[^\.]*$", RegexOptions.Compiled)]
+    private static partial Regex ContainsFileHash();
+}
 #endregion

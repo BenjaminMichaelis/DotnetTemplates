@@ -10,6 +10,11 @@
 
   <ItemGroup>
     <PackageReference Include="IntelliTect.Coalesce.Vue" />
+    <PackageReference Include="IntelliTect.Multitool" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
