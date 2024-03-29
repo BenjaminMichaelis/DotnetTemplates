@@ -125,6 +125,9 @@ jobs:
           Push-Location TestCoalesce
           dotnet new bmichaelis.coalesce
           dotnet test
+          git init
+          git add *
+          git commit --all --message "Commiting so we have something to compare against to make sure Coalesce has run"
 
       - name: Ensure Coalesce has been run
         uses: benjaminmichaelis/check-intellitect-coalesce-action@v1
