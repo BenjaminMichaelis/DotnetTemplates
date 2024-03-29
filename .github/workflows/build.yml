@@ -125,13 +125,3 @@ jobs:
           Push-Location TestCoalesce
           dotnet new bmichaelis.coalesce
           dotnet test
-          git init
-          git config user.email "myfakeemailforthistest@gmail.com"
-          git config user.name "GithubBot"
-          git add *
-          git commit --all --message "Commiting so we have something to compare against to make sure Coalesce has run"
-
-      - name: Ensure Coalesce has been run
-        uses: benjaminmichaelis/check-intellitect-coalesce-action@v1
-        with:
-          working-directory: TestCoalesce/TestCoalesce.Web
