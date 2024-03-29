@@ -129,4 +129,4 @@ jobs:
       - name: Ensure Coalesce has been run
         uses: benjaminmichaelis/check-intellitect-coalesce-action@v1
         with:
-          working-directory: ./TestCoalesce.Web
+          working-directory: TestCoalesce.Web
