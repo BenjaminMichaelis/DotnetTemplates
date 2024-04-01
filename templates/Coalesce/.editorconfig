@@ -519,9 +519,19 @@ spelling_error_severity = information
 #### COALESCE SPECIFIC ####
 ###########################
 
+[*.g.cs]
+# INTL0303: Local variable unused
+dotnet_diagnostic.INTL0303.severity = none
+
 [*.cs]
 # CS1591: Missing XML comment for publicly visible type or member
 dotnet_diagnostic.CS1591.severity = none
+
+# CA1062: Validate arguments of public methods
+dotnet_diagnostic.CA1062.severity = none
+
+# CA1034: Nested types should not be visible
+dotnet_diagnostic.CA1034.severity = none
 
 # If you use EF Core Migrations, you may need to mark the migration folder as generated code to stop analyzers on it
 # [*/Migrations/*]
