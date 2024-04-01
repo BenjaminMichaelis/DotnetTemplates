@@ -1,0 +1,168 @@
+[*.{received,verified}.{txt,xml,json}]
+[*.{vue,ts,csproj,props}]
+[*.g.cs]
+[*/Migrations/*]
+[*Tests.cs]
+# CA1050: Declare types in namespaces
+# CA1054: Uri parameters should not be strings
+# CA1056: Uri properties should not be strings
+# CA1062: Validate arguments of public methods
+# CA1305: Specify IFormatProvider
+# CA1309 Use ordinal string comparison
+# CA1310: Specify IFormatProvider
+# CA1707: Identifiers should not contain underscores
+# CA1724: Type names should not match namespaces (conflicts with Microsoft.Graph type names)
+# CA1822: Mark members as static
+# CA1825: Avoid zero-length array allocations.
+# CA1825: Avoid zero-length array allocations.
+# CA1827: Do not use Count() or LongCount() when Any() can be used
+# CA1848: Use the LoggerMessage delegates
+# CA1860: Avoid using 'Enumerable.Any()' extension method
+# CA1861: Avoid constant arrays as arguments
+# CA2227: Collection properties should be read only
+# Consider calling ConfigureAwait on the awaited task
+# CS0612: Type or member is obsolete
+# CS1591: Missing XML comment for publicly visible type or member
+# Does not work with Coalesce
+# IDE0049: Simplify Names
+# IDE0051: Remove unused private members
+# INTL0001: Fields _PascalCase
+# INTL0003: Methods PascalCase
+# INTL0059: Remove unnecessary value assignment
+# INTL0303: Local variable unused
+# INTL0303: Local variable unused
+# Locale
+# Not Working with some C# features, probably remove later
+# Primary Constructors
+# RCS1047: Non-asynchronous method name should not end with 'Async'.
+# RCS1155: Use StringComparison when comparing strings.
+# RCS1163: Unused parameter
+# RCS1249: Unnecessary null-forgiving operator.
+# RCS1261: Resource can be disposed asynchronously
+# TODO: Remove after issue is closed https://github.com/IntelliTect/CodingGuidelines/issues/267
+# TODO: Remove after updating analyzers once https://github.com/IntelliTect/CodingGuidelines/issues/270 is deployed
+# Use strings from ResourceManager instead of string literal
+# Use URI to GetAsync instead of string
+# Verify Test Settings
+# xUnit Analyzers
+# xUnit1042: The member referenced by the MemberData attribute returns untyped data rows
+# xUnit2024: Do not use boolean asserts for simple equality tests
+charset = "utf-8-bom"
+csharp_prefer_static_local_function = true:suggestion
+csharp_style_expression_bodied_lambdas = true:silent
+csharp_style_implicit_object_creation_when_type_is_apparent = true:suggestion
+csharp_style_namespace_declarations= file_scoped:suggestion
+csharp_style_prefer_extended_property_pattern = true:suggestion
+csharp_style_prefer_local_over_anonymous_function = true:suggestion
+csharp_style_prefer_null_check_over_type_check = true:suggestion
+csharp_style_prefer_primary_constructors = true:suggestion
+csharp_style_prefer_readonly_struct = true:suggestion
+csharp_style_prefer_tuple_swap = true:suggestion
+csharp_style_prefer_utf8_string_literals = true:suggestion
+dotnet_diagnostic.CA1034.severity = none
+dotnet_diagnostic.CA1050.severity = none
+dotnet_diagnostic.CA1054.severity = suggestion
+dotnet_diagnostic.CA1056.severity = none
+dotnet_diagnostic.CA1062.severity = none
+dotnet_diagnostic.CA1069.severity = warning
+dotnet_diagnostic.CA1303.severity = none
+dotnet_diagnostic.CA1304.severity = none
+dotnet_diagnostic.CA1305.severity = none
+dotnet_diagnostic.CA1307.severity = none
+dotnet_diagnostic.CA1309.severity = none
+dotnet_diagnostic.CA1310.severity = none
+dotnet_diagnostic.CA1311.severity = none
+dotnet_diagnostic.CA1707.severity = none
+dotnet_diagnostic.CA1724.severity = none
+dotnet_diagnostic.CA1801.severity = none
+dotnet_diagnostic.CA1801.severity = none
+dotnet_diagnostic.CA1822.severity = suggestion
+dotnet_diagnostic.CA1825.severity = none
+dotnet_diagnostic.CA1825.severity = suggestion
+dotnet_diagnostic.CA1827.severity = warning
+dotnet_diagnostic.CA1828.severity = warning
+dotnet_diagnostic.CA1829.severity = warning
+dotnet_diagnostic.CA1836.severity = warning
+dotnet_diagnostic.CA1848.severity = silent
+dotnet_diagnostic.CA1860.severity = silent
+dotnet_diagnostic.CA1861.severity = none
+dotnet_diagnostic.CA1862.severity = none
+dotnet_diagnostic.CA2007.severity = none
+dotnet_diagnostic.CA2227.severity = none
+dotnet_diagnostic.CA2234.severity = none
+dotnet_diagnostic.CS0612.severity = suggestion
+dotnet_diagnostic.CS1591.severity = silent
+dotnet_diagnostic.IDE0005.severity = none
+dotnet_diagnostic.IDE0017.severity = warning
+dotnet_diagnostic.IDE0028.severity = warning
+dotnet_diagnostic.IDE0040.severity = warning
+dotnet_diagnostic.IDE0041.severity = suggestion
+dotnet_diagnostic.IDE0049.severity = error
+dotnet_diagnostic.IDE0051.severity = warning
+dotnet_diagnostic.IDE0071.severity = suggestion
+dotnet_diagnostic.IDE0075.severity = suggestion
+dotnet_diagnostic.IDE0090.severity = warning
+dotnet_diagnostic.IDE0120.severity = suggestion
+dotnet_diagnostic.INTL0001.severity = none
+dotnet_diagnostic.INTL0003.severity = none
+dotnet_diagnostic.INTL0003.severity = none
+dotnet_diagnostic.INTL0059.severity = warning
+dotnet_diagnostic.INTL0303.severity = none
+dotnet_diagnostic.INTL0303.severity = warning
+dotnet_diagnostic.RCS1001.severity = warning
+dotnet_diagnostic.RCS1036.severity = warning
+dotnet_diagnostic.RCS1036.severity = warning
+dotnet_diagnostic.RCS1037.severity = silent
+dotnet_diagnostic.RCS1047.severity = warning
+dotnet_diagnostic.RCS1077.severity = warning
+dotnet_diagnostic.RCS1124.severity = warning
+dotnet_diagnostic.RCS1155.severity = suggestion
+dotnet_diagnostic.RCS1163.severity = warning
+dotnet_diagnostic.RCS1249.severity = warning
+dotnet_diagnostic.RCS1261.severity = warning
+dotnet_diagnostic.VSTHRD2.severity = none
+dotnet_diagnostic.VSTHRD200.severity = none
+dotnet_diagnostic.xUnit1042.severity = error
+dotnet_diagnostic.xUnit2024.severity = warning
+dotnet_naming_rule.interface_should_be_begins_with_i.severity = suggestion
+dotnet_naming_rule.interface_should_be_begins_with_i.style = begins_with_i
+dotnet_naming_rule.interface_should_be_begins_with_i.symbols = interface
+dotnet_naming_rule.non_field_members_should_be_pascal_case.severity = suggestion
+dotnet_naming_rule.non_field_members_should_be_pascal_case.style = pascal_case
+dotnet_naming_rule.non_field_members_should_be_pascal_case.symbols = non_field_members
+dotnet_naming_rule.types_should_be_pascal_case.severity = suggestion
+dotnet_naming_rule.types_should_be_pascal_case.style = pascal_case
+dotnet_naming_rule.types_should_be_pascal_case.symbols = types
+dotnet_naming_style.begins_with_i.capitalization = pascal_case
+dotnet_naming_style.begins_with_i.required_prefix = I
+dotnet_naming_style.begins_with_i.required_suffix =
+dotnet_naming_style.begins_with_i.word_separator =
+dotnet_naming_style.pascal_case.capitalization = pascal_case
+dotnet_naming_style.pascal_case.capitalization = pascal_case
+dotnet_naming_style.pascal_case.required_prefix =
+dotnet_naming_style.pascal_case.required_prefix =
+dotnet_naming_style.pascal_case.required_suffix =
+dotnet_naming_style.pascal_case.required_suffix =
+dotnet_naming_style.pascal_case.word_separator =
+dotnet_naming_style.pascal_case.word_separator =
+dotnet_naming_symbols.interface.applicable_accessibilities = public, internal, private, protected, protected_internal, private_protected
+dotnet_naming_symbols.interface.applicable_kinds = interface
+dotnet_naming_symbols.interface.required_modifiers =
+dotnet_naming_symbols.types.applicable_accessibilities = public, internal, private, protected, protected_internal, private_protected
+dotnet_naming_symbols.types.applicable_kinds = class, struct, interface, enum
+dotnet_naming_symbols.types.required_modifiers =
+dotnet_style_namespace_match_folder = true:suggestion
+dotnet_style_prefer_auto_properties = true:silent
+dotnet_style_prefer_collection_expression = true:suggestion
+dotnet_style_prefer_collection_expression = true:suggestion
+dotnet_style_prefer_conditional_expression_over_assignment = true:silent
+dotnet_style_prefer_conditional_expression_over_return = true:silent
+dotnet_style_readonly_field = true:suggestion
+end_of_line = lf
+end_of_line = lf
+generated_code = true
+indent_size = unset
+indent_style = space
+indent_style = unset
+tab_width = unset
+trim_trailing_whitespace = false
