@@ -5,7 +5,7 @@ on:
     types: [created]
   workflow_dispatch:
   schedule:
-    - cron: '45 23 * * *'
+    - cron: '30 1 * * *'
 
 defaults:
   run:
@@ -48,7 +48,7 @@ jobs:
         run: |
           echo "${{ github.ref }}"
           $tagVersion = "${{ github.ref }}".substring(11)
-          if ( "${{ github.event_name }}" == "schedule" ) {
+          if ( ${{ github.event_name }} == "schedule" ) {
             $tagVersion = & git describe --tags --abbrev=0
             $tagVersion = "$tagVersion-${{ github.run_number }}"
           }
