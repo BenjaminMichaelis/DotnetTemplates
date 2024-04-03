@@ -392,6 +392,9 @@ dotnet_diagnostic.IDE0049.severity = error
 # IDE0051: Remove unused private members
 dotnet_diagnostic.IDE0051.severity = warning
 
+# IDE0052: Remove unread private members
+dotnet_diagnostic.IDE0052.severity = warning
+
 # IDE0120: Simplify LINQ expression
 dotnet_diagnostic.IDE0120.severity = warning
 
