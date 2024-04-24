@@ -32,7 +32,7 @@ builder.Configuration
 
 IServiceCollection services = builder.Services;
 
-services.AddDbContext<AppDbContext>(options => options
+services.AddDbContextFactory<AppDbContext>(options => options
     .UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), opt => opt
         .EnableRetryOnFailure()
         .UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)
