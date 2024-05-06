@@ -2,7 +2,7 @@
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <CentralPackageTransitivePinningEnabled>false</CentralPackageTransitivePinningEnabled>
-    <CoalesceVersion>4.0.0-alpha.20240422.1</CoalesceVersion>
+    <CoalesceVersion>4.0.0-alpha.20240502.1</CoalesceVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="IntelliTect.Multitool" Version="1.5.0" />
