@@ -5,7 +5,7 @@
     <CoalesceVersion>4.0.0-alpha.20240530.2</CoalesceVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="IntelliTect.Multitool" Version="1.5.0" />
+    <PackageVersion Include="IntelliTect.Multitool" Version="1.5.2" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="8.0.6" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Analyzers" Version="8.0.6" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.5" />
