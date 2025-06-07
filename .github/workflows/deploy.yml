@@ -78,7 +78,7 @@ jobs:
         run: |
           echo "${{ github.ref }}"
           $tagVersion = "${{ github.ref }}".substring(11)
-          if ( "${{ github.event_name }}" == "schedule" ) {
+          if ("${{ github.event_name }}" -eq "schedule") {
             $tagVersion = & git describe --tags --abbrev=0
             $tagVersion = "$tagVersion-${{ github.run_number }}"
           }
