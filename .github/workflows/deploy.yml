@@ -64,6 +64,9 @@ jobs:
     needs: check-for-changes
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -113,6 +116,11 @@ jobs:
     name: Push NuGets
 
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
