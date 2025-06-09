@@ -78,6 +78,7 @@ jobs:
 
       - name: Set Version
         run: |
+          git fetch --tags
           echo "${{ github.ref }}"
           $tagVersion = "${{ github.ref }}".substring(11)
           if ("${{ github.event_name }}" -eq "schedule") {
