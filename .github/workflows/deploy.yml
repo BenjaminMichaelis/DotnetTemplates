@@ -5,7 +5,7 @@ on:
     types: [created]
   workflow_dispatch:
   schedule:
-    - cron: '15 18 * * *'
+    - cron: '5 10 * * *'
 
 defaults:
   run:
@@ -122,15 +122,15 @@ jobs:
 
       - name: Push NuGet
         run: |
-          $tagVersion = "${{ github.ref }}".substring(11)
-          if ( "${{ github.event_name }}" == "schedule" || "${{ github.event_name }}" == "push" ) {
-            $tagVersion = & git describe --tags --abbrev=0
-            # Remove 'v' or 'V' prefix if present for NuGet version compatibility
-            if ($tagVersion.StartsWith("v") -or $tagVersion.StartsWith("V")) {
-              $tagVersion = $tagVersion.Substring(1)
-            }
-            $tagVersion = "$tagVersion-${{ github.run_number }}"
-          }
-          echo "TAG_VERSION=$tagVersion" >> $env:GITHUB_OUTPUT
-          dotnet nuget push BenjaminMichaelis.Dotnet.Templates.$tagVersion.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+         $tagVersion = "${{ github.ref }}".substring(11)
+         if ( "${{ github.event_name }}" -eq "schedule" -or "${{ github.event_name }}" -eq "push" ) {
+           $tagVersion = & git describe --tags --abbrev=0
+           # Remove 'v' or 'V' prefix if present for NuGet version compatibility
+           if ($tagVersion.StartsWith("v") -or $tagVersion.StartsWith("V")) {
+             $tagVersion = $tagVersion.Substring(1)
+           }
+           $tagVersion = "$tagVersion-${{ github.run_number }}"
+         }
+         echo "TAG_VERSION=$tagVersion" >> $env:GITHUB_OUTPUT
+         dotnet nuget push BenjaminMichaelis.Dotnet.Templates.$tagVersion.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
         id: tag-version
