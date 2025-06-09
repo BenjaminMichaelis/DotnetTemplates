@@ -5,7 +5,7 @@ on:
     types: [created]
   workflow_dispatch:
   schedule:
-    - cron: '15 17 * * *'
+    - cron: '35 17 * * *'
 
 defaults:
   run:
@@ -65,6 +65,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          fetch-depth: 0
           fetch-tags: true
 
       - name: Setup .NET
