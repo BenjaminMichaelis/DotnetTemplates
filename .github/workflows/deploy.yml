@@ -79,7 +79,13 @@ jobs:
           echo "${{ github.ref }}"
           $tagVersion = "${{ github.ref }}".substring(11)
           if ("${{ github.event_name }}" -eq "schedule") {
-            $tagVersion = & git describe --tags --abbrev=0
+            try {
+              $tagVersion = & git describe --tags --abbrev=0 2>$null
+              if ($LASTEXITCODE -ne 0) { throw "No tags found" }
+            } catch {
+              Write-Host "No tags found, using default version 1.1.0"
+              $tagVersion = "1.1.0"
+            }
             $tagVersion = "$tagVersion-${{ github.run_number }}"
           }
           echo "buildVersion=$tagVersion.${{ github.run_number }}" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
@@ -116,7 +122,13 @@ jobs:
         run: |
           $tagVersion = "${{ github.ref }}".substring(11)
           if ( "${{ github.event_name }}" == "schedule" || "${{ github.event_name }}" == "push" ) {
-            $tagVersion = & git describe --tags --abbrev=0
+            try {
+              $tagVersion = & git describe --tags --abbrev=0 2>$null
+              if ($LASTEXITCODE -ne 0) { throw "No tags found" }
+            } catch {
+              Write-Host "No tags found, using default version 1.1.0"
+              $tagVersion = "1.1.0"
+            }
             $tagVersion = "$tagVersion-${{ github.run_number }}"
           }
           echo "TAG_VERSION=$tagVersion" >> $env:GITHUB_OUTPUT
