@@ -5,7 +5,7 @@ on:
     types: [created]
   workflow_dispatch:
   schedule:
-    - cron: '40 16 * * *'
+    - cron: '15 17 * * *'
 
 defaults:
   run:
