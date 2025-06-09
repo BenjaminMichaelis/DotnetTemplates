@@ -64,6 +64,8 @@ jobs:
     needs: check-for-changes
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-tags: true
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
