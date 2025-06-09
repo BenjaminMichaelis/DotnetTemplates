@@ -5,7 +5,7 @@ on:
     types: [created]
   workflow_dispatch:
   schedule:
-    - cron: '35 17 * * *'
+    - cron: '15 18 * * *'
 
 defaults:
   run:
@@ -84,6 +84,10 @@ jobs:
           $tagVersion = "${{ github.ref }}".substring(11)
           if ("${{ github.event_name }}" -eq "schedule") {
             $tagVersion = & git describe --tags --abbrev=0
+            # Remove 'v' or 'V' prefix if present for NuGet version compatibility
+            if ($tagVersion.StartsWith("v") -or $tagVersion.StartsWith("V")) {
+              $tagVersion = $tagVersion.Substring(1)
+            }
             $tagVersion = "$tagVersion-${{ github.run_number }}"
           }
           echo "buildVersion=$tagVersion.${{ github.run_number }}" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
@@ -121,6 +125,10 @@ jobs:
           $tagVersion = "${{ github.ref }}".substring(11)
           if ( "${{ github.event_name }}" == "schedule" || "${{ github.event_name }}" == "push" ) {
             $tagVersion = & git describe --tags --abbrev=0
+            # Remove 'v' or 'V' prefix if present for NuGet version compatibility
+            if ($tagVersion.StartsWith("v") -or $tagVersion.StartsWith("V")) {
+              $tagVersion = $tagVersion.Substring(1)
+            }
             $tagVersion = "$tagVersion-${{ github.run_number }}"
           }
           echo "TAG_VERSION=$tagVersion" >> $env:GITHUB_OUTPUT
