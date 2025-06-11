@@ -83,10 +83,16 @@ jobs:
           echo "${{ github.ref }}"
           $tagVersion = "${{ github.ref }}".substring(11)
           if ("${{ github.event_name }}" -eq "schedule") {
-            $tagVersion = & git describe --tags --abbrev=0
-            # Remove 'v' or 'V' prefix if present for NuGet version compatibility
-            if ($tagVersion.StartsWith("v") -or $tagVersion.StartsWith("V")) {
-              $tagVersion = $tagVersion.Substring(1)
+            $latestTag = & git describe --tags --abbrev=0 2>&1
+            if ($LASTEXITCODE -eq 0) {
+              $tagVersion = $latestTag
+              # Remove 'v' or 'V' prefix if present for NuGet version compatibility
+              if ($tagVersion.StartsWith("v") -or $tagVersion.StartsWith("V")) {
+                $tagVersion = $tagVersion.Substring(1)
+              }
+            } else {
+              Write-Host "No tags found, using fallback version"
+              $tagVersion = "0.0.1"
             }
             $tagVersion = "$tagVersion-${{ github.run_number }}"
           }
@@ -115,6 +121,12 @@ jobs:
     name: Push NuGets
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
@@ -124,10 +136,16 @@ jobs:
         run: |
          $tagVersion = "${{ github.ref }}".substring(11)
          if ( "${{ github.event_name }}" -eq "schedule" -or "${{ github.event_name }}" -eq "push" ) {
-           $tagVersion = & git describe --tags --abbrev=0
-           # Remove 'v' or 'V' prefix if present for NuGet version compatibility
-           if ($tagVersion.StartsWith("v") -or $tagVersion.StartsWith("V")) {
-             $tagVersion = $tagVersion.Substring(1)
+           $latestTag = & git describe --tags --abbrev=0 2>&1
+           if ($LASTEXITCODE -eq 0) {
+             $tagVersion = $latestTag
+             # Remove 'v' or 'V' prefix if present for NuGet version compatibility
+             if ($tagVersion.StartsWith("v") -or $tagVersion.StartsWith("V")) {
+               $tagVersion = $tagVersion.Substring(1)
+             }
+           } else {
+             Write-Host "No tags found, using fallback version"
+             $tagVersion = "0.0.1"
            }
            $tagVersion = "$tagVersion-${{ github.run_number }}"
          }
