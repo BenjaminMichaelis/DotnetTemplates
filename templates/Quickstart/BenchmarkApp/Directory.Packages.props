@@ -17,9 +17,9 @@
   This would typically list all NuGet packages used within this solution.
   -->
   <ItemGroup>
-    <PackageVersion Include="BenchmarkDotNet" Version="0.15.1" />
-    <PackageVersion Include="BenchmarkDotNet.Annotations" Version="0.15.1" />
-	<PackageVersion Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.15.1"/>
+    <PackageVersion Include="BenchmarkDotNet" Version="0.15.2" />
+    <PackageVersion Include="BenchmarkDotNet.Annotations" Version="0.15.2" />
+	<PackageVersion Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.15.2"/>
     <PackageVersion Include="coverlet.collector" Version="6.0.4">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
