@@ -88,6 +88,14 @@ jobs:
             if ($tagVersion.StartsWith("v") -or $tagVersion.StartsWith("V")) {
               $tagVersion = $tagVersion.Substring(1)
             }
+            # Increment patch version for scheduled beta releases
+            $versionParts = $tagVersion.Split('.')
+            if ($versionParts.Length -ge 3) {
+              $major = [int]$versionParts[0]
+              $minor = [int]$versionParts[1]
+              $patch = [int]$versionParts[2] + 1
+              $tagVersion = "$major.$minor.$patch"
+            }
             $tagVersion = "$tagVersion-beta.${{ github.run_number }}"
           }
           echo "buildVersion=$tagVersion.${{ github.run_number }}" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
@@ -132,6 +140,16 @@ jobs:
            # Remove 'v' or 'V' prefix if present for NuGet version compatibility
            if ($tagVersion.StartsWith("v") -or $tagVersion.StartsWith("V")) {
              $tagVersion = $tagVersion.Substring(1)
+           }
+           # Increment patch version for scheduled beta releases
+           if ("${{ github.event_name }}" -eq "schedule") {
+             $versionParts = $tagVersion.Split('.')
+             if ($versionParts.Length -ge 3) {
+               $major = [int]$versionParts[0]
+               $minor = [int]$versionParts[1]
+               $patch = [int]$versionParts[2] + 1
+               $tagVersion = "$major.$minor.$patch"
+             }
            }
            $tagVersion = "$tagVersion-beta.${{ github.run_number }}"
          }
