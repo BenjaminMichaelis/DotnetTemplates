@@ -33,13 +33,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Using Include="System"/>
-    <Using Include="System.Collections.Concurrent"/>
-    <Using Include="System.Collections.Generic"/>
-    <Using Include="System.IO"/>
-    <Using Include="System.Linq"/>
-    <Using Include="System.Net.Http.Json"/>
-    <Using Include="System.Text"/>
-    <Using Include="System.Threading.Tasks"/>
+    <Using Include="System" />
+    <Using Include="System.Collections.Concurrent" />
+    <Using Include="System.Collections.Generic" />
+    <Using Include="System.IO" />
+    <Using Include="System.Linq" />
+    <Using Include="System.Net.Http.Json" />
+    <Using Include="System.Text" />
+    <Using Include="System.Threading.Tasks" />
   </ItemGroup>
 </Project>
