@@ -9,6 +9,7 @@
     <Description>.NET Templates built by Benjamin Michaelis</Description>
     <PackageTags>dotnet-new;templates;nuget</PackageTags>
     <PackageProjectUrl>https://github.com/BenjaminMichaelis/DotnetTemplates</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/BenjaminMichaelis/DotnetTemplates</RepositoryUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 
     <TargetFramework>net8.0</TargetFramework>
