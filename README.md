@@ -25,6 +25,7 @@ with templatename being a name of one of the included templates listed below. Ex
 ## Included Templates (by template name, prepending `bmichaelis.` before the name as shown above)
 
 - [nuget](./templates/Library/NuGet/README.md)
+- [quickstart.benchmarkconsole](./templates/Quickstart/BenchmarkApp/README.md)
 - [quickstart.consoleapp](./templates/Quickstart/ConsoleApp/README.md)
 - [coalesce](./templates/Coalesce/README.md)
 
