@@ -12,7 +12,7 @@
     <RepositoryUrl>https://github.com/BenjaminMichaelis/DotnetTemplates</RepositoryUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
 
