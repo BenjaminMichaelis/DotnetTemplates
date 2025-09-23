@@ -37,22 +37,3 @@ updates:
     directory: "/templates/Quickstart/ConsoleApp"
     schedule:
       interval: "weekly"
-
-  - package-ecosystem: "nuget"
-    directory: "/templates/Coalesce"
-    schedule:
-      interval: "weekly" 
-
-  - package-ecosystem: "npm"
-    directory: "/templates/Coalesce/Coalesce.Web"
-    schedule:
-      interval: "weekly"
-
-  - package-ecosystem: "github-actions" 
-    directory: "/templates/Coalesce/.github/workflows"
-    schedule:
-      interval: "weekly" 
-    groups:
-       dev-dependencies:
-          patterns:
-            - "*-artifact"

@@ -1,5 +1,0 @@
-{
-  "typescript.tsdk": "Coalesce.Starter.Vue.Web\\node_modules\\typescript\\lib",
-  "editor.formatOnSave": true,
-  "cSpell.words": ["Vite", "unplugin", "iconsets", "viewmodels", "composables"]
-}

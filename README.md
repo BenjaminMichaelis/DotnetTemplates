@@ -27,7 +27,6 @@ with templatename being a name of one of the included templates listed below. Ex
 - [nuget](./templates/Library/NuGet/README.md)
 - [quickstart.benchmarkconsole](./templates/Quickstart/BenchmarkApp/README.md)
 - [quickstart.consoleapp](./templates/Quickstart/ConsoleApp/README.md)
-- [coalesce](./templates/Coalesce/README.md)
 
 ## Updating
 
