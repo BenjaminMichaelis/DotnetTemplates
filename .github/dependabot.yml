@@ -26,13 +26,12 @@ updates:
           patterns:
             - "*-artifact"  
 
-# Quickstart.BenchmarkApp Project
+# Quickstart.ConsoleApp Project
   - package-ecosystem: "nuget"
-    directory: "/templates/Quickstart/BenchmarkApp"
+    directory: "/templates/Quickstart/ConsoleApp"
     schedule:
-      interval: "weekly" 
+      interval: "weekly"
 
-# Coalesce Project
   - package-ecosystem: "nuget"
     directory: "/templates/Coalesce"
     schedule:
