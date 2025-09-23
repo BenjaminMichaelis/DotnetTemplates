@@ -2,6 +2,10 @@
 
 The repository contains a set of opinionated [dotnet new templates](https://learn.microsoft.com/dotnet/core/tools/custom-templates). I am happy to receive critique/feedback on the existing templates, so feel free to open issues.
 
+## Requirements
+
+These templates require [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0) or later.
+
 ## Installing
 
 Use [dotnet new install](https://learn.microsoft.com/dotnet/core/tools/dotnet-new-install) to install the templates.
