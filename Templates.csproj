@@ -24,7 +24,7 @@
 
   <ItemGroup>
     <None Include="./README.md" Pack="true" PackagePath="\"/>
-    <Content Include="templates\**\*" Exclude="templates\**\bin\**;templates\**\obj\**" />
+    <Content Include="templates\**\*" Exclude="templates\**\bin\**;templates\**\obj\**;templates\**\.vs\**" />
 	<Content Include ="templates*\global.json" Pack="true" />
     <Compile Remove="**\*" />
   </ItemGroup>

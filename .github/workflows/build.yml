@@ -125,4 +125,4 @@ jobs:
           Push-Location TestQuickstartConsoleApp
           dotnet new bmichaelis.quickstart.consoleapp
           dotnet test
-          dotnet run -c Release
+          dotnet pack --configuration Release -o ./NuGet
