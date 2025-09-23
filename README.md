@@ -75,6 +75,35 @@ When done, you can remove the local install of the template package by running:
 
 - [ ] Add project under the template directory
 - [ ] Update .template.config in directory
+- [ ] Copy root .editorconfig to template directory (or run `./CopyEditorConfigToTemplates.ps1`)
 - [ ] Update dependabot.yml
 - [ ] Update build.yml workflow
 - [ ] Add to README
+
+### EditorConfig Management
+
+Each template includes an `.editorconfig` file that is based on the root repository's `.editorconfig`. This ensures consistent coding standards across all generated projects.
+
+**For new templates:**
+- Copy the root `.editorconfig` to your template directory
+- Or run `./CopyEditorConfigToTemplates.ps1` to copy to all templates
+
+**For template-specific customizations:**
+- Templates can have their own `.editorconfig` customizations (e.g., the NuGet template has more relaxed var usage rules)
+- When updating the root `.editorconfig`, use the `CopyEditorConfigToTemplates.ps1` script which will detect and preserve existing customizations
+
+**When updating root .editorconfig:**
+
+**Automated Process (Recommended):**
+- Simply update the root `.editorconfig` file and push to main
+- The `update-template-editorconfig` GitHub Actions workflow will automatically:
+  - Detect the changes and run the copy script
+  - Create or update a PR with the template updates
+  - Preserve existing customizations and create backups for manual review
+  - Provide clear documentation of what was changed
+
+**Manual Process:**
+1. Update the root `.editorconfig` file
+2. Run `./CopyEditorConfigToTemplates.ps1` 
+3. Review any templates with customizations and manually merge changes if needed
+4. Test all templates to ensure they work correctly
