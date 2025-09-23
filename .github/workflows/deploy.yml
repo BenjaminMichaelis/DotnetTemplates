@@ -11,6 +11,9 @@ defaults:
   run:
     shell: pwsh
 
+env:
+  DOTNET_VERSION: 9.x
+
 jobs:
   check-for-changes:
     runs-on: ubuntu-latest
@@ -71,7 +74,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
-          global-json-file: global.json
+            dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Restore dependencies
         run: dotnet restore

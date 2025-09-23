@@ -14,6 +14,9 @@ defaults:
   run:
     shell: pwsh
 
+env:
+  DOTNET_VERSION: 9.x
+
 jobs:
   copilot-setup-steps:
     name: copilot-setup-steps
@@ -27,7 +30,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v5
       with:
-        global-json-file: global.json
+        dotnet-version: ${{ env.DOTNET_VERSION }}
     - name: Setup Dependency Caching
       uses: actions/cache@v4
       id: nuget-cache
