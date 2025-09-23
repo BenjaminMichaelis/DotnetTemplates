@@ -93,6 +93,16 @@ Each template includes an `.editorconfig` file that is based on the root reposit
 - When updating the root `.editorconfig`, use the `CopyEditorConfigToTemplates.ps1` script which will detect and preserve existing customizations
 
 **When updating root .editorconfig:**
+
+**Automated Process (Recommended):**
+- Simply update the root `.editorconfig` file and push to main
+- The `update-template-editorconfig` GitHub Actions workflow will automatically:
+  - Detect the changes and run the copy script
+  - Create or update a PR with the template updates
+  - Preserve existing customizations and create backups for manual review
+  - Provide clear documentation of what was changed
+
+**Manual Process:**
 1. Update the root `.editorconfig` file
 2. Run `./CopyEditorConfigToTemplates.ps1` 
 3. Review any templates with customizations and manually merge changes if needed
