@@ -17,6 +17,7 @@
   This would typically list all NuGet packages used within this solution.
   -->
   <ItemGroup>
+    <PackageVersion Include="coverlet.collector" Version="6.0.2" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
     <PackageVersion Include="Moq" Version="4.20.72" />
