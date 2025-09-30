@@ -28,35 +28,40 @@ jobs:
       - name: Check for changes
         id: check
         run: |
-          try {
-            # Get the latest published date of the NuGet package
-            $packageInfo = Invoke-RestMethod -Uri "https://api.nuget.org/v3/registration5-gz-semver2/benjaminmichaelis.dotnet.templates/index.json"
-            $latestVersion = $packageInfo.items[0].items | Sort-Object { [version]$_.catalogEntry.version } | Select-Object -Last 1
-            $lastPublishedDate = [DateTime]::Parse($latestVersion.catalogEntry.published)
-            
-            Write-Host "Latest NuGet package version: $($latestVersion.catalogEntry.version)"
-            Write-Host "Last published date: $lastPublishedDate"
-            
-            # Get the latest commit date
-            $latestCommitDate = [DateTime]::Parse((git log -1 --format=%ci))
-            Write-Host "Latest commit date: $latestCommitDate"
-            
-            # Check if there are commits newer than the last published package
-            if ($latestCommitDate -gt $lastPublishedDate) {
-              Write-Host "Repository has changes newer than the last published package"
-              "changes=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
-            } else {
-              Write-Host "No changes since last published package"
-              "changes=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
-            }
-          } catch {
-            Write-Host "Error checking NuGet package date: $($_.Exception.Message)"
-            Write-Host "Falling back to checking for changes in the last 24 hours"
-            $hasChanges = git log --since="24 hours ago" --oneline
-            if ($hasChanges) {
-              "changes=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
-            } else {
-              "changes=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          if ($env:GITHUB_EVENT_NAME -in @('release', 'workflow_dispatch')) {
+            Write-Host "Event '$env:GITHUB_EVENT_NAME' detected - forcing build and deployment."
+            "changes=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          } else {
+            try {
+              # Get the latest published date of the NuGet package
+              $packageInfo = Invoke-RestMethod -Uri "https://api.nuget.org/v3/registration5-gz-semver2/benjaminmichaelis.dotnet.templates/index.json"
+              $latestVersion = $packageInfo.items[0].items | Sort-Object { [version]$_.catalogEntry.version } | Select-Object -Last 1
+              $lastPublishedDate = [DateTime]::Parse($latestVersion.catalogEntry.published)
+
+              Write-Host "Latest NuGet package version: $($latestVersion.catalogEntry.version)"
+              Write-Host "Last published date: $lastPublishedDate"
+
+              # Get the latest commit date
+              $latestCommitDate = [DateTime]::Parse((git log -1 --format=%ci))
+              Write-Host "Latest commit date: $latestCommitDate"
+
+              # Check if there are commits newer than the last published package
+              if ($latestCommitDate -gt $lastPublishedDate) {
+                Write-Host "Repository has changes newer than the last published package"
+                "changes=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+              } else {
+                Write-Host "No changes since last published package"
+                "changes=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+              }
+            } catch {
+              Write-Host "Error checking NuGet package date: $($_.Exception.Message)"
+              Write-Host "Falling back to checking for changes in the last 24 hours"
+              $hasChanges = git log --since="24 hours ago" --oneline
+              if ($hasChanges) {
+                "changes=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+              } else {
+                "changes=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+              }
             }
           }
 
