@@ -1,4 +1,4 @@
-namespace BenchmarkApp.Console.Tests;
+namespace ConsoleApp.Console.Tests;
 
 public class ProgramTests
 {

@@ -15,6 +15,10 @@ Create a new app in your current directory by running.
  dotnet new bmichaelis.quickstart.consoleapp
 ```
 
+Source: 
+- [DotnetTemplates](https://github.com/BenjaminMichaelis/DotnetTemplates)
+- [NuGet](https://www.nuget.org/packages/BenjaminMichaelis.Dotnet.Templates)
+
 ### Parameters
 
 - `--no-sln`: Don't include the solution file.
@@ -27,7 +31,4 @@ Create a new app in your current directory by running.
 - Simple console app with minimal dependencies.
 - Includes unit tests using xUnit.
 - Ready to build, test, and run.
-
-## Key Features
-
-- Should just work out of the box. Not meant to be the perfect project setup to start with, but rather a quick way to get started with benchmarking and testing out different algorithms or such.
+- 
