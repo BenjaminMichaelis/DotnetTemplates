@@ -4,7 +4,7 @@ The repository contains a set of opinionated [dotnet new templates](https://lear
 
 ## Requirements
 
-These templates require [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0) or later.
+These templates require [.NET 10.0 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) or later.
 
 ## Installing
 
