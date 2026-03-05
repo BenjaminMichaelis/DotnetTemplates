@@ -73,8 +73,8 @@ jobs:
           mkdir TestLibrary
           Push-Location TestLibrary
           dotnet new bmichaelis.nuget
-          dotnet test *.sln /p:TreatWarningsAsErrors=true
-          dotnet pack *.sln --configuration Release -o ./NuGet
+          dotnet test /p:TreatWarningsAsErrors=true
+          dotnet pack --configuration Release -o ./NuGet
 
   test-quickstart-benchmarkconsole:
     runs-on: ubuntu-latest
@@ -97,11 +97,11 @@ jobs:
           mkdir TestQuickstartBenchmarkConsole
           Push-Location TestQuickstartBenchmarkConsole
           dotnet new bmichaelis.quickstart.benchmarkconsole
-          dotnet test *.sln /p:TreatWarningsAsErrors=true
+          dotnet test /p:TreatWarningsAsErrors=true
           cd TestQuickstartBenchmarkConsole
           dotnet run -c Release
           cd ..
-          dotnet pack *.sln --configuration Release -o ./NuGet
+          dotnet pack --configuration Release -o ./NuGet
 
   test-quickstart-consoleapp:
     runs-on: ubuntu-latest
@@ -124,5 +124,5 @@ jobs:
           mkdir TestQuickstartConsoleApp
           Push-Location TestQuickstartConsoleApp
           dotnet new bmichaelis.quickstart.consoleapp
-          dotnet test *.sln /p:TreatWarningsAsErrors=true
-          dotnet pack *.sln --configuration Release -o ./NuGet
+          dotnet test /p:TreatWarningsAsErrors=true
+          dotnet pack --configuration Release -o ./NuGet
