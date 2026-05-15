@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Deterministic>true</Deterministic>
+    <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
+
+    <!-- dotnet tool packaging -->
+    <PackAsTool>true</PackAsTool>
+    <!-- CHANGEME: set this to your desired CLI command name, e.g. my-tool -->
+    <ToolCommandName>CHANGEME-toolname</ToolCommandName>
+
+    <!--
+    RID-specific packaging: a single `dotnet pack` produces self-contained packages for each RID
+    plus a top-level pointer package. Users get the best binary for their platform automatically.
+    See: https://learn.microsoft.com/en-us/dotnet/core/tools/rid-specific-tools
+
+    Note: NU5017 is emitted as a false positive by NuGet validation — the pointer package is valid
+    but NuGet does not yet recognise DotnetToolSettings.xml as content. All packages are created
+    correctly. Track https://github.com/NuGet/NuGet.Client/issues for when this is fixed.
+    -->
+    <RuntimeIdentifiers>win-x64;linux-x64;osx-arm64</RuntimeIdentifiers>
+
+    <!--
+    Optionally enable trimming to reduce the package size. Trimming may require trim annotations
+    on reflection-heavy code. Enable only after validating your tool works when trimmed.
+    See: https://learn.microsoft.com/dotnet/core/deploying/trimming/trimming-options
+    -->
+    <!--<PublishTrimmed>true</PublishTrimmed>-->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>

@@ -35,6 +35,7 @@ Use the short name after `bmichaelis.`:
 | Short name | Template docs |
 | --- | --- |
 | `nuget` | [templates/Library/NuGet](./templates/Library/NuGet/README.md) |
+| `tool` | [templates/Library/DotnetTool](./templates/Library/DotnetTool/README.md) |
 | `quickstart.consoleapp` | [templates/Quickstart/ConsoleApp](./templates/Quickstart/ConsoleApp/README.md) |
 | `quickstart.benchmarkconsole` | [templates/Quickstart/BenchmarkApp](./templates/Quickstart/BenchmarkApp/README.md) |
 | `aspire.minimalapi` | [templates/Aspire/MinimalApi](./templates/Aspire/MinimalApi/README.md) |
