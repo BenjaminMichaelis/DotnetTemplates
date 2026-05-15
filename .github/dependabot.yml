@@ -9,7 +9,7 @@ multi-ecosystem-groups:
 updates:
 # Template Project (Root)
   - package-ecosystem: "github-actions" 
-    directory: "/.github/workflows"
+    directory: "/"
     schedule:
       interval: "weekly" 
     groups:
@@ -24,15 +24,6 @@ updates:
     schedule:
       interval: "weekly"
 
-  - package-ecosystem: "github-actions" 
-    directory: "/templates/Library/NuGet/.github/workflows"
-    schedule:
-      interval: "weekly" 
-    groups:
-       dev-dependencies:
-          patterns:
-            - "*-artifact"
-
 # Quickstart.BenchmarkApp Project
   - package-ecosystem: "nuget"
     directory: "/templates/Quickstart/BenchmarkApp"
@@ -44,11 +35,6 @@ updates:
     schedule:
       interval: "weekly"
 
-  - package-ecosystem: "github-actions"
-    directory: "/templates/Quickstart/BenchmarkApp/.github/workflows"
-    schedule:
-      interval: "weekly"
-
 # Quickstart.ConsoleApp Project
   - package-ecosystem: "nuget"
     directory: "/templates/Quickstart/ConsoleApp"
@@ -57,11 +43,6 @@ updates:
 
   - package-ecosystem: "dotnet-sdk"
     directory: "/templates/Quickstart/ConsoleApp"
-    schedule:
-      interval: "weekly"
-
-  - package-ecosystem: "github-actions"
-    directory: "/templates/Quickstart/ConsoleApp/.github/workflows"
     schedule:
       interval: "weekly"
 
@@ -99,11 +80,6 @@ updates:
 
   - package-ecosystem: "terraform"
     directory: "/templates/Aspire/MinimalApi/Infra"
-    schedule:
-      interval: "weekly"
-
-  - package-ecosystem: "github-actions"
-    directory: "/templates/Aspire/MinimalApi/.github/workflows"
     schedule:
       interval: "weekly"
 
