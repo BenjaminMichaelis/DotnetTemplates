@@ -128,6 +128,9 @@ jobs:
       name: "Production"
       url: "https://www.nuget.org/packages/BenjaminMichaelis.Dotnet.Templates"
     name: Push NuGets
+    permissions:
+      id-token: write   # Required for NuGet trusted publishing (OIDC)
+      contents: read
 
     steps:
       - uses: actions/checkout@v5
@@ -138,6 +141,12 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: NuGet
+
+      - name: NuGet login (OIDC)
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ secrets.NUGET_USER }}  # nuget.org profile name (NOT email)
 
       - name: Push NuGet
         run: |
@@ -161,5 +170,5 @@ jobs:
            $tagVersion = "$tagVersion-beta.${{ github.run_number }}"
          }
          echo "TAG_VERSION=$tagVersion" >> $env:GITHUB_OUTPUT
-         dotnet nuget push BenjaminMichaelis.Dotnet.Templates.$tagVersion.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+         dotnet nuget push BenjaminMichaelis.Dotnet.Templates.$tagVersion.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ steps.login.outputs.NUGET_API_KEY }} --skip-duplicate
         id: tag-version
