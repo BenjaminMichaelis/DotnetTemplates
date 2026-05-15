@@ -33,17 +33,39 @@ jobs:
             "changes=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           } else {
             try {
-              # Get the latest published date of the NuGet package
+              # Get the latest published package metadata from NuGet registration.
+              # Avoid [System.Version] parsing because prerelease versions are not compatible with that type.
               $packageInfo = Invoke-RestMethod -Uri "https://api.nuget.org/v3/registration5-gz-semver2/benjaminmichaelis.dotnet.templates/index.json"
-              $latestVersion = $packageInfo.items[0].items | Sort-Object { [version]$_.catalogEntry.version } | Select-Object -Last 1
-              $lastPublishedDate = [DateTime]::Parse($latestVersion.catalogEntry.published)
+              $registrationPages = @($packageInfo.items)
+              $registrationItems = @()
 
-              Write-Host "Latest NuGet package version: $($latestVersion.catalogEntry.version)"
-              Write-Host "Last published date: $lastPublishedDate"
+              foreach ($page in $registrationPages) {
+                if ($null -ne $page.items) {
+                  $registrationItems += @($page.items)
+                } elseif ($null -ne $page.'@id') {
+                  $pageResponse = Invoke-RestMethod -Uri $page.'@id'
+                  foreach ($innerPage in @($pageResponse.items)) {
+                    if ($null -ne $innerPage.items) {
+                      $registrationItems += @($innerPage.items)
+                    }
+                  }
+                }
+              }
 
-              # Get the latest commit date
-              $latestCommitDate = [DateTime]::Parse((git log -1 --format=%ci))
-              Write-Host "Latest commit date: $latestCommitDate"
+              $publishedItems = $registrationItems | Where-Object { $null -ne $_.catalogEntry -and $null -ne $_.catalogEntry.published }
+              if (-not $publishedItems) {
+                throw "No published package entries were found in NuGet registration feed."
+              }
+
+              $latestPublishedItem = $publishedItems | Sort-Object { [DateTimeOffset]::Parse($_.catalogEntry.published).UtcDateTime } | Select-Object -Last 1
+              $lastPublishedDate = [DateTimeOffset]::Parse($latestPublishedItem.catalogEntry.published).UtcDateTime
+
+              Write-Host "Latest NuGet package version: $($latestPublishedItem.catalogEntry.version)"
+              Write-Host "Last published date (UTC): $lastPublishedDate"
+
+              # Get the latest commit date.
+              $latestCommitDate = [DateTimeOffset]::Parse((git log -1 --format=%cI)).UtcDateTime
+              Write-Host "Latest commit date (UTC): $latestCommitDate"
 
               # Check if there are commits newer than the last published package
               if ($latestCommitDate -gt $lastPublishedDate) {
@@ -54,14 +76,8 @@ jobs:
                 "changes=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
               }
             } catch {
-              Write-Host "Error checking NuGet package date: $($_.Exception.Message)"
-              Write-Host "Falling back to checking for changes in the last 24 hours"
-              $hasChanges = git log --since="24 hours ago" --oneline
-              if ($hasChanges) {
-                "changes=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
-              } else {
-                "changes=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
-              }
+              Write-Error "Failed to determine NuGet publish state for nightly deploy: $($_.Exception.Message)"
+              throw
             }
           }
 
