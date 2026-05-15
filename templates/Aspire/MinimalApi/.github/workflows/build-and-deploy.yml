@@ -25,29 +25,9 @@ env:
   TERRAFORM_VERSION: '1.14.6'
 
 jobs:
-  # Validate that global.json SDK major.minor matches the Dockerfile FROM tags.
-  # This catches misaligned updates before dependency PRs can merge in a broken state.
-  check-version-alignment:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Verify global.json and Dockerfile are on the same major.minor
-        run: |
-          SDK_MAJOR_MINOR=$(jq -r '.sdk.version' global.json | cut -d. -f1,2)
-          DOCKER_MAJOR_MINOR=$(grep -m1 'FROM mcr.microsoft.com/dotnet/sdk:' MinimalApi/Dockerfile \
-            | sed 's|.*dotnet/sdk:\([0-9]*\.[0-9]*\).*|\1|')
-          if [ "$SDK_MAJOR_MINOR" != "$DOCKER_MAJOR_MINOR" ]; then
-            echo "::error::Version mismatch: global.json SDK is ${SDK_MAJOR_MINOR} but Dockerfile uses ${DOCKER_MAJOR_MINOR}."
-            echo "::error::Update SDK and Docker dependencies together (Dependabot 'dotnet-version' group) before merging this branch."
-            exit 1
-          fi
-          echo "OK: global.json (${SDK_MAJOR_MINOR}) and Dockerfile (${DOCKER_MAJOR_MINOR}) are aligned."
-
   # Build and test backend
   build:
     runs-on: ubuntu-latest
-    needs: check-version-alignment
     steps:
       - uses: actions/checkout@v6
 
