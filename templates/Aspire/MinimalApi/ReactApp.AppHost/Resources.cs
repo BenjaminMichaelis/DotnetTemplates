@@ -474,6 +474,7 @@ public static class Resources
                 // Aggregate state from all children
                 var hasUnhealthy = false;
                 var hasStarting = false;
+                var hasFailedToStart = false;
                 var allRunning = true;
 
                 foreach (var (childState, childHealth) in childStates.Values)
@@ -481,7 +482,11 @@ public static class Resources
                     if (childState != "Running")
                     {
                         allRunning = false;
-                        if (childState == "Starting" || childState == "FailedToStart")
+                        if (childState == "FailedToStart")
+                        {
+                            hasFailedToStart = true;
+                        }
+                        else if (childState == "Starting")
                         {
                             hasStarting = true;
                         }
@@ -494,7 +499,7 @@ public static class Resources
                 }
 
                 // Determine parent state
-                string parentState = hasUnhealthy ? "Unhealthy" : !allRunning ? hasStarting ? "Starting" : "Degraded" : "Running";
+                string parentState = hasFailedToStart ? "FailedToStart" : hasUnhealthy ? "Unhealthy" : !allRunning ? hasStarting ? "Starting" : "Degraded" : "Running";
 
                 // Update the parent's state
                 await resourceNotificationService.PublishUpdateAsync(resource,

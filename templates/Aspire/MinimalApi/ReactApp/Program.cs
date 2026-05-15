@@ -46,6 +46,17 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddAuthorization();
 
+var signingKey = builder.Configuration["Auth:SigningKey"];
+if (string.IsNullOrWhiteSpace(signingKey))
+{
+    throw new InvalidOperationException("Missing required configuration value 'Auth:SigningKey'.");
+}
+
+if (signingKey.Length < 32)
+{
+    throw new InvalidOperationException("Configuration value 'Auth:SigningKey' must be at least 32 characters.");
+}
+
 var authBuilder = builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = IdentityConstants.ApplicationScheme;
@@ -83,9 +94,7 @@ authBuilder.AddJwtBearer(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = "ReactApp",
         ValidAudience = "ReactApp",
-        IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["Auth:SigningKey"]
-                ?? "ReactApp-Auth-Signing-Key-Min-32-Chars-Long!"))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey))
     };
 });
 

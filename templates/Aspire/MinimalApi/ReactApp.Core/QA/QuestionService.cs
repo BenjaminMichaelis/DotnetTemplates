@@ -11,6 +11,7 @@ public class QuestionService(IDbContextFactory<ApplicationDbContext> contextFact
     //TODO: This does not horizontally scale
     private static readonly ConcurrentDictionary<string, DateTimeOffset> _lastSubmissionTimes = new();
     private static readonly TimeSpan _rateLimitWindow = TimeSpan.FromSeconds(10);
+    private static long _nextPruneAtUtcTicks = DateTimeOffset.UtcNow.Add(_rateLimitWindow).UtcTicks;
 
     public async Task<IEnumerable<Question>> GetQuestionsByRoomIdAsync(Guid roomId)
     {
@@ -149,20 +150,46 @@ public class QuestionService(IDbContextFactory<ApplicationDbContext> contextFact
 
     public Task<bool> CanSubmitQuestionAsync(string clientId)
     {
+        var now = DateTimeOffset.UtcNow;
+        PruneExpiredSubmissions(now);
+
         if (!_lastSubmissionTimes.TryGetValue(clientId, out var lastSubmission))
         {
-            _lastSubmissionTimes[clientId] = DateTimeOffset.UtcNow;
+            _lastSubmissionTimes[clientId] = now;
             return Task.FromResult(true);
         }
 
-        var timeSinceLastSubmission = DateTimeOffset.UtcNow - lastSubmission;
+        var timeSinceLastSubmission = now - lastSubmission;
         
         if (timeSinceLastSubmission >= _rateLimitWindow)
         {
-            _lastSubmissionTimes[clientId] = DateTimeOffset.UtcNow;
+            _lastSubmissionTimes[clientId] = now;
             return Task.FromResult(true);
         }
 
         return Task.FromResult(false);
+    }
+
+    private static void PruneExpiredSubmissions(DateTimeOffset now)
+    {
+        var nextPruneAt = Interlocked.Read(ref _nextPruneAtUtcTicks);
+        if (now.UtcTicks < nextPruneAt)
+        {
+            return;
+        }
+
+        var updatedNextPruneAt = now.Add(_rateLimitWindow).UtcTicks;
+        if (Interlocked.CompareExchange(ref _nextPruneAtUtcTicks, updatedNextPruneAt, nextPruneAt) != nextPruneAt)
+        {
+            return;
+        }
+
+        foreach (var submission in _lastSubmissionTimes)
+        {
+            if (now - submission.Value >= _rateLimitWindow)
+            {
+                _lastSubmissionTimes.TryRemove(submission.Key, out _);
+            }
+        }
     }
 }
