@@ -1,4 +1,11 @@
 version: 2
+
+multi-ecosystem-groups:
+  dotnet-version:
+    schedule:
+      interval: "weekly"
+    labels: ["dependencies"]
+
 updates:
 # Template Project (Root)
   - package-ecosystem: "github-actions" 
@@ -38,14 +45,22 @@ updates:
     schedule:
       interval: "weekly"
 
-# Aspire.MinimalApi Template
+# Aspire.MinimalApi Template - NuGet and Docker grouped into one PR
   - package-ecosystem: "nuget"
     directory: "/templates/Aspire/MinimalApi"
     schedule:
       interval: "weekly"
+    patterns: ["Microsoft.*", "Aspire.*", "System.*"]
+    multi-ecosystem-group: "dotnet-version"
 
-  # NOTE: Docker image and global.json SDK updates are kept in sync by the
-  # update-dotnet-sdk.yml workflow in the template, not by Dependabot.
-  # A separate Dependabot docker PR would update the Dockerfile without
-  # touching global.json, breaking the build on major.minor version jumps.
+  - package-ecosystem: "docker"
+    directory: "/templates/Aspire/MinimalApi/ReactApp"
+    schedule:
+      interval: "weekly"
+    patterns: ["mcr.microsoft.com/dotnet/*"]
+    multi-ecosystem-group: "dotnet-version"
+
+  # NOTE: global.json is not a Dependabot-supported ecosystem.
+  # The update-dotnet-sdk.yml workflow in the template handles it separately.
+  # The build CI checks that global.json and Dockerfile major.minor stay aligned.
 

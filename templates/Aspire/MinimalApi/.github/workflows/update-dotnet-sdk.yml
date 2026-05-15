@@ -1,15 +1,13 @@
 name: Update .NET SDK
 
-# Dependabot does not support global.json natively, and a separate Dependabot
-# docker PR (without a matching global.json change) would break the build.
-# This workflow handles BOTH atomically in a single PR:
-#   - global.json sdk.version
-#   - Dockerfile FROM image tags (only when the major.minor changes, e.g. 10 -> 11)
+# Dependabot does not support global.json natively, so this workflow fills that gap.
+# It updates global.json when a newer SDK is available in the current major.minor channel.
 #
-# Within the same major.minor (e.g. 10.0.100 -> 10.0.200), the Dockerfile uses
-# floating tags (sdk:10.0 / aspnet:10.0-noble-chiseled) that auto-pull the
-# latest patch, and global.json's rollForward:latestFeature handles the SDK.
-# No PR is needed for patch-only updates.
+# Docker FROM image tags are handled by Dependabot (dotnet-version multi-ecosystem group)
+# which batches them with NuGet package updates into a single PR.
+#
+# A build-time alignment check (see build-and-deploy.yml) ensures global.json and the
+# Dockerfile are on the same major.minor before any PR can merge.
 
 on:
   schedule:
@@ -34,35 +32,20 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "major_minor=$MAJOR_MINOR" >> "$GITHUB_OUTPUT"
 
-      - name: Fetch latest SDK for current major.minor
+      - name: Fetch latest SDK for current major.minor channel
         id: latest
         run: |
           MAJOR_MINOR="${{ steps.current.outputs.major_minor }}"
           VERSION=$(curl -fsSL \
             "https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/${MAJOR_MINOR}/releases.json" \
             | jq -r '.releases[0].sdk.version')
-          LATEST_MAJOR_MINOR=$(echo "$VERSION" | cut -d. -f1,2)
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "major_minor=$LATEST_MAJOR_MINOR" >> "$GITHUB_OUTPUT"
 
       - name: Update global.json
         if: steps.latest.outputs.version != steps.current.outputs.version
         run: |
           jq --arg v "${{ steps.latest.outputs.version }}" \
             '.sdk.version = $v' global.json > tmp.json && mv tmp.json global.json
-
-      - name: Update Dockerfile FROM tags (major.minor change only)
-        # Patch updates (10.0.100 -> 10.0.200) use floating tags and need no change.
-        # Major.minor changes (10.0 -> 11.0) must update the FROM tags atomically
-        # with global.json to keep the SDK and runtime image in sync.
-        if: |
-          steps.latest.outputs.version != steps.current.outputs.version &&
-          steps.latest.outputs.major_minor != steps.current.outputs.major_minor
-        run: |
-          OLD="${{ steps.current.outputs.major_minor }}"
-          NEW="${{ steps.latest.outputs.major_minor }}"
-          sed -i "s|/dotnet/sdk:${OLD}|/dotnet/sdk:${NEW}|g" ReactApp/Dockerfile
-          sed -i "s|/dotnet/aspnet:${OLD}-|/dotnet/aspnet:${NEW}-|g" ReactApp/Dockerfile
 
       - name: Open pull request
         if: steps.latest.outputs.version != steps.current.outputs.version
@@ -72,13 +55,11 @@ jobs:
           branch: "deps/dotnet-sdk-${{ steps.latest.outputs.version }}"
           title: "chore(deps): bump .NET SDK to ${{ steps.latest.outputs.version }}"
           body: |
-            Bumps `.NET SDK` to `${{ steps.latest.outputs.version }}`.
-
-            Changes in this PR:
-            - `global.json` `sdk.version`
-            ${{ steps.latest.outputs.major_minor != steps.current.outputs.major_minor && '- `ReactApp/Dockerfile` FROM image tags' || '*(Dockerfile tags unchanged - patch update only)*' }}
+            Bumps `global.json` SDK version to `${{ steps.latest.outputs.version }}`.
 
             > [!NOTE]
-            > Also review the Dependabot PR (if open) that bumps NuGet packages
-            > for the same .NET release.
+            > Merge alongside the Dependabot `dotnet-version` PR (if open) that
+            > updates the `mcr.microsoft.com/dotnet/aspnet` Docker image and NuGet packages.
+            > The build CI will fail if `global.json` and the Dockerfile are on different
+            > major.minor versions.
           labels: dependencies
