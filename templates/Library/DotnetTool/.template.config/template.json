@@ -47,7 +47,9 @@
         {
           "condition": "(no-tests)",
           "exclude": [
-            "DotnetTool.Tests/*"
+            "DotnetTool.Tests/*",
+            "DotnetTool.slnx",
+            ".github/workflows/build-and-test.yml"
           ]
         }
       ]
