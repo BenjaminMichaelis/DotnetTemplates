@@ -23,36 +23,20 @@ updates:
             - "*-artifact"
 
 
-# Library.NuGet Template
-  - package-ecosystem: "nuget" 
-    directory: "/templates/Library/NuGet"
-    schedule:
-      interval: "weekly"
-
-# Quickstart.BenchmarkApp Project
+# Library.NuGet, Quickstart.BenchmarkApp, Quickstart.ConsoleApp Templates
   - package-ecosystem: "nuget"
-    directory: "/templates/Quickstart/BenchmarkApp"
-    schedule:
-      interval: "weekly" 
-
-  - package-ecosystem: "dotnet-sdk"
-    directory: "/templates/Quickstart/BenchmarkApp"
-    schedule:
-      interval: "weekly"
-
-# Quickstart.ConsoleApp Project
-  - package-ecosystem: "nuget"
-    directory: "/templates/Quickstart/ConsoleApp"
+    directories:
+      - "/templates/Library/NuGet"
+      - "/templates/Quickstart/BenchmarkApp"
+      - "/templates/Quickstart/ConsoleApp"
     schedule:
       interval: "weekly"
 
   - package-ecosystem: "dotnet-sdk"
-    directory: "/templates/Quickstart/ConsoleApp"
-    schedule:
-      interval: "weekly"
-
-  - package-ecosystem: "dotnet-sdk"
-    directory: "/templates/Library/NuGet"
+    directories:
+      - "/templates/Library/NuGet"
+      - "/templates/Quickstart/BenchmarkApp"
+      - "/templates/Quickstart/ConsoleApp"
     schedule:
       interval: "weekly"
 
