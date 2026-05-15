@@ -46,7 +46,7 @@ updates:
     schedule:
       interval: "weekly"
 
-# Aspire.MinimalApi Template - Docker and SDK grouped into one PR
+# Aspire.MinimalApi Template - Docker and dotnet SDK grouped into one PR
   - package-ecosystem: "docker"
     directory: "/templates/Aspire/MinimalApi/MinimalApi"
     schedule:
