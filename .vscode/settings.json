@@ -1,0 +1,6 @@
+{
+  "dotnet.defaultSolution": "disable",
+  "github.copilot.enable": {
+    "markdown": true
+  }
+}
