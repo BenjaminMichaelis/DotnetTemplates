@@ -13,6 +13,15 @@ builder.AddServiceDefaults()
     .AddDatabase()
     .AddQAServices();
 
+//#if (applicationInsights)
+// The Application Insights Profiler captures CPU flame graphs and uploads them to App Insights.
+// It activates only when APPLICATIONINSIGHTS_CONNECTION_STRING is set (auto-injected by Aspire in Azure).
+// NOTE: Do NOT also call AddApplicationInsightsTelemetry() - that is the classic AI SDK and would
+// double-report telemetry. The Azure Monitor OTel exporter (UseAzureMonitor in ServiceDefaults) is
+// the sole App Insights integration path in this template.
+builder.Services.AddServiceProfiler();
+//#endif
+
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

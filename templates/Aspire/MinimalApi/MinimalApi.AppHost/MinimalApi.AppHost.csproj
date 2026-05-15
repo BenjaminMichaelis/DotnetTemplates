@@ -10,6 +10,9 @@
     <PackageReference Include="Aspire.Hosting.Azure.AppContainers" />
     <PackageReference Include="Aspire.Hosting.Azure.Sql" />
     <PackageReference Include="Aspire.Hosting.SqlServer" />
+    <!--#if (applicationInsights)-->
+    <PackageReference Include="Aspire.Hosting.Azure.ApplicationInsights" />
+    <!--#endif-->
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

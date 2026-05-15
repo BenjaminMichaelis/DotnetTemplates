@@ -13,6 +13,13 @@ builder.AddMUIDocs().WithParentRelationship(docsGroup);
 
 IResourceBuilder<IResourceWithConnectionString> db;
 
+//#if (applicationInsights)
+// Application Insights is provisioned by Aspire in Azure and the connection string is
+// injected automatically into all referencing projects as APPLICATIONINSIGHTS_CONNECTION_STRING.
+// Locally, Aspire Dashboard receives all telemetry via OTLP instead.
+var appInsights = builder.AddAzureApplicationInsights("appinsights");
+//#endif
+
 if (builder.ExecutionContext.IsPublishMode)
 {
     db = builder.AddAzureSqlServer().AddDatabase("MinimalApi-db");
@@ -45,6 +52,9 @@ else
 
 var backend = builder.AddProject<Projects.MinimalApi>("MinimalApi-backend")
     .WithDependency(db, ConnectionStrings.DatabaseKey)
+    //#if (applicationInsights)
+    .WithReference(appInsights)
+    //#endif
     .WithExternalHttpEndpoints()
     .PublishAsAzureContainerApp((infra, app) => app.Template.Scale.MaxReplicas = 1);
 
