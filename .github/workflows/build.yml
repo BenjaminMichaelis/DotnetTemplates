@@ -64,15 +64,23 @@ jobs:
         include:
           - variant: default
             args: ""
-            expectSolution: true
+            expectSln: false
+            expectSlnx: true
             expectTests: true
           - variant: no-tests
             args: "--no-tests"
-            expectSolution: true
+            expectSln: false
+            expectSlnx: true
             expectTests: false
+          - variant: sln
+            args: "--sln"
+            expectSln: true
+            expectSlnx: false
+            expectTests: true
           - variant: no-sln
             args: "--no-sln"
-            expectSolution: false
+            expectSln: false
+            expectSlnx: false
             expectTests: true
 
     steps:
@@ -94,9 +102,11 @@ jobs:
           Push-Location $outDir
           dotnet new bmichaelis.nuget ${{ matrix.args }}
           $projectName = Split-Path -Leaf (Get-Location)
-          $hasSolution = (Test-Path "$projectName.sln") -or (Test-Path "$projectName.slnx")
+          $hasSln = Test-Path "$projectName.sln"
+          $hasSlnx = Test-Path "$projectName.slnx"
           $hasTests = Test-Path "$projectName.Tests/$projectName.Tests.csproj"
-          if ([bool]::Parse("${{ matrix.expectSolution }}") -ne $hasSolution) { throw "Unexpected solution file presence: $hasSolution" }
+          if ([bool]::Parse("${{ matrix.expectSln }}") -ne $hasSln) { throw "Unexpected .sln file presence: $hasSln" }
+          if ([bool]::Parse("${{ matrix.expectSlnx }}") -ne $hasSlnx) { throw "Unexpected .slnx file presence: $hasSlnx" }
           if ([bool]::Parse("${{ matrix.expectTests }}") -ne $hasTests) { throw "Unexpected test project presence: $hasTests" }
           if ($hasTests) {
             dotnet test "$projectName.Tests/$projectName.Tests.csproj" /p:TreatWarningsAsErrors=true
@@ -114,15 +124,23 @@ jobs:
         include:
           - variant: default
             args: ""
-            expectSolution: true
+            expectSln: false
+            expectSlnx: true
             expectTests: true
           - variant: no-tests
             args: "--no-tests"
-            expectSolution: true
+            expectSln: false
+            expectSlnx: true
             expectTests: false
+          - variant: sln
+            args: "--sln"
+            expectSln: true
+            expectSlnx: false
+            expectTests: true
           - variant: no-sln
             args: "--no-sln"
-            expectSolution: false
+            expectSln: false
+            expectSlnx: false
             expectTests: true
 
     steps:
@@ -144,9 +162,11 @@ jobs:
           Push-Location $outDir
           dotnet new bmichaelis.quickstart.benchmarkconsole ${{ matrix.args }}
           $projectName = Split-Path -Leaf (Get-Location)
-          $hasSolution = (Test-Path "$projectName.sln") -or (Test-Path "$projectName.slnx")
+          $hasSln = Test-Path "$projectName.sln"
+          $hasSlnx = Test-Path "$projectName.slnx"
           $hasTests = Test-Path "$projectName.Tests/$projectName.Tests.csproj"
-          if ([bool]::Parse("${{ matrix.expectSolution }}") -ne $hasSolution) { throw "Unexpected solution file presence: $hasSolution" }
+          if ([bool]::Parse("${{ matrix.expectSln }}") -ne $hasSln) { throw "Unexpected .sln file presence: $hasSln" }
+          if ([bool]::Parse("${{ matrix.expectSlnx }}") -ne $hasSlnx) { throw "Unexpected .slnx file presence: $hasSlnx" }
           if ([bool]::Parse("${{ matrix.expectTests }}") -ne $hasTests) { throw "Unexpected test project presence: $hasTests" }
           if ($hasTests) {
             dotnet test "$projectName.Tests/$projectName.Tests.csproj" /p:TreatWarningsAsErrors=true
@@ -165,15 +185,18 @@ jobs:
         include:
           - variant: default
             args: ""
-            expectSolution: true
+            expectSln: false
+            expectSlnx: true
             expectTests: true
           - variant: no-tests
             args: "--no-tests"
-            expectSolution: true
+            expectSln: false
+            expectSlnx: true
             expectTests: false
           - variant: no-sln
             args: "--no-sln"
-            expectSolution: false
+            expectSln: false
+            expectSlnx: false
             expectTests: true
 
     steps:
@@ -195,9 +218,11 @@ jobs:
           Push-Location $outDir
           dotnet new bmichaelis.quickstart.consoleapp ${{ matrix.args }}
           $projectName = Split-Path -Leaf (Get-Location)
-          $hasSolution = (Test-Path "$projectName.sln") -or (Test-Path "$projectName.slnx")
+          $hasSln = Test-Path "$projectName.sln"
+          $hasSlnx = Test-Path "$projectName.slnx"
           $hasTests = Test-Path "$projectName.Tests/$projectName.Tests.csproj"
-          if ([bool]::Parse("${{ matrix.expectSolution }}") -ne $hasSolution) { throw "Unexpected solution file presence: $hasSolution" }
+          if ([bool]::Parse("${{ matrix.expectSln }}") -ne $hasSln) { throw "Unexpected .sln file presence: $hasSln" }
+          if ([bool]::Parse("${{ matrix.expectSlnx }}") -ne $hasSlnx) { throw "Unexpected .slnx file presence: $hasSlnx" }
           if ([bool]::Parse("${{ matrix.expectTests }}") -ne $hasTests) { throw "Unexpected test project presence: $hasTests" }
           if ($hasTests) {
             dotnet test "$projectName.Tests/$projectName.Tests.csproj" /p:TreatWarningsAsErrors=true
