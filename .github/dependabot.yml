@@ -23,14 +23,20 @@ updates:
             - "*-artifact"
 
 
-# Library.NuGet, Quickstart.BenchmarkApp, Quickstart.ConsoleApp Templates
+# Library.NuGet, Quickstart.BenchmarkApp, Quickstart.ConsoleApp, Aspire.MinimalApi Templates
   - package-ecosystem: "nuget"
     directories:
       - "/templates/Library/NuGet"
       - "/templates/Quickstart/BenchmarkApp"
       - "/templates/Quickstart/ConsoleApp"
+      - "/templates/Aspire/MinimalApi"
     schedule:
       interval: "weekly"
+    groups:
+      entity-framework-stack:
+        patterns:
+          - "Microsoft.EntityFrameworkCore.*"
+          - "dotnet-ef"
 
   - package-ecosystem: "dotnet-sdk"
     directories:
@@ -40,17 +46,7 @@ updates:
     schedule:
       interval: "weekly"
 
-# Aspire.MinimalApi Template - NuGet, Docker, and SDK grouped into one PR
-  - package-ecosystem: "nuget"
-    directory: "/templates/Aspire/MinimalApi"
-    schedule:
-      interval: "weekly"
-    groups:
-      entity-framework-stack:
-        patterns:
-          - "Microsoft.EntityFrameworkCore.*"
-          - "dotnet-ef"
-
+# Aspire.MinimalApi Template - Docker and SDK grouped into one PR
   - package-ecosystem: "docker"
     directory: "/templates/Aspire/MinimalApi/MinimalApi"
     schedule:
