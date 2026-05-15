@@ -222,66 +222,6 @@ public static class Resources
 
             return builder;
         }
-
-        public IResourceBuilder<TResource> WithUITests()
-        {
-            builder.WithCommand("RunUITests", "Run UI Tests", async ctx =>
-            {
-                if (!builder.Resource.TryGetEndpoints(out var endpoints) || endpoints.FirstOrDefault() is not { } endpoint)
-                {
-                    return CommandResults.Failure("No external HTTP endpoint available for UI tests");
-                }
-                string baseUrl = $"{endpoint.UriScheme}://{endpoint.TargetHost}:{endpoint.Port}";
-#pragma warning disable ASPIREINTERACTION001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-                var interactionService = ctx.ServiceProvider.GetRequiredService<IInteractionService>();
-                InteractionInput headlessInput = new()
-                {
-                    Name = "Headless?",
-                    InputType = InputType.Boolean,
-                    Value = bool.TrueString
-                };
-                InteractionInput baseUrlInput = new()
-                {
-                    Name = "Base URL",
-                    InputType = InputType.Text,
-                    Value = baseUrl
-                };
-                var result = await interactionService.PromptInputsAsync("Testing", "Run the UI tests", [
-                    headlessInput,
-                    baseUrlInput
-                ]);
-                if (result.Canceled) return CommandResults.Canceled();
-#pragma warning restore ASPIREINTERACTION001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-                ProcessStartInfo psi = new()
-                {
-                    FileName = "dotnet",
-                    ArgumentList = {
-                        "run",
-                        "--no-build",
-                        "--project",
-                        "ReactApp.UITests\\ReactApp.UITests.csproj"
-                    },
-                    WorkingDirectory = GetSolutionDirectory()?.FullName,
-                    EnvironmentVariables =
-                    {
-                        { "TEST_BASE_URL", baseUrlInput.Value },
-                        // Invert the boolean: if headless is True, don't set HEADLESS (defaults to true)
-                        // if headless is False, set HEADLESS=false to run in headed mode
-                        { "HEADLESS", headlessInput.Value?.Equals(bool.FalseString, StringComparison.OrdinalIgnoreCase) == true ? "false" : "" }
-                    }
-                };
-
-                bool processResult = await builder.Resource.ExecuteProcessAsync(ctx.ServiceProvider, psi);
-                return processResult ? CommandResults.Success() : CommandResults.Failure("UI Tests did not complete successfully");
-            }, new CommandOptions()
-            {
-                IconName = "ChevronDoubleRight",
-                UpdateState = ctx =>
-                    ctx.ResourceSnapshot.HealthStatus == HealthStatus.Healthy
-                        ? ResourceCommandState.Enabled : ResourceCommandState.Disabled
-            });
-            return builder;
-        }
     }
 
     extension(IResourceBuilder<SqlServerServerResource> sql)

@@ -72,8 +72,6 @@ jobs:
       acr_login_server: ${{ steps.terraform-outputs.outputs.acr_login_server }}
       backend_container_app_name: ${{ steps.terraform-outputs.outputs.backend_container_app_name }}
       resource_group_name: ${{ steps.terraform-outputs.outputs.resource_group_name }}
-      static_web_app_name: ${{ steps.terraform-outputs.outputs.static_web_app_name }}
-      static_web_app_api_key: ${{ steps.terraform-outputs.outputs.static_web_app_api_key }}
     steps:
       - uses: actions/checkout@v6
 

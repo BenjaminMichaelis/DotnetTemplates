@@ -61,15 +61,6 @@ jobs:
       - name: Test
         run: dotnet test --no-build --configuration Release --verbosity normal --maximum-failed-tests 10
 
-      - name: Upload test failure screenshots
-        if: failure()
-        uses: actions/upload-artifact@v7
-        with:
-          name: test-failure-screenshots
-          path: '**/TestResults/screenshots/*.png'
-          if-no-files-found: ignore
-          retention-days: 7
-
       - name: Upload test failure logs
         if: failure()
         uses: actions/upload-artifact@v7

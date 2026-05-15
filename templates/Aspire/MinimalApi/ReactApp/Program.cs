@@ -80,7 +80,7 @@ authBuilder.AddIdentityCookies(options =>
         }
         else
         {
-            // In production, frontend and backend are same-site (same eTLD+1),
+            // In production, clients are expected to be same-site (same eTLD+1),
             // so Lax cookies are sent on cross-origin fetch requests.
             // SameSite=None would be blocked by iOS Safari's ITP.
             cookieOptions.Cookie.SameSite = SameSiteMode.Lax;
