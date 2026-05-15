@@ -264,3 +264,14 @@ jobs:
           Push-Location MinimalApi
           dotnet build /p:TreatWarningsAsErrors=true
           dotnet test --no-build /p:TreatWarningsAsErrors=true -p:TestingPlatformDotnetTestSupport=true
+
+  all-tests:
+    runs-on: ubuntu-latest
+    needs: [test-library, test-quickstart-benchmarkconsole, test-quickstart-consoleapp, test-aspire-minimalapi]
+    if: always()
+    steps:
+      - name: All tests passed
+        run: |
+          if ("${{ contains(needs.*.result, 'failure') }}" -eq "true" -or "${{ contains(needs.*.result, 'cancelled') }}" -eq "true") {
+            throw "One or more test jobs failed or were cancelled"
+          }
