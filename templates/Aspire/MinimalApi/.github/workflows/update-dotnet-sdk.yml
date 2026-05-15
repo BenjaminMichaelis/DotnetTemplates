@@ -1,0 +1,57 @@
+name: Update .NET SDK
+
+# Dependabot does not support global.json natively.
+# This workflow fills that gap: weekly it checks for a newer .NET 10 SDK release,
+# updates global.json, and opens a pull request. The PR is labelled "dependencies"
+# to align with Dependabot's docker/nuget PRs for the same .NET release.
+
+on:
+  schedule:
+    - cron: '0 6 * * 1' # 06:00 UTC every Monday (matches Dependabot schedule)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-dotnet-sdk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch latest .NET 10 SDK version
+        id: latest
+        run: |
+          VERSION=$(curl -fsSL \
+            "https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/10.0/releases.json" \
+            | jq -r '.releases[0].sdk.version')
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Read current version from global.json
+        id: current
+        run: |
+          VERSION=$(jq -r '.sdk.version' global.json)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Update global.json
+        if: steps.latest.outputs.version != steps.current.outputs.version
+        run: |
+          jq --arg v "${{ steps.latest.outputs.version }}" \
+            '.sdk.version = $v' global.json > tmp.json && mv tmp.json global.json
+
+      - name: Open pull request
+        if: steps.latest.outputs.version != steps.current.outputs.version
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: "chore: bump .NET SDK to ${{ steps.latest.outputs.version }} in global.json"
+          branch: "deps/dotnet-sdk-${{ steps.latest.outputs.version }}"
+          title: "chore(deps): bump .NET SDK to ${{ steps.latest.outputs.version }}"
+          body: |
+            Bumps the .NET SDK version in `global.json` to `${{ steps.latest.outputs.version }}`.
+
+            > [!NOTE]
+            > Also merge or check the Dependabot PR (if open) that updates the
+            > `mcr.microsoft.com/dotnet/aspnet` Docker image and NuGet packages
+            > to the same .NET release (`dotnet-version` group).
+          labels: dependencies

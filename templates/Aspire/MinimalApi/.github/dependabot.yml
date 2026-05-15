@@ -5,17 +5,31 @@
 
 version: 2
 updates:
-  - package-ecosystem: "nuget" # See documentation for possible values
-    directory: "/" # Location of package manifests
+  - package-ecosystem: "nuget"
+    directory: "/"
     schedule:
       interval: "weekly"
     groups:
+      dotnet-version:
+        patterns:
+          - "Microsoft.*"
+          - "Aspire.*"
+          - "System.*"
       nuget:
         patterns:
           - "*"
 
-  - package-ecosystem: "github-actions" # See documentation for possible values
-    directory: "/" # Location of package manifests
+  - package-ecosystem: "docker"
+    directory: "/ReactApp"
+    schedule:
+      interval: "weekly"
+    groups:
+      dotnet-version:
+        patterns:
+          - "mcr.microsoft.com/dotnet/*"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
     schedule:
       interval: "weekly"
     groups:
