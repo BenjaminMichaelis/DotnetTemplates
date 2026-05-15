@@ -45,13 +45,11 @@ updates:
     directory: "/templates/Aspire/MinimalApi"
     schedule:
       interval: "weekly"
-    patterns: ["*"]
     groups:
       entity-framework-stack:
         patterns:
           - "Microsoft.EntityFrameworkCore.*"
           - "dotnet-ef"
-    multi-ecosystem-group: "dotnet-version"
 
   - package-ecosystem: "docker"
     directory: "/templates/Aspire/MinimalApi/MinimalApi"

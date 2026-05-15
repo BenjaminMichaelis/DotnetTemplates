@@ -12,18 +12,15 @@ multi-ecosystem-groups:
     labels: ["dependencies"]
 
 updates:
-  # NuGet, Docker, and .NET SDK are grouped: one Dependabot PR per .NET release.
   - package-ecosystem: "nuget"
     directory: "/"
     schedule:
       interval: "weekly"
-    patterns: ["*"]
     groups:
       entity-framework-stack:
         patterns:
           - "Microsoft.EntityFrameworkCore.*"
           - "dotnet-ef"
-    multi-ecosystem-group: "dotnet-version"
 
   - package-ecosystem: "docker"
     directory: "/MinimalApi"
