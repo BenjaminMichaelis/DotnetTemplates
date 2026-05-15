@@ -9,7 +9,12 @@ multi-ecosystem-groups:
 updates:
 # Template Project (Root)
   - package-ecosystem: "github-actions" 
-    directory: "/"
+    directories:
+      - "/"
+      - "/templates/Library/NuGet/.github/workflows"
+      - "/templates/Quickstart/BenchmarkApp/.github/workflows"
+      - "/templates/Quickstart/ConsoleApp/.github/workflows"
+      - "/templates/Aspire/MinimalApi/.github/workflows"
     schedule:
       interval: "weekly" 
     groups:
@@ -18,49 +23,46 @@ updates:
             - "*-artifact"
 
 
-# Library.NuGet Template
-  - package-ecosystem: "nuget" 
-    directory: "/templates/Library/NuGet"
+# Library.NuGet, Quickstart.BenchmarkApp, Quickstart.ConsoleApp, Aspire.MinimalApi Templates
+  - package-ecosystem: "nuget"
+    directories:
+      - "/templates/Library/NuGet"
+      - "/templates/Quickstart/BenchmarkApp"
+      - "/templates/Quickstart/ConsoleApp"
+      - "/templates/Aspire/MinimalApi"
     schedule:
       interval: "weekly"
-
-  - package-ecosystem: "github-actions" 
-    directory: "/templates/Library/NuGet/.github/workflows"
-    schedule:
-      interval: "weekly" 
     groups:
-       dev-dependencies:
-          patterns:
-            - "*-artifact"  
+      entity-framework-stack:
+        patterns:
+          - "Microsoft.EntityFrameworkCore.*"
+          - "dotnet-ef"
 
-# Quickstart.BenchmarkApp Project
-  - package-ecosystem: "nuget"
-    directory: "/templates/Quickstart/BenchmarkApp"
-    schedule:
-      interval: "weekly" 
-
-# Quickstart.ConsoleApp Project
-  - package-ecosystem: "nuget"
-    directory: "/templates/Quickstart/ConsoleApp"
+  - package-ecosystem: "dotnet-sdk"
+    directories:
+      - "/templates/Library/NuGet"
+      - "/templates/Quickstart/BenchmarkApp"
+      - "/templates/Quickstart/ConsoleApp"
     schedule:
       interval: "weekly"
 
-# Aspire.MinimalApi Template - NuGet and Docker grouped into one PR
-  - package-ecosystem: "nuget"
-    directory: "/templates/Aspire/MinimalApi"
-    schedule:
-      interval: "weekly"
-    patterns: ["Microsoft.*", "Aspire.*", "System.*"]
-    multi-ecosystem-group: "dotnet-version"
-
+# Docker and dotnet SDK grouped into one PR
   - package-ecosystem: "docker"
     directory: "/templates/Aspire/MinimalApi/MinimalApi"
     schedule:
       interval: "weekly"
-    patterns: ["mcr.microsoft.com/dotnet/*"]
+    patterns: ["*"]
     multi-ecosystem-group: "dotnet-version"
 
-  # NOTE: global.json is not a Dependabot-supported ecosystem.
-  # The update-dotnet-sdk.yml workflow in the template handles it separately.
-  # The build CI checks that global.json and Dockerfile major.minor stay aligned.
+  - package-ecosystem: "dotnet-sdk"
+    directory: "/templates/Aspire/MinimalApi"
+    schedule:
+      interval: "weekly"
+    patterns: ["*"]
+    multi-ecosystem-group: "dotnet-version"
+
+  - package-ecosystem: "terraform"
+    directory: "/templates/Aspire/MinimalApi/Infra"
+    schedule:
+      interval: "weekly"
 
