@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ReactApp.Core\ReactApp.Core.csproj" />
+    <ProjectReference Include="..\ReactApp.Data\ReactApp.Data.csproj" />
+    <ProjectReference Include="..\ReactApp.ServiceDefaults\ReactApp.ServiceDefaults.csproj" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" />
+    <PackageReference Include="Swashbuckle.AspNetCore" />
+  </ItemGroup>
+
+</Project>

@@ -37,3 +37,9 @@ updates:
     directory: "/templates/Quickstart/ConsoleApp"
     schedule:
       interval: "weekly"
+
+# Aspire.MinimalApi Template
+  - package-ecosystem: "nuget"
+    directory: "/templates/Aspire/MinimalApi"
+    schedule:
+      interval: "weekly"
