@@ -1,0 +1,64 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "BenjaminMichaelis",
+  "classifications": [
+    "Common",
+    "Aspire",
+    "Web API"
+  ],
+  "identity": "BenjaminMichaelis.Aspire.MinimalApi",
+  "name": "Benjamin Michaelis Aspire Minimal API",
+  "description": "Creates a .NET Aspire solution with an ASP.NET Core Web API backend, EF Core, ASP.NET Core Identity, and Azure deployment assets.",
+  "shortName": "bmichaelis.aspire.minimalapi",
+  "icon": "favicon.ico",
+  "tags": {
+    "language": "C#",
+    "type": "solution"
+  },
+  "preferNameDirectory": true,
+  "sourceName": "MinimalApi",
+  "primaryOutputs": [
+    {
+      "path": "MinimalApi.slnx"
+    },
+    {
+      "path": "MinimalApi.AppHost/MinimalApi.AppHost.csproj"
+    }
+  ],
+  "postActions": [
+    {
+      "condition": "(skipRestore != \"true\")",
+      "description": "Restore NuGet packages required by this solution.",
+      "manualInstructions": [
+        {
+          "text": "Run 'dotnet restore' in the created project directory."
+        }
+      ],
+      "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+      "continueOnError": true,
+      "args": {
+        "files": [
+          "MinimalApi/MinimalApi.csproj",
+          "MinimalApi.AppHost/MinimalApi.AppHost.csproj",
+          "MinimalApi.Core/MinimalApi.Core.csproj",
+          "MinimalApi.Core.Tests/MinimalApi.Core.Tests.csproj",
+          "MinimalApi.Data/MinimalApi.Data.csproj",
+          "MinimalApi.ServiceDefaults/MinimalApi.ServiceDefaults.csproj"
+        ]
+      }
+    }
+  ],
+  "symbols": {
+    "applicationInsights": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "false",
+      "description": "Add Azure Application Insights monitoring: Aspire auto-provisioning, the Azure Monitor OpenTelemetry exporter, and the Application Insights Profiler."
+    }
+  },
+  "sources": [
+    {
+      "modifiers": []
+    }
+  ]
+}

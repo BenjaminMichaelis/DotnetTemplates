@@ -1,0 +1,39 @@
+# To get started with Dependabot version updates, you'll need to specify which
+# package ecosystems to update and where the package manifests are located.
+# Please see the documentation for all configuration options:
+# https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+
+version: 2
+
+multi-ecosystem-groups:
+  dotnet-version:
+    schedule:
+      interval: "weekly"
+    labels: ["dependencies"]
+
+updates:
+  # NuGet and Docker are grouped: one Dependabot PR per .NET release.
+  # global.json is handled by update-dotnet-sdk.yml (not a Dependabot ecosystem).
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    patterns: ["Microsoft.*", "Aspire.*", "System.*"]
+    multi-ecosystem-group: "dotnet-version"
+
+  - package-ecosystem: "docker"
+    directory: "/MinimalApi"
+    schedule:
+      interval: "weekly"
+    patterns: ["mcr.microsoft.com/dotnet/*"]
+    multi-ecosystem-group: "dotnet-version"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+

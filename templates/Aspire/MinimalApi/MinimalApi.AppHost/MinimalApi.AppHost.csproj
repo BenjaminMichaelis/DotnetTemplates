@@ -1,0 +1,28 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.2.0">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.Azure" />
+    <PackageReference Include="Aspire.Hosting.Azure.AppContainers" />
+    <PackageReference Include="Aspire.Hosting.Azure.Sql" />
+    <PackageReference Include="Aspire.Hosting.SqlServer" />
+    <!--#if (applicationInsights)-->
+    <PackageReference Include="Aspire.Hosting.Azure.ApplicationInsights" />
+    <!--#endif-->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MinimalApi.Core\MinimalApi.Core.csproj" IsAspireProjectResource="false" />
+    <ProjectReference Include="..\MinimalApi.Data\MinimalApi.Data.csproj" IsAspireProjectResource="false" />
+    <ProjectReference Include="..\MinimalApi\MinimalApi.csproj" />
+  </ItemGroup>
+
+</Project>

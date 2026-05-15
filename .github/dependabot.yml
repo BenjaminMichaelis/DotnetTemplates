@@ -1,4 +1,11 @@
 version: 2
+
+multi-ecosystem-groups:
+  dotnet-version:
+    schedule:
+      interval: "weekly"
+    labels: ["dependencies"]
+
 updates:
 # Template Project (Root)
   - package-ecosystem: "github-actions" 
@@ -37,3 +44,23 @@ updates:
     directory: "/templates/Quickstart/ConsoleApp"
     schedule:
       interval: "weekly"
+
+# Aspire.MinimalApi Template - NuGet and Docker grouped into one PR
+  - package-ecosystem: "nuget"
+    directory: "/templates/Aspire/MinimalApi"
+    schedule:
+      interval: "weekly"
+    patterns: ["Microsoft.*", "Aspire.*", "System.*"]
+    multi-ecosystem-group: "dotnet-version"
+
+  - package-ecosystem: "docker"
+    directory: "/templates/Aspire/MinimalApi/MinimalApi"
+    schedule:
+      interval: "weekly"
+    patterns: ["mcr.microsoft.com/dotnet/*"]
+    multi-ecosystem-group: "dotnet-version"
+
+  # NOTE: global.json is not a Dependabot-supported ecosystem.
+  # The update-dotnet-sdk.yml workflow in the template handles it separately.
+  # The build CI checks that global.json and Dockerfile major.minor stay aligned.
+
