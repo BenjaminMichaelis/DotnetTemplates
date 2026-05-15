@@ -157,5 +157,6 @@ jobs:
           mkdir $outDir
           Push-Location $outDir
           dotnet new bmichaelis.aspire.minimalapi --name MinimalApi ${{ matrix.args }}
+          Push-Location MinimalApi
           dotnet build /p:TreatWarningsAsErrors=true
           dotnet test --no-build /p:TreatWarningsAsErrors=true -p:TestingPlatformDotnetTestSupport=true
