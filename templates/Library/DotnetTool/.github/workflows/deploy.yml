@@ -34,13 +34,26 @@ jobs:
       - name: Pack
         if: startsWith(github.ref, 'refs/tags/v')
         run: |
-          dotnet pack -p:PackageVersion=${{ env.nugetVersion }} --configuration Release -o ${{ github.workspace }}/PackedNuget
+          $packOutput = & dotnet pack -p:PackageVersion=${{ env.nugetVersion }} --configuration Release -o ${{ github.workspace }}/PackedNuget 2>&1
+          $exitCode = $LASTEXITCODE
+          $unexpectedErrors = $packOutput | Where-Object {
+            $_ -match 'error' -and
+            $_ -notmatch 'NU5017' -and
+            $_ -notmatch '^Build failed with \d+ error\(s\)'
+          }
+          if ($exitCode -ne 0 -and $unexpectedErrors) {
+            $unexpectedErrors | ForEach-Object { Write-Error $_ }
+            throw "dotnet pack failed"
+          }
           # NU5017 is a known false positive for RID-specific tool pointer packages (SDK 10 bug):
           # NuGet validation does not yet recognise DotnetToolSettings.xml as package content.
           # All packages are created correctly. Verify they exist before proceeding.
           $pkgs = Get-ChildItem "${{ github.workspace }}/PackedNuget" -Filter "*.nupkg"
           if ($pkgs.Count -lt 5) { throw "Expected at least 5 .nupkg files but found $($pkgs.Count)" }
-          $LASTEXITCODE = 0
+          if ($exitCode -ne 0) {
+            Write-Warning "dotnet pack returned exit code $exitCode, but only the known NU5017 false positive was detected."
+          }
+          exit 0
 
       - name: Upload Artifacts
         if: startsWith(github.ref, 'refs/tags/v')

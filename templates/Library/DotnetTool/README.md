@@ -34,7 +34,7 @@ dotnet new bmichaelis.tool
 ```cli
 dotnet build
 dotnet test --no-build
-dotnet pack --configuration Release
+dotnet pack --configuration Release -o ./artifacts/package/release
 ```
 
 This creates:
@@ -49,7 +49,17 @@ This creates:
 ## Installing the tool locally
 
 ```cli
-dotnet tool install --global --add-source ./artifacts/package/release DotnetTool
+@"
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <packageSources>
+    <clear />
+    <add key="local" value="./artifacts/package/release" />
+  </packageSources>
+</configuration>
+"@ | Set-Content ./NuGet.local.config
+
+dotnet tool install --global DotnetTool --configfile ./NuGet.local.config
 ```
 
 ## Generating Releases
