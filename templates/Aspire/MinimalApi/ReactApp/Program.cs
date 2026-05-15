@@ -1,5 +1,4 @@
 using ReactApp.Core;
-using ReactApp.Core.Hubs;
 using ReactApp.Data;
 using ReactApp.Middleware;
 
@@ -13,9 +12,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults()
     .AddDatabase()
     .AddQAServices();
-
-// Add HTTP context accessor for SignalR authentication
-builder.Services.AddHttpContextAccessor();
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -48,18 +44,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Add authorization policies
-builder.Services.AddAuthorization(options =>
-{
-    // Policy that allows both cookie and JWT authentication for SignalR
-    options.AddPolicy("SignalRPolicy", policy =>
-    {
-        policy.AddAuthenticationSchemes(
-            IdentityConstants.ApplicationScheme, 
-            JwtBearerDefaults.AuthenticationScheme);
-        policy.RequireAssertion(_ => true); // Always allow
-    });
-});
+builder.Services.AddAuthorization();
 
 var authBuilder = builder.Services.AddAuthentication(options =>
 {
@@ -99,38 +84,10 @@ authBuilder.AddJwtBearer(options =>
         ValidIssuer = "ReactApp",
         ValidAudience = "ReactApp",
         IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["SignalR:SigningKey"] 
-                ?? "ReactApp-SignalR-Signing-Key-Min-32-Chars-Long!"))
-    };
-
-    // For SignalR, read the token from the query string
-    options.Events = new JwtBearerEvents
-    {
-        OnMessageReceived = context =>
-        {
-            var accessToken = context.Request.Query["access_token"];
-            if (!string.IsNullOrEmpty(accessToken) && context.HttpContext.Request.Path.StartsWithSegments("/hubs"))
-            {
-                context.Token = accessToken;
-            }
-            return Task.CompletedTask;
-        },
-        OnAuthenticationFailed = context =>
-        {
-            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
-            logger.LogWarning("JWT authentication failed: {Exception}", context.Exception.Message);
-            return Task.CompletedTask;
-        },
-        OnChallenge = context =>
-        {
-            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
-            logger.LogWarning("JWT authentication challenge: {Error} - {ErrorDescription}", context.Error, context.ErrorDescription);
-            return Task.CompletedTask;
-        }
+            Encoding.UTF8.GetBytes(builder.Configuration["Auth:SigningKey"]
+                ?? "ReactApp-Auth-Signing-Key-Min-32-Chars-Long!"))
     };
 });
-
-builder.Services.AddSignalR();
 
 // No-op email sender for now (can be replaced with real implementation)
 builder.Services.AddScoped<IEmailSender<ApplicationUser>>(sp => 
@@ -165,11 +122,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
-// SignalR hub uses JWT authentication when token present, allows anonymous otherwise
-// Method-level [Authorize] enforces authentication for owner operations
-app.MapHub<RoomHub>("/hubs/room")
-    .RequireAuthorization("SignalRPolicy");
 
 app.Run();
 

@@ -1,6 +1,6 @@
 # Aspire Minimal API Template
 
-This template creates a .NET Aspire solution with an ASP.NET Core Web API backend, EF Core, ASP.NET Core Identity, SignalR, and Azure deployment assets.
+This template creates a .NET Aspire solution with an ASP.NET Core Web API backend, EF Core, ASP.NET Core Identity, and Azure deployment assets.
 
 ## Template
 
@@ -21,8 +21,7 @@ Create a new app in your current directory by running:
 ## What is included
 
 - **API project** – ASP.NET Core Web API with controllers, CORS, Swagger/OpenAPI
-- **ASP.NET Core Identity** – Cookie + JWT authentication for API and SignalR
-- **SignalR** – Real-time hub with JWT and cookie auth
+- **ASP.NET Core Identity** – Cookie + JWT authentication for API endpoints
 - **EF Core** – SQL Server data layer with migrations via AppHost
 - **Aspire AppHost** – Local orchestration with SQL Server container and DB viewer (dbGate)
 - **ServiceDefaults** – Shared OpenTelemetry, health checks, service discovery

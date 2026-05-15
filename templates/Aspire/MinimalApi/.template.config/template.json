@@ -8,7 +8,7 @@
   ],
   "identity": "BenjaminMichaelis.Aspire.MinimalApi",
   "name": "Benjamin Michaelis Aspire Minimal API",
-  "description": "Creates a .NET Aspire solution with an ASP.NET Core Web API backend, EF Core, ASP.NET Core Identity, SignalR, and Azure deployment assets.",
+  "description": "Creates a .NET Aspire solution with an ASP.NET Core Web API backend, EF Core, ASP.NET Core Identity, and Azure deployment assets.",
   "shortName": "bmichaelis.aspire.minimalapi",
   "icon": "favicon.ico",
   "tags": {

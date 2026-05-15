@@ -1,12 +1,10 @@
-using ReactApp.Core.Hubs;
 using ReactApp.Data;
 
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace ReactApp.Core.QA;
 
-public class RoomService(IDbContextFactory<ApplicationDbContext> contextFactory, IHubContext<RoomHub> hubContext) : IRoomService
+public class RoomService(IDbContextFactory<ApplicationDbContext> contextFactory) : IRoomService
 {
     public async Task<IEnumerable<Room>> GetAllRoomsAsync()
     {
@@ -69,8 +67,6 @@ public class RoomService(IDbContextFactory<ApplicationDbContext> contextFactory,
         context.Rooms.Add(room);
         await context.SaveChangesAsync(cancellationToken);
         
-        // Broadcast AFTER database save completes
-        await hubContext.Clients.All.SendAsync("RoomCreated", (RoomDto?)room, cancellationToken);
         return room;
     }
 
@@ -110,7 +106,6 @@ public class RoomService(IDbContextFactory<ApplicationDbContext> contextFactory,
         room.CurrentQuestionId = questionId;
         await context.SaveChangesAsync(cancellationToken);
 
-        await hubContext.SendCurrentQuestionChangedAsync(room.Id, room.CurrentQuestion, cancellationToken);
     }
 
     public async Task DeleteRoomAsync(Guid roomId, string userId, CancellationToken cancellationToken)
@@ -133,7 +128,5 @@ public class RoomService(IDbContextFactory<ApplicationDbContext> contextFactory,
         context.Rooms.Remove(room);
         await context.SaveChangesAsync(cancellationToken);
         
-        // Broadcast AFTER database save completes
-        await hubContext.SendRoomDeletedAsync(roomId, cancellationToken);
     }
 }

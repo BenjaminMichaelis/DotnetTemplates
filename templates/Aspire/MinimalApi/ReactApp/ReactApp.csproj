@@ -9,7 +9,6 @@
     <ProjectReference Include="..\ReactApp.Data\ReactApp.Data.csproj" />
     <ProjectReference Include="..\ReactApp.ServiceDefaults\ReactApp.ServiceDefaults.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" />
     <PackageReference Include="Swashbuckle.AspNetCore" />
   </ItemGroup>
 

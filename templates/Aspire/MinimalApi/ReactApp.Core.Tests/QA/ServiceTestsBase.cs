@@ -1,4 +1,3 @@
-using ReactApp.Core.Hubs;
 using ReactApp.Data;
 
 namespace ReactApp.Core.Tests.QA;
@@ -11,7 +10,6 @@ public abstract class ServiceTestsBase
     public async Task Setup()
     {
         Mocker.WithDbContext<ApplicationDbContext>();
-        Mocker.WithSignalR<RoomHub>();
     }
 
     [After(Test)]

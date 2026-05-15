@@ -1,14 +1,12 @@
 using System.Collections.Concurrent;
 
-using ReactApp.Core.Hubs;
 using ReactApp.Data;
 
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace ReactApp.Core.QA;
 
-public class QuestionService(IDbContextFactory<ApplicationDbContext> contextFactory, IHubContext<RoomHub> hubContext) : IQuestionService
+public class QuestionService(IDbContextFactory<ApplicationDbContext> contextFactory) : IQuestionService
 {
     //TODO: This does not horizontally scale
     private static readonly ConcurrentDictionary<string, DateTimeOffset> _lastSubmissionTimes = new();
@@ -63,7 +61,6 @@ public class QuestionService(IDbContextFactory<ApplicationDbContext> contextFact
         context.Questions.Add(question);
         await context.SaveChangesAsync(cancellationToken);
 
-        await hubContext.SendQuestionSubmittedAsync(question, cancellationToken);
         return question;
     }
 
@@ -109,7 +106,6 @@ public class QuestionService(IDbContextFactory<ApplicationDbContext> contextFact
         question.IsApproved = true;
         await context.SaveChangesAsync(cancellationToken);
         
-        await hubContext.SendQuestionApprovedAsync(question, cancellationToken);
     }
 
     public async Task MarkAsAnsweredAsync(Guid questionId, string userId, CancellationToken cancellationToken)
@@ -130,7 +126,6 @@ public class QuestionService(IDbContextFactory<ApplicationDbContext> contextFact
         question.IsAnswered = true;
         await context.SaveChangesAsync(cancellationToken);
         
-        await hubContext.SendQuestionAnsweredAsync(question, cancellationToken);
     }
 
     public async Task DeleteQuestionAsync(Guid questionId, string userId, CancellationToken cancellationToken)
@@ -148,11 +143,8 @@ public class QuestionService(IDbContextFactory<ApplicationDbContext> contextFact
             throw new UnauthorizedAccessException("Only the room owner can delete questions");
         }
 
-        var roomId = question.RoomId;
         context.Questions.Remove(question);
         await context.SaveChangesAsync(cancellationToken);
-
-        await hubContext.SendQuestionDeletedAsync(roomId, questionId, cancellationToken);
     }
 
     public Task<bool> CanSubmitQuestionAsync(string clientId)
