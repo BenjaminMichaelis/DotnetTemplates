@@ -7,14 +7,19 @@
     <Title>Benjamin Michaelis's .NET Templates</Title>
     <Authors>Benjamin Michaelis</Authors>
     <Description>.NET Templates built by Benjamin Michaelis</Description>
-    <PackageTags>dotnet-new;templates;nuget</PackageTags>
+    <PackageTags>dotnet-new;dotnet-template;template;template-pack;scaffolding;aspire;benchmark;console;library;nuget</PackageTags>
     <PackageProjectUrl>https://github.com/BenjaminMichaelis/DotnetTemplates</PackageProjectUrl>
     <RepositoryUrl>https://github.com/BenjaminMichaelis/DotnetTemplates</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReleaseNotes>Adds template authoring validation and improves package metadata, CI coverage, and contributor setup.</PackageReleaseNotes>
+    <PackageIcon>NuGetIcon.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 
     <TargetFramework>net9.0</TargetFramework>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
+    <LocalizeTemplates>false</LocalizeTemplates>
+    <NoWarn>$(NoWarn);NU5128;NU5110;NU5111</NoWarn>
 
     <IncludeContentInPack>true</IncludeContentInPack>
     <IncludeBuildOutput>false</IncludeBuildOutput>
@@ -23,9 +28,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.TemplateEngine.Tasks" Version="7.0.120" PrivateAssets="all" IsImplicitlyDefined="true" />
+    <None Include="NuGetIcon.png" Pack="true" PackagePath="\" />
     <None Include="./README.md" Pack="true" PackagePath="\"/>
     <Content Include="templates\**\*" Exclude="templates\**\bin\**;templates\**\obj\**;templates\**\.vs\**" />
-	<Content Include ="templates*\global.json" Pack="true" />
     <Compile Remove="**\*" />
   </ItemGroup>
 

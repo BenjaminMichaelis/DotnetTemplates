@@ -49,7 +49,7 @@
         {
           "condition": "(no-sln)",
           "exclude": [
-            "ConsoleApp.sln"
+            "ConsoleApp.slnx"
           ]
         },
         {

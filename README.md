@@ -4,7 +4,7 @@ The repository contains a set of opinionated [dotnet new templates](https://lear
 
 ## Requirements
 
-These templates require [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0) or later.
+These templates require [.NET 10.0 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) or later.
 
 ## Installing
 
@@ -62,7 +62,7 @@ You can now test the template by running:
 ```cli
 > dotnet new bmichaelis.{templatename}
 > dotnet build
-> dotent test --no-build
+> dotnet test --no-build
 > dotnet publish --no-build
 ```
 
