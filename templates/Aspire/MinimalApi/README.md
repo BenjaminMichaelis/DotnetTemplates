@@ -35,6 +35,33 @@ Create a new app in your current directory by running:
 > aspire run
 ```
 
+## Container / Docker
+
+A `Dockerfile` is included in `ReactApp/` for building the API image outside of Aspire (CI/CD pipelines, Docker Compose, manual builds).
+
+**Build the image** (run from the solution root — `templates/Aspire/MinimalApi/`):
+
+```sh
+docker build -f ReactApp/Dockerfile -t myapp:latest .
+```
+
+**Run the image** (connection strings and secrets must be provided at runtime — never bake them in):
+
+```sh
+docker run -p 8080:8080 \
+  -e Auth__SigningKey="<at-least-32-char-secret>" \
+  -e ConnectionStrings__ReactApp-db="Server=...;Database=...;" \
+  myapp:latest
+```
+
+### Security notes
+- Runtime image is `mcr.microsoft.com/dotnet/aspnet:10.0-noble-chiseled` — no shell, no package manager, non-root (`app`, UID 65532)
+- HTTPS is **not** terminated in the container; configure TLS at your ingress/load balancer
+- All secrets must be injected via environment variables or a secrets manager (Azure Key Vault, Kubernetes secrets, etc.)
+
+### Aspire vs. standalone Docker
+When running with `aspire run`, the AppHost uses `AddProject<Projects.ReactApp>` and Aspire handles container publishing automatically (no Dockerfile required). The `Dockerfile` is for non-Aspire workflows only.
+
 ## Azure deployment
 
 Infrastructure is managed with Terraform under `Infra/`. See `Infra/README.md` for setup instructions.
