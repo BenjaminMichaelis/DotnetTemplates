@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "BenjaminMichaelis",
+  "classifications": [
+    "Common",
+    "Tool",
+    "NuGet"
+  ],
+  "identity": "BenjaminMichaelis.Library.DotnetTool",
+  "name": "Benjamin Michaelis's .NET Global Tool",
+  "shortName": "bmichaelis.tool",
+  "tags": {
+    "language": "C#",
+    "type": "solution"
+  },
+  "preferNameDirectory": true,
+  "sourceName": "DotnetTool",
+  "symbols": {
+    "createdDate": {
+      "type": "generated",
+      "generator": "now",
+      "parameters": {
+        "format": "yyyy"
+      },
+      "replaces": "1970"
+    },
+    "no-sln": {
+      "type": "parameter",
+      "dataType": "bool",
+      "defaultValue": "false"
+    },
+    "no-tests": {
+      "type": "parameter",
+      "dataType": "bool",
+      "defaultValue": "false"
+    }
+  },
+  "sources": [
+    {
+      "modifiers": [
+        {
+          "condition": "(no-sln)",
+          "exclude": [
+            "DotnetTool.slnx"
+          ]
+        },
+        {
+          "condition": "(no-tests)",
+          "exclude": [
+            "DotnetTool.Tests/*"
+          ]
+        }
+      ]
+    }
+  ]
+}

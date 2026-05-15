@@ -1,0 +1,58 @@
+# DotnetTool
+
+A base template for .NET Global Tool packages, with unit tests and GitHub Actions. Supports RID-specific packaging so the tool installs a platform-optimized binary on `win-x64`, `linux-x64`, and `osx-arm64` with no user-visible difference.
+
+> **Requires .NET SDK 10.0 or later.** RID-specific tool packaging is a .NET SDK 10 feature.
+> See [RID-specific tools](https://learn.microsoft.com/en-us/dotnet/core/tools/rid-specific-tools) for background.
+
+## Startup Steps
+
+- [ ] Search for all CHANGEME words — most are in `Directory.Build.props` and `deploy.yml`
+- [ ] Set `<ToolCommandName>` in `DotnetTool.csproj` to your desired CLI command name
+- [ ] Make sure the project compiles and tests pass
+- [ ] Add `NUGET_API_KEY` with your NuGet.org API key to the GitHub repository secrets
+
+## Features
+
+- `PackAsTool` with `RuntimeIdentifiers` for `win-x64`, `linux-x64`, and `osx-arm64`
+- A single `dotnet pack` produces all RID-specific packages plus a top-level pointer package
+- GitHub Actions deploy workflow that publishes RID-specific packages before the pointer package (required ordering)
+- Central Package Management (`Directory.Packages.props`)
+- SourceLink for debuggable symbols
+- xunit + Moq.AutoMock test project
+
+## Template
+
+Create a new tool in your current directory by running:
+
+```cli
+dotnet new bmichaelis.tool
+```
+
+## Building and packing locally
+
+```cli
+dotnet build
+dotnet test --no-build
+dotnet pack --configuration Release
+```
+
+This creates:
+- `DotnetTool.win-x64.<version>.nupkg`
+- `DotnetTool.linux-x64.<version>.nupkg`
+- `DotnetTool.osx-arm64.<version>.nupkg`
+- `DotnetTool.1.0.0.nupkg` (top-level pointer package)
+
+## Installing the tool locally
+
+```cli
+dotnet tool install --global --add-source ./artifacts/package/release DotnetTool
+```
+
+## Generating Releases
+
+1. Create a release on GitHub
+2. Add your [NuGet.org](https://www.nuget.org/account/apikeys) API key to the GitHub repository secrets as `NUGET_API_KEY` with push scope permissions
+3. Tag the release following `v*.*.*` format, e.g. `v1.0.0`
+
+The deploy workflow publishes RID-specific packages first, then the pointer package last. This ordering is required — if the pointer package is published before its sub-packages, installs will fail.
