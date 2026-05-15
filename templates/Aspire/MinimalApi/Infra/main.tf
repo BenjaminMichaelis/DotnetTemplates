@@ -1,6 +1,6 @@
 locals {
   default_tags = {
-    "app" = "ReactApp"
+    "app" = "MinimalApi"
   }
 
   # TODO: Review and adjust variables as needed for your project

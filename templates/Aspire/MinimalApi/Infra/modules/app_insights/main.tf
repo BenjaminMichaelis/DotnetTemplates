@@ -1,5 +1,5 @@
 resource "azurerm_application_insights" "application_insights" {
-  name                = "reactapp-${lower(var.environment)}-appinsights"
+  name                = "MinimalApi-${lower(var.environment)}-appinsights"
   location            = var.resource_group.location
   resource_group_name = var.resource_group.name
   application_type    = "web"

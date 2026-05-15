@@ -6,7 +6,7 @@ locals {
 }
 
 resource "azurerm_resource_group" "resource_group" {
-  name     = "reactapp-shared-rg"
+  name     = "MinimalApi-shared-rg"
   location = var.location
 
   tags = local.tags
@@ -15,7 +15,7 @@ resource "azurerm_resource_group" "resource_group" {
 module "container_registry" {
   source = "../modules/container_registry"
 
-  name           = "reactappacr${lower(var.environment)}"
+  name           = "MinimalApiacr${lower(var.environment)}"
   resource_group = azurerm_resource_group.resource_group
   tags           = local.tags
 

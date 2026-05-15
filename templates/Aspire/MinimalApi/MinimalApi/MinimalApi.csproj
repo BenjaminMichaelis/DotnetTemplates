@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MinimalApi.Core\MinimalApi.Core.csproj" />
+    <ProjectReference Include="..\MinimalApi.Data\MinimalApi.Data.csproj" />
+    <ProjectReference Include="..\MinimalApi.ServiceDefaults\MinimalApi.ServiceDefaults.csproj" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Swashbuckle.AspNetCore" />
+  </ItemGroup>
+
+</Project>

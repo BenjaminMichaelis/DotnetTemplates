@@ -7,18 +7,18 @@ locals {
 }
 
 resource "azurerm_resource_group" "resource_group" {
-  name     = "reactapp-${lower(local.environment)}-rg"
+  name     = "MinimalApi-${lower(local.environment)}-rg"
   location = var.location
 
   tags = local.tags
 }
 resource "azuread_group" "admins_group" {
-  display_name     = "ReactApp-${local.environment}-admins"
+  display_name     = "MinimalApi-${local.environment}-admins"
   security_enabled = true
 }
 
 resource "azurerm_user_assigned_identity" "app_identity" {
-  name                = "reactapp-${lower(local.environment)}-mi"
+  name                = "MinimalApi-${lower(local.environment)}-mi"
   location            = azurerm_resource_group.resource_group.location
   resource_group_name = azurerm_resource_group.resource_group.name
 
@@ -28,7 +28,7 @@ resource "azurerm_user_assigned_identity" "app_identity" {
 module "container_app_environment" {
   source = "../modules/container_app_environment"
 
-  container_app_environment_name = "reactapp-${lower(local.environment)}-cae"
+  container_app_environment_name = "MinimalApi-${lower(local.environment)}-cae"
   resource_group                 = azurerm_resource_group.resource_group
   identity_id                    = azurerm_user_assigned_identity.app_identity.principal_id
 }
@@ -36,7 +36,7 @@ module "container_app_environment" {
 module "backend_container_app" {
   source = "../modules/container_app"
 
-  name                            = "reactapp-${lower(local.environment)}-backend"
+  name                            = "MinimalApi-${lower(local.environment)}-backend"
   container_app_environment_id    = module.container_app_environment.container_app_environment_id
   resource_group_name             = azurerm_resource_group.resource_group.name
   identity_id                     = azurerm_user_assigned_identity.app_identity.id
@@ -57,8 +57,8 @@ module "sql" {
 
   resource_group = azurerm_resource_group.resource_group
 
-  server_name   = "reactapp-${lower(local.environment)}-sqlserver"
-  database_name = "reactapp-${lower(local.environment)}-db"
+  server_name   = "MinimalApi-${lower(local.environment)}-sqlserver"
+  database_name = "MinimalApi-${lower(local.environment)}-db"
 
   tags            = local.tags
   users           = { app_identity = azurerm_user_assigned_identity.app_identity.name }

@@ -36,7 +36,7 @@ jobs:
       - name: Verify global.json and Dockerfile are on the same major.minor
         run: |
           SDK_MAJOR_MINOR=$(jq -r '.sdk.version' global.json | cut -d. -f1,2)
-          DOCKER_MAJOR_MINOR=$(grep -m1 'FROM mcr.microsoft.com/dotnet/sdk:' ReactApp/Dockerfile \
+          DOCKER_MAJOR_MINOR=$(grep -m1 'FROM mcr.microsoft.com/dotnet/sdk:' MinimalApi/Dockerfile \
             | sed 's|.*dotnet/sdk:\([0-9]*\.[0-9]*\).*|\1|')
           if [ "$SDK_MAJOR_MINOR" != "$DOCKER_MAJOR_MINOR" ]; then
             echo "::error::Version mismatch: global.json SDK is ${SDK_MAJOR_MINOR} but Dockerfile uses ${DOCKER_MAJOR_MINOR}."
@@ -71,8 +71,8 @@ jobs:
         run: |
           dotnet ef migrations has-pending-model-changes `
             --configuration Release `
-            --project ReactApp.Data/ReactApp.Data.csproj `
-           --startup-project ReactApp.AppHost/ReactApp.AppHost.csproj
+            --project MinimalApi.Data/MinimalApi.Data.csproj `
+           --startup-project MinimalApi.AppHost/MinimalApi.AppHost.csproj
 
       # Microsoft Testing Platform can stop the run once 10 tests fail in CI:
       # https://learn.microsoft.com/dotnet/core/testing/microsoft-testing-platform-cli-options
@@ -101,8 +101,8 @@ jobs:
             --self-contained `
             --no-build `
             --configuration Release `
-            --project ReactApp.Data/ReactApp.Data.csproj `
-            --startup-project .\ReactApp.AppHost\ReactApp.AppHost.csproj `
+            --project MinimalApi.Data/MinimalApi.Data.csproj `
+            --startup-project .\MinimalApi.AppHost\MinimalApi.AppHost.csproj `
             --output efbundle
 
       - name: Upload DB Migration
@@ -240,4 +240,4 @@ jobs:
           az containerapp update `
             --name ${{ needs.get-infrastructure-outputs.outputs.backend_container_app_name }} `
             --resource-group ${{ needs.get-infrastructure-outputs.outputs.resource_group_name }} `
-            --image ${{ needs.get-infrastructure-outputs.outputs.acr_login_server }}/reactapp:${{ github.sha }}
+            --image ${{ needs.get-infrastructure-outputs.outputs.acr_login_server }}/MinimalApi:${{ github.sha }}

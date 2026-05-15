@@ -54,7 +54,7 @@ updates:
     multi-ecosystem-group: "dotnet-version"
 
   - package-ecosystem: "docker"
-    directory: "/templates/Aspire/MinimalApi/ReactApp"
+    directory: "/templates/Aspire/MinimalApi/MinimalApi"
     schedule:
       interval: "weekly"
     patterns: ["mcr.microsoft.com/dotnet/*"]

@@ -16,13 +16,13 @@
     "type": "solution"
   },
   "preferNameDirectory": true,
-  "sourceName": "ReactApp",
+  "sourceName": "MinimalApi",
   "primaryOutputs": [
     {
-      "path": "ReactApp.slnx"
+      "path": "MinimalApi.slnx"
     },
     {
-      "path": "ReactApp.AppHost/ReactApp.AppHost.csproj"
+      "path": "MinimalApi.AppHost/MinimalApi.AppHost.csproj"
     }
   ],
   "postActions": [
@@ -38,12 +38,12 @@
       "continueOnError": true,
       "args": {
         "files": [
-          "ReactApp/ReactApp.csproj",
-          "ReactApp.AppHost/ReactApp.AppHost.csproj",
-          "ReactApp.Core/ReactApp.Core.csproj",
-          "ReactApp.Core.Tests/ReactApp.Core.Tests.csproj",
-          "ReactApp.Data/ReactApp.Data.csproj",
-          "ReactApp.ServiceDefaults/ReactApp.ServiceDefaults.csproj"
+          "MinimalApi/MinimalApi.csproj",
+          "MinimalApi.AppHost/MinimalApi.AppHost.csproj",
+          "MinimalApi.Core/MinimalApi.Core.csproj",
+          "MinimalApi.Core.Tests/MinimalApi.Core.Tests.csproj",
+          "MinimalApi.Data/MinimalApi.Data.csproj",
+          "MinimalApi.ServiceDefaults/MinimalApi.ServiceDefaults.csproj"
         ]
       }
     }

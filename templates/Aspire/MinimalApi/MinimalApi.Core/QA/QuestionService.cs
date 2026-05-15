@@ -1,0 +1,195 @@
+using System.Collections.Concurrent;
+
+using MinimalApi.Data;
+
+using Microsoft.EntityFrameworkCore;
+
+namespace MinimalApi.Core.QA;
+
+public class QuestionService(IDbContextFactory<ApplicationDbContext> contextFactory) : IQuestionService
+{
+    //TODO: This does not horizontally scale
+    private static readonly ConcurrentDictionary<string, DateTimeOffset> _lastSubmissionTimes = new();
+    private static readonly TimeSpan _rateLimitWindow = TimeSpan.FromSeconds(10);
+    private static long _nextPruneAtUtcTicks = DateTimeOffset.UtcNow.Add(_rateLimitWindow).UtcTicks;
+
+    public async Task<IEnumerable<Question>> GetQuestionsByRoomIdAsync(Guid roomId)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        return await context.Questions
+            .Where(q => q.RoomId == roomId)
+            .OrderBy(q => q.CreatedDate)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Question>> GetApprovedQuestionsByRoomIdAsync(Guid roomId)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        return await context.Questions
+            .Where(q => q.RoomId == roomId && q.IsApproved)
+            .OrderBy(q => q.CreatedDate)
+            .ToListAsync();
+    }
+
+    public async Task<Question?> GetQuestionByIdAsync(Guid id)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        return await context.Questions
+            .Include(q => q.Room)
+            .FirstOrDefaultAsync(q => q.Id == id);
+    }
+
+    public async Task<Question> SubmitQuestionAsync(Guid roomId, string questionText, string? authorName, CancellationToken cancellationToken)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync(cancellationToken);
+
+        // Verify room exists
+        var roomExists = await context.Rooms.AnyAsync(r => r.Id == roomId, cancellationToken);
+        if (!roomExists)
+        {
+            throw new InvalidOperationException("Room not found");
+        }
+
+        var question = new Question
+        {
+            Id = Guid.NewGuid(),
+            RoomId = roomId,
+            QuestionText = questionText,
+            AuthorName = authorName,
+            CreatedDate = DateTimeOffset.UtcNow
+        };
+
+        context.Questions.Add(question);
+        await context.SaveChangesAsync(cancellationToken);
+
+        return question;
+    }
+
+    public async Task<Question> UpdateQuestionAsync(Guid questionId, string questionText, string? authorName, CancellationToken cancellationToken)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync(cancellationToken);
+
+        var question = await context.Questions
+            .AsTracking()
+            .FirstOrDefaultAsync(q => q.Id == questionId, cancellationToken)
+            ?? throw new InvalidOperationException("Question not found");
+
+        // Only allow updates to unapproved questions
+        if (question.IsApproved)
+        {
+            throw new InvalidOperationException("Cannot update an approved question");
+        }
+
+        question.QuestionText = questionText;
+        question.AuthorName = authorName;
+        question.LastModifiedDate = DateTimeOffset.UtcNow;
+
+        await context.SaveChangesAsync(cancellationToken);
+
+        return question;
+    }
+
+    public async Task ApproveQuestionAsync(Guid questionId, string userId, CancellationToken cancellationToken)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync(cancellationToken);
+
+        var question = await context.Questions
+            .Include(x => x.Room)
+            .AsTracking()
+            .FirstOrDefaultAsync(q => q.Id == questionId, cancellationToken)
+            ?? throw new InvalidOperationException("Question not found");
+
+        if (question.Room!.CreatedByUserId != userId)
+        {
+            throw new UnauthorizedAccessException("Only the room owner can approve questions");
+        }
+
+        question.IsApproved = true;
+        await context.SaveChangesAsync(cancellationToken);
+        
+    }
+
+    public async Task MarkAsAnsweredAsync(Guid questionId, string userId, CancellationToken cancellationToken)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync(cancellationToken);
+
+        var question = await context.Questions
+            .Include(x => x.Room)
+            .AsTracking()
+            .FirstOrDefaultAsync(q => q.Id == questionId, cancellationToken)
+            ?? throw new InvalidOperationException("Question not found");
+
+        if (question.Room!.CreatedByUserId != userId)
+        {
+            throw new UnauthorizedAccessException("Only the room owner can mark questions as answered");
+        }
+
+        question.IsAnswered = true;
+        await context.SaveChangesAsync(cancellationToken);
+        
+    }
+
+    public async Task DeleteQuestionAsync(Guid questionId, string userId, CancellationToken cancellationToken)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync(cancellationToken);
+
+        var question = await context.Questions
+            .Include(x => x.Room)
+            .FirstOrDefaultAsync(q => q.Id == questionId, cancellationToken)
+            ?? throw new InvalidOperationException("Question not found");
+
+        
+        if (question.Room!.CreatedByUserId != userId)
+        {
+            throw new UnauthorizedAccessException("Only the room owner can delete questions");
+        }
+
+        context.Questions.Remove(question);
+        await context.SaveChangesAsync(cancellationToken);
+    }
+
+    public Task<bool> CanSubmitQuestionAsync(string clientId)
+    {
+        var now = DateTimeOffset.UtcNow;
+        PruneExpiredSubmissions(now);
+
+        if (!_lastSubmissionTimes.TryGetValue(clientId, out var lastSubmission))
+        {
+            _lastSubmissionTimes[clientId] = now;
+            return Task.FromResult(true);
+        }
+
+        var timeSinceLastSubmission = now - lastSubmission;
+        
+        if (timeSinceLastSubmission >= _rateLimitWindow)
+        {
+            _lastSubmissionTimes[clientId] = now;
+            return Task.FromResult(true);
+        }
+
+        return Task.FromResult(false);
+    }
+
+    private static void PruneExpiredSubmissions(DateTimeOffset now)
+    {
+        var nextPruneAt = Interlocked.Read(ref _nextPruneAtUtcTicks);
+        if (now.UtcTicks < nextPruneAt)
+        {
+            return;
+        }
+
+        var updatedNextPruneAt = now.Add(_rateLimitWindow).UtcTicks;
+        if (Interlocked.CompareExchange(ref _nextPruneAtUtcTicks, updatedNextPruneAt, nextPruneAt) != nextPruneAt)
+        {
+            return;
+        }
+
+        foreach (var submission in _lastSubmissionTimes)
+        {
+            if (now - submission.Value >= _rateLimitWindow)
+            {
+                _lastSubmissionTimes.TryRemove(submission.Key, out _);
+            }
+        }
+    }
+}

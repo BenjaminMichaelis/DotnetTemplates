@@ -37,12 +37,12 @@ Create a new app in your current directory by running:
 
 ## Container / Docker
 
-A `Dockerfile` is included in `ReactApp/` for building the API image outside of Aspire (CI/CD pipelines, Docker Compose, manual builds).
+A `Dockerfile` is included in `MinimalApi/` for building the API image outside of Aspire (CI/CD pipelines, Docker Compose, manual builds).
 
 **Build the image** (run from the solution root — `templates/Aspire/MinimalApi/`):
 
 ```sh
-docker build -f ReactApp/Dockerfile -t myapp:latest .
+docker build -f MinimalApi/Dockerfile -t myapp:latest .
 ```
 
 **Run the image** (connection strings and secrets must be provided at runtime — never bake them in):
@@ -50,7 +50,7 @@ docker build -f ReactApp/Dockerfile -t myapp:latest .
 ```sh
 docker run -p 8080:8080 \
   -e Auth__SigningKey="<at-least-32-char-secret>" \
-  -e ConnectionStrings__ReactApp-db="Server=...;Database=...;" \
+  -e ConnectionStrings__MinimalApi-db="Server=...;Database=...;" \
   myapp:latest
 ```
 
@@ -60,7 +60,7 @@ docker run -p 8080:8080 \
 - All secrets must be injected via environment variables or a secrets manager (Azure Key Vault, Kubernetes secrets, etc.)
 
 ### Aspire vs. standalone Docker
-When running with `aspire run`, the AppHost uses `AddProject<Projects.ReactApp>` and Aspire handles container publishing automatically (no Dockerfile required). The `Dockerfile` is for non-Aspire workflows only.
+When running with `aspire run`, the AppHost uses `AddProject<Projects.MinimalApi>` and Aspire handles container publishing automatically (no Dockerfile required). The `Dockerfile` is for non-Aspire workflows only.
 
 ## Azure deployment
 
