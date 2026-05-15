@@ -26,8 +26,7 @@ env:
 
 jobs:
   # Validate that global.json SDK major.minor matches the Dockerfile FROM tags.
-  # This catches misaligned updates before either Dependabot or the SDK workflow
-  # can be merged independently in a broken state.
+  # This catches misaligned updates before dependency PRs can merge in a broken state.
   check-version-alignment:
     runs-on: ubuntu-latest
     steps:
@@ -40,7 +39,7 @@ jobs:
             | sed 's|.*dotnet/sdk:\([0-9]*\.[0-9]*\).*|\1|')
           if [ "$SDK_MAJOR_MINOR" != "$DOCKER_MAJOR_MINOR" ]; then
             echo "::error::Version mismatch: global.json SDK is ${SDK_MAJOR_MINOR} but Dockerfile uses ${DOCKER_MAJOR_MINOR}."
-            echo "::error::Merge the Dependabot 'dotnet-version' PR and the SDK workflow PR together before merging this branch."
+            echo "::error::Update SDK and Docker dependencies together (Dependabot 'dotnet-version' group) before merging this branch."
             exit 1
           fi
           echo "OK: global.json (${SDK_MAJOR_MINOR}) and Dockerfile (${DOCKER_MAJOR_MINOR}) are aligned."

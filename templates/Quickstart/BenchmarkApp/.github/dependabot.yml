@@ -10,7 +10,12 @@ updates:
     schedule:
       interval: "weekly"
 
+  - package-ecosystem: "dotnet-sdk" # See documentation for possible values
+    directory: "/" # Location of global.json
+    schedule:
+      interval: "weekly"
+
   - package-ecosystem: "github-actions" # See documentation for possible values
-    directory: "/" # Location of package manifests
+    directory: "/.github/workflows" # Location of workflow files
     schedule:
       interval: "weekly" 

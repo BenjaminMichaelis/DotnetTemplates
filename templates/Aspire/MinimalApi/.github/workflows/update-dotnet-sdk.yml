@@ -1,17 +1,15 @@
-name: Update .NET SDK
+name: Manually update .NET SDK
 
-# Dependabot does not support global.json natively, so this workflow fills that gap.
-# It updates global.json when a newer SDK is available in the current major.minor channel.
+# Dependabot (dotnet-sdk ecosystem) is the default updater for global.json.
+# This workflow is retained as a manual fallback.
 #
 # Docker FROM image tags are handled by Dependabot (dotnet-version multi-ecosystem group)
-# which batches them with NuGet package updates into a single PR.
+# which batches them with NuGet package updates and .NET SDK updates into a single PR.
 #
 # A build-time alignment check (see build-and-deploy.yml) ensures global.json and the
 # Dockerfile are on the same major.minor before any PR can merge.
 
 on:
-  schedule:
-    - cron: '0 6 * * 1' # 06:00 UTC every Monday
   workflow_dispatch:
 
 permissions:

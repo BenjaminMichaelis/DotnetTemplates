@@ -12,24 +12,40 @@ multi-ecosystem-groups:
     labels: ["dependencies"]
 
 updates:
-  # NuGet and Docker are grouped: one Dependabot PR per .NET release.
-  # global.json is handled by update-dotnet-sdk.yml (not a Dependabot ecosystem).
+  # NuGet, Docker, and .NET SDK are grouped: one Dependabot PR per .NET release.
   - package-ecosystem: "nuget"
     directory: "/"
     schedule:
       interval: "weekly"
-    patterns: ["Microsoft.*", "Aspire.*", "System.*"]
+    patterns: ["*"]
+    groups:
+      entity-framework-stack:
+        patterns:
+          - "Microsoft.EntityFrameworkCore.*"
+          - "dotnet-ef"
     multi-ecosystem-group: "dotnet-version"
 
   - package-ecosystem: "docker"
     directory: "/MinimalApi"
     schedule:
       interval: "weekly"
-    patterns: ["mcr.microsoft.com/dotnet/*"]
+    patterns: ["*"]
     multi-ecosystem-group: "dotnet-version"
 
-  - package-ecosystem: "github-actions"
+  - package-ecosystem: "dotnet-sdk"
     directory: "/"
+    schedule:
+      interval: "weekly"
+    patterns: ["*"]
+    multi-ecosystem-group: "dotnet-version"
+
+  - package-ecosystem: "terraform"
+    directory: "/Infra"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "github-actions"
+    directory: "/.github/workflows"
     schedule:
       interval: "weekly"
     groups:
