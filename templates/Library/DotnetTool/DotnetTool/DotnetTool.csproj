@@ -21,7 +21,11 @@
     but NuGet does not yet recognise DotnetToolSettings.xml as content. All packages are created
     correctly. Track https://github.com/NuGet/NuGet.Client/issues for when this is fixed.
     -->
-    <RuntimeIdentifiers>win-x64;linux-x64;osx-arm64</RuntimeIdentifiers>
+    <!--
+    `any` is a portable CoreCLR fallback for users on platforms not listed above (e.g. win-arm64,
+    linux-arm64, osx-x64). The .NET CLI automatically picks the best match per platform.
+    -->
+    <RuntimeIdentifiers>win-x64;linux-x64;osx-arm64;any</RuntimeIdentifiers>
 
     <!--
     Optionally enable trimming to reduce the package size. Trimming may require trim annotations
@@ -40,3 +44,4 @@
   </ItemGroup>
 
 </Project>
+

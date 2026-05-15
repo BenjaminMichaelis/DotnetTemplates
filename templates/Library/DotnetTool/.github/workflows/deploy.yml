@@ -39,7 +39,7 @@ jobs:
           # NuGet validation does not yet recognise DotnetToolSettings.xml as package content.
           # All packages are created correctly. Verify they exist before proceeding.
           $pkgs = Get-ChildItem "${{ github.workspace }}/PackedNuget" -Filter "*.nupkg"
-          if ($pkgs.Count -lt 4) { throw "Expected at least 4 .nupkg files but found $($pkgs.Count)" }
+          if ($pkgs.Count -lt 5) { throw "Expected at least 5 .nupkg files but found $($pkgs.Count)" }
           $LASTEXITCODE = 0
 
       - name: Upload Artifacts
@@ -70,7 +70,7 @@ jobs:
       - name: Push RID-specific NuGet packages
         run: |
           $version = "${{ github.ref }}".substring(11)
-          foreach ($rid in @("win-x64", "linux-x64", "osx-arm64")) {
+          foreach ($rid in @("win-x64", "linux-x64", "osx-arm64", "any")) {
             $pkg = "CHANGEME_Package_Name.$rid.$version.nupkg"
             if (Test-Path $pkg) {
               dotnet nuget push $pkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
