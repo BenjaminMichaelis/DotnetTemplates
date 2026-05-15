@@ -1,13 +1,19 @@
 name: Update .NET SDK
 
-# Dependabot does not support global.json natively.
-# This workflow fills that gap: weekly it checks for a newer .NET 10 SDK release,
-# updates global.json, and opens a pull request. The PR is labelled "dependencies"
-# to align with Dependabot's docker/nuget PRs for the same .NET release.
+# Dependabot does not support global.json natively, and a separate Dependabot
+# docker PR (without a matching global.json change) would break the build.
+# This workflow handles BOTH atomically in a single PR:
+#   - global.json sdk.version
+#   - Dockerfile FROM image tags (only when the major.minor changes, e.g. 10 -> 11)
+#
+# Within the same major.minor (e.g. 10.0.100 -> 10.0.200), the Dockerfile uses
+# floating tags (sdk:10.0 / aspnet:10.0-noble-chiseled) that auto-pull the
+# latest patch, and global.json's rollForward:latestFeature handles the SDK.
+# No PR is needed for patch-only updates.
 
 on:
   schedule:
-    - cron: '0 6 * * 1' # 06:00 UTC every Monday (matches Dependabot schedule)
+    - cron: '0 6 * * 1' # 06:00 UTC every Monday
   workflow_dispatch:
 
 permissions:
@@ -20,19 +26,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Fetch latest .NET 10 SDK version
-        id: latest
-        run: |
-          VERSION=$(curl -fsSL \
-            "https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/10.0/releases.json" \
-            | jq -r '.releases[0].sdk.version')
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-
       - name: Read current version from global.json
         id: current
         run: |
           VERSION=$(jq -r '.sdk.version' global.json)
+          MAJOR_MINOR=$(echo "$VERSION" | cut -d. -f1,2)
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "major_minor=$MAJOR_MINOR" >> "$GITHUB_OUTPUT"
+
+      - name: Fetch latest SDK for current major.minor
+        id: latest
+        run: |
+          MAJOR_MINOR="${{ steps.current.outputs.major_minor }}"
+          VERSION=$(curl -fsSL \
+            "https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/${MAJOR_MINOR}/releases.json" \
+            | jq -r '.releases[0].sdk.version')
+          LATEST_MAJOR_MINOR=$(echo "$VERSION" | cut -d. -f1,2)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "major_minor=$LATEST_MAJOR_MINOR" >> "$GITHUB_OUTPUT"
 
       - name: Update global.json
         if: steps.latest.outputs.version != steps.current.outputs.version
@@ -40,18 +51,34 @@ jobs:
           jq --arg v "${{ steps.latest.outputs.version }}" \
             '.sdk.version = $v' global.json > tmp.json && mv tmp.json global.json
 
+      - name: Update Dockerfile FROM tags (major.minor change only)
+        # Patch updates (10.0.100 -> 10.0.200) use floating tags and need no change.
+        # Major.minor changes (10.0 -> 11.0) must update the FROM tags atomically
+        # with global.json to keep the SDK and runtime image in sync.
+        if: |
+          steps.latest.outputs.version != steps.current.outputs.version &&
+          steps.latest.outputs.major_minor != steps.current.outputs.major_minor
+        run: |
+          OLD="${{ steps.current.outputs.major_minor }}"
+          NEW="${{ steps.latest.outputs.major_minor }}"
+          sed -i "s|/dotnet/sdk:${OLD}|/dotnet/sdk:${NEW}|g" ReactApp/Dockerfile
+          sed -i "s|/dotnet/aspnet:${OLD}-|/dotnet/aspnet:${NEW}-|g" ReactApp/Dockerfile
+
       - name: Open pull request
         if: steps.latest.outputs.version != steps.current.outputs.version
         uses: peter-evans/create-pull-request@v7
         with:
-          commit-message: "chore: bump .NET SDK to ${{ steps.latest.outputs.version }} in global.json"
+          commit-message: "chore(deps): bump .NET SDK to ${{ steps.latest.outputs.version }}"
           branch: "deps/dotnet-sdk-${{ steps.latest.outputs.version }}"
           title: "chore(deps): bump .NET SDK to ${{ steps.latest.outputs.version }}"
           body: |
-            Bumps the .NET SDK version in `global.json` to `${{ steps.latest.outputs.version }}`.
+            Bumps `.NET SDK` to `${{ steps.latest.outputs.version }}`.
+
+            Changes in this PR:
+            - `global.json` `sdk.version`
+            ${{ steps.latest.outputs.major_minor != steps.current.outputs.major_minor && '- `ReactApp/Dockerfile` FROM image tags' || '*(Dockerfile tags unchanged - patch update only)*' }}
 
             > [!NOTE]
-            > Also merge or check the Dependabot PR (if open) that updates the
-            > `mcr.microsoft.com/dotnet/aspnet` Docker image and NuGet packages
-            > to the same .NET release (`dotnet-version` group).
+            > Also review the Dependabot PR (if open) that bumps NuGet packages
+            > for the same .NET release.
           labels: dependencies

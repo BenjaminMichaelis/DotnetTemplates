@@ -43,18 +43,9 @@ updates:
     directory: "/templates/Aspire/MinimalApi"
     schedule:
       interval: "weekly"
-    groups:
-      dotnet-version:
-        patterns:
-          - "Microsoft.*"
-          - "Aspire.*"
-          - "System.*"
 
-  - package-ecosystem: "docker"
-    directory: "/templates/Aspire/MinimalApi/ReactApp"
-    schedule:
-      interval: "weekly"
-    groups:
-      dotnet-version:
-        patterns:
-          - "mcr.microsoft.com/dotnet/*"
+  # NOTE: Docker image and global.json SDK updates are kept in sync by the
+  # update-dotnet-sdk.yml workflow in the template, not by Dependabot.
+  # A separate Dependabot docker PR would update the Dockerfile without
+  # touching global.json, breaking the build on major.minor version jumps.
+

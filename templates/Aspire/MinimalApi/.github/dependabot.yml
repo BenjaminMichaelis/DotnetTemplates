@@ -10,23 +10,9 @@ updates:
     schedule:
       interval: "weekly"
     groups:
-      dotnet-version:
-        patterns:
-          - "Microsoft.*"
-          - "Aspire.*"
-          - "System.*"
       nuget:
         patterns:
           - "*"
-
-  - package-ecosystem: "docker"
-    directory: "/ReactApp"
-    schedule:
-      interval: "weekly"
-    groups:
-      dotnet-version:
-        patterns:
-          - "mcr.microsoft.com/dotnet/*"
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -36,3 +22,4 @@ updates:
       github-actions:
         patterns:
           - "*"
+
