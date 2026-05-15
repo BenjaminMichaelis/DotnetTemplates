@@ -1,6 +1,6 @@
 # DotnetTool
 
-A base template for .NET Global Tool packages, with unit tests and GitHub Actions. Supports RID-specific packaging so the tool installs a platform-optimized binary on `win-x64`, `linux-x64`, and `osx-arm64` with no user-visible difference.
+A base template for .NET Global Tool packages, with unit tests and GitHub Actions. Supports RID-specific packaging so the tool installs a platform-optimized binary on `win-x64`, `linux-x64`, and `osx-arm64`, with a portable `any` CoreCLR fallback for all other platforms (e.g. `win-arm64`, `linux-arm64`).
 
 > **Requires .NET SDK 10.0 or later.** RID-specific tool packaging is a .NET SDK 10 feature.
 > See [RID-specific tools](https://learn.microsoft.com/en-us/dotnet/core/tools/rid-specific-tools) for background.
@@ -14,7 +14,7 @@ A base template for .NET Global Tool packages, with unit tests and GitHub Action
 
 ## Features
 
-- `PackAsTool` with `RuntimeIdentifiers` for `win-x64`, `linux-x64`, and `osx-arm64`
+- `PackAsTool` with `RuntimeIdentifiers` for `win-x64`, `linux-x64`, `osx-arm64`, and `any` (portable fallback)
 - A single `dotnet pack` produces all RID-specific packages plus a top-level pointer package
 - GitHub Actions deploy workflow that publishes RID-specific packages before the pointer package (required ordering)
 - Central Package Management (`Directory.Packages.props`)
@@ -41,7 +41,10 @@ This creates:
 - `DotnetTool.win-x64.<version>.nupkg`
 - `DotnetTool.linux-x64.<version>.nupkg`
 - `DotnetTool.osx-arm64.<version>.nupkg`
-- `DotnetTool.1.0.0.nupkg` (top-level pointer package)
+- `DotnetTool.any.<version>.nupkg` (portable CoreCLR fallback)
+- `DotnetTool.<version>.nupkg` (top-level pointer package)
+
+> **Note:** `dotnet pack` may emit `NU5017` on the pointer package. This is a known false positive in .NET SDK 10 — NuGet validation does not yet recognise `DotnetToolSettings.xml` as package content. All packages are created correctly and the pointer package installs as expected.
 
 ## Installing the tool locally
 
