@@ -1,9 +1,11 @@
 #!/usr/bin/env pwsh
 
 # Script to copy the root .editorconfig to all template directories
-# This should be run when the root .editorconfig is updated to ensure all templates get the latest settings
+# This should be run when the root .editorconfig or template override files are updated.
+# Per-template overrides live in ".template.config/editorconfig.override".
 
 $rootEditorConfig = "./.editorconfig"
+$templatesRoot = (Resolve-Path "./templates").Path
 $templateDirs = Get-ChildItem -Path "./templates" -Recurse -Directory | Where-Object { $_.Name -match "^[A-Z]" -and (Test-Path (Join-Path $_.FullName ".template.config")) }
 
 if (-not (Test-Path $rootEditorConfig)) {
@@ -11,35 +13,93 @@ if (-not (Test-Path $rootEditorConfig)) {
     exit 1
 }
 
+$rootContent = Get-Content $rootEditorConfig -Raw
+$lineEnding = if ($rootContent -match "`r`n") { "`r`n" } else { "`n" }
+
+function Convert-ToNormalizedText {
+    param (
+        [string]$Content,
+        [string]$TargetLineEnding
+    )
+
+    if ($null -eq $Content) {
+        return ""
+    }
+
+    $normalized = ($Content -replace "`r`n", "`n" -replace "`r", "`n").TrimEnd("`n")
+    if ([string]::IsNullOrEmpty($normalized)) {
+        return ""
+    }
+
+    return ($normalized -replace "`n", $TargetLineEnding)
+}
+
+function Compose-EditorConfigContent {
+    param (
+        [string]$BaseContent,
+        [string]$OverrideContent,
+        [string]$TargetLineEnding,
+        [string]$OverridePath
+    )
+
+    $baseNormalized = Convert-ToNormalizedText -Content $BaseContent -TargetLineEnding $TargetLineEnding
+    if ([string]::IsNullOrWhiteSpace($OverrideContent)) {
+        return "$baseNormalized$TargetLineEnding"
+    }
+
+    $overrideNormalized = Convert-ToNormalizedText -Content $OverrideContent -TargetLineEnding $TargetLineEnding
+    if ($overrideNormalized -match "(?m)^\s*root\s*=") {
+        throw "Override file '$OverridePath' contains a disallowed root setting. Remove 'root = ...' from the override file."
+    }
+
+    return "$baseNormalized$TargetLineEnding$TargetLineEnding# Template-specific overrides$TargetLineEnding$overrideNormalized$TargetLineEnding"
+}
+
+$changedTemplates = New-Object System.Collections.Generic.List[string]
+$templatesWithOverrides = New-Object System.Collections.Generic.List[string]
+
 Write-Host "Found template directories:"
 $templateDirs | ForEach-Object { Write-Host "  - $($_.FullName)" }
 Write-Host ""
 
 foreach ($templateDir in $templateDirs) {
     $targetPath = Join-Path $templateDir.FullName ".editorconfig"
-    $hasCustomizations = $false
-    
-    # Check if template already has customizations
-    if (Test-Path $targetPath) {
-        $existingContent = Get-Content $targetPath -Raw
-        $rootContent = Get-Content $rootEditorConfig -Raw
-        
-        if ($existingContent -ne $rootContent) {
-            $hasCustomizations = $true
-            Write-Warning "Template $($templateDir.Name) has customizations in its .editorconfig"
-            Write-Host "  You may want to manually review and merge changes."
-            Write-Host "  Backup created at: $targetPath.backup"
-            Copy-Item $targetPath "$targetPath.backup" -Force
+    $overridePath = Join-Path $templateDir.FullName ".template.config/editorconfig.override"
+    $relativeTemplatePath = [System.IO.Path]::GetRelativePath($templatesRoot, $templateDir.FullName).Replace("\", "/")
+
+    $overrideContent = ""
+    if (Test-Path $overridePath) {
+        $overrideContent = Get-Content $overridePath -Raw
+        if (-not [string]::IsNullOrWhiteSpace($overrideContent)) {
+            $templatesWithOverrides.Add($relativeTemplatePath)
         }
     }
-    
-    if (-not $hasCustomizations) {
-        Copy-Item $rootEditorConfig $targetPath -Force
-        Write-Host "✓ Copied .editorconfig to $($templateDir.Name)"
+
+    $finalContent = Compose-EditorConfigContent -BaseContent $rootContent -OverrideContent $overrideContent -TargetLineEnding $lineEnding -OverridePath $overridePath
+    $existingContent = if (Test-Path $targetPath) { Get-Content $targetPath -Raw } else { "" }
+
+    if ($existingContent -ne $finalContent) {
+        Set-Content -Path $targetPath -Value $finalContent -NoNewline
+        $changedTemplates.Add($relativeTemplatePath)
+        Write-Host "✓ Updated .editorconfig for $relativeTemplatePath"
     } else {
-        Write-Host "⚠ Skipped $($templateDir.Name) due to customizations (backup created)"
+        Write-Host "✓ No changes needed for $relativeTemplatePath"
     }
 }
 
+$changedTemplatesValue = (($changedTemplates | Sort-Object -Unique) -join ", ")
+$templatesWithOverridesValue = (($templatesWithOverrides | Sort-Object -Unique) -join ", ")
+$hasChanges = if ($changedTemplates.Count -gt 0) { "true" } else { "false" }
+
+if ($env:GITHUB_OUTPUT) {
+    "has_changes=$hasChanges" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+    "changed_templates=$changedTemplatesValue" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+    "templates_with_overrides=$templatesWithOverridesValue" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+}
+
 Write-Host ""
-Write-Host "✓ Script completed. Remember to test the templates after updating .editorconfig files."
+if ($changedTemplates.Count -gt 0) {
+    Write-Host "✓ Script completed with updates: $changedTemplatesValue"
+} else {
+    Write-Host "✓ Script completed. All template .editorconfig files are up to date."
+}

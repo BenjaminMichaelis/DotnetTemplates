@@ -46,8 +46,15 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
-    - name: Build
-      run: dotnet pack --configuration Release -o . 
+    - name: Restore dependencies
+      run: dotnet restore Templates.csproj
+
+    - name: Enforce formatting
+      run: |
+        .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -Targets "Templates.csproj"
+
+    - name: Pack
+      run: dotnet pack --configuration Release --no-restore -o .
     
     - name: Upload Artifacts
       uses: actions/upload-artifact@v7
@@ -64,15 +71,28 @@ jobs:
         include:
           - variant: default
             args: ""
-            expectSolution: true
+            expectSln: false
+            expectSlnx: true
             expectTests: true
           - variant: no-tests
             args: "--no-tests"
-            expectSolution: true
+            expectSln: false
+            expectSlnx: true
+            expectTests: false
+          - variant: sln
+            args: "--sln"
+            expectSln: true
+            expectSlnx: false
+            expectTests: true
+          - variant: sln-no-tests
+            args: "--sln --no-tests"
+            expectSln: true
+            expectSlnx: false
             expectTests: false
           - variant: no-sln
             args: "--no-sln"
-            expectSolution: false
+            expectSln: false
+            expectSlnx: false
             expectTests: true
 
     steps:
@@ -98,12 +118,22 @@ jobs:
           $outDir = "TestLibrary-${{ matrix.variant }}"
           mkdir $outDir
           Push-Location $outDir
-          $projectName = "TestLibrary${{ matrix.variant }}".Replace('-', '')
-          dotnet new bmichaelis.nuget --name $projectName --output . ${{ matrix.args }}
-          $hasSolution = (Test-Path "$projectName.sln") -or (Test-Path "$projectName.slnx")
+          dotnet new bmichaelis.nuget ${{ matrix.args }}
+          $projectName = Split-Path -Leaf (Get-Location)
+          $hasSln = Test-Path "$projectName.sln"
+          $hasSlnx = Test-Path "$projectName.slnx"
           $hasTests = Test-Path "$projectName.Tests/$projectName.Tests.csproj"
-          if ([bool]::Parse("${{ matrix.expectSolution }}") -ne $hasSolution) { throw "Unexpected solution file presence: $hasSolution" }
+          if ([bool]::Parse("${{ matrix.expectSln }}") -ne $hasSln) { throw "Unexpected .sln file presence: $hasSln" }
+          if ([bool]::Parse("${{ matrix.expectSlnx }}") -ne $hasSlnx) { throw "Unexpected .slnx file presence: $hasSlnx" }
           if ([bool]::Parse("${{ matrix.expectTests }}") -ne $hasTests) { throw "Unexpected test project presence: $hasTests" }
+          $solutionPath = if ($hasSln) { "$projectName.sln" } elseif ($hasSlnx) { "$projectName.slnx" } else { $null }
+          if ($solutionPath) {
+            .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -Targets $solutionPath -RestoreTargets
+            dotnet restore $solutionPath
+            dotnet build $solutionPath /p:TreatWarningsAsErrors=true
+          } else {
+            .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -DiscoverFromCurrentDirectory -RestoreTargets
+          }
           if ($hasTests) {
             dotnet test "$projectName.Tests/$projectName.Tests.csproj" /p:TreatWarningsAsErrors=true --results-directory trx-data --logger "trx;LogFileName=tests.trx"
           } else {
@@ -148,15 +178,28 @@ jobs:
         include:
           - variant: default
             args: ""
-            expectSolution: true
+            expectSln: false
+            expectSlnx: true
             expectTests: true
           - variant: no-tests
             args: "--no-tests"
-            expectSolution: true
+            expectSln: false
+            expectSlnx: true
+            expectTests: false
+          - variant: sln
+            args: "--sln"
+            expectSln: true
+            expectSlnx: false
+            expectTests: true
+          - variant: sln-no-tests
+            args: "--sln --no-tests"
+            expectSln: true
+            expectSlnx: false
             expectTests: false
           - variant: no-sln
             args: "--no-sln"
-            expectSolution: false
+            expectSln: false
+            expectSlnx: false
             expectTests: true
 
     steps:
@@ -182,12 +225,22 @@ jobs:
           $outDir = "TestQuickstartBenchmarkConsole-${{ matrix.variant }}"
           mkdir $outDir
           Push-Location $outDir
-          $projectName = "TestQuickstartBenchmarkConsole${{ matrix.variant }}".Replace('-', '')
-          dotnet new bmichaelis.quickstart.benchmarkconsole --name $projectName --output . ${{ matrix.args }}
-          $hasSolution = (Test-Path "$projectName.sln") -or (Test-Path "$projectName.slnx")
+          dotnet new bmichaelis.quickstart.benchmarkconsole ${{ matrix.args }}
+          $projectName = Split-Path -Leaf (Get-Location)
+          $hasSln = Test-Path "$projectName.sln"
+          $hasSlnx = Test-Path "$projectName.slnx"
           $hasTests = Test-Path "$projectName.Tests/$projectName.Tests.csproj"
-          if ([bool]::Parse("${{ matrix.expectSolution }}") -ne $hasSolution) { throw "Unexpected solution file presence: $hasSolution" }
+          if ([bool]::Parse("${{ matrix.expectSln }}") -ne $hasSln) { throw "Unexpected .sln file presence: $hasSln" }
+          if ([bool]::Parse("${{ matrix.expectSlnx }}") -ne $hasSlnx) { throw "Unexpected .slnx file presence: $hasSlnx" }
           if ([bool]::Parse("${{ matrix.expectTests }}") -ne $hasTests) { throw "Unexpected test project presence: $hasTests" }
+          $solutionPath = if ($hasSln) { "$projectName.sln" } elseif ($hasSlnx) { "$projectName.slnx" } else { $null }
+          if ($solutionPath) {
+            .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -Targets $solutionPath -RestoreTargets
+            dotnet restore $solutionPath
+            dotnet build $solutionPath /p:TreatWarningsAsErrors=true
+          } else {
+            .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -DiscoverFromCurrentDirectory -RestoreTargets
+          }
           if ($hasTests) {
             dotnet test "$projectName.Tests/$projectName.Tests.csproj" /p:TreatWarningsAsErrors=true --results-directory trx-data --logger "trx;LogFileName=tests.trx"
           } else {
@@ -233,15 +286,18 @@ jobs:
         include:
           - variant: default
             args: ""
-            expectSolution: true
+            expectSln: false
+            expectSlnx: true
             expectTests: true
           - variant: no-tests
             args: "--no-tests"
-            expectSolution: true
+            expectSln: false
+            expectSlnx: true
             expectTests: false
           - variant: no-sln
             args: "--no-sln"
-            expectSolution: false
+            expectSln: false
+            expectSlnx: false
             expectTests: true
 
     steps:
@@ -267,12 +323,22 @@ jobs:
           $outDir = "TestQuickstartConsoleApp-${{ matrix.variant }}"
           mkdir $outDir
           Push-Location $outDir
-          $projectName = "TestQuickstartConsoleApp${{ matrix.variant }}".Replace('-', '')
-          dotnet new bmichaelis.quickstart.consoleapp --name $projectName --output . ${{ matrix.args }}
-          $hasSolution = (Test-Path "$projectName.sln") -or (Test-Path "$projectName.slnx")
+          dotnet new bmichaelis.quickstart.consoleapp ${{ matrix.args }}
+          $projectName = Split-Path -Leaf (Get-Location)
+          $hasSln = Test-Path "$projectName.sln"
+          $hasSlnx = Test-Path "$projectName.slnx"
           $hasTests = Test-Path "$projectName.Tests/$projectName.Tests.csproj"
-          if ([bool]::Parse("${{ matrix.expectSolution }}") -ne $hasSolution) { throw "Unexpected solution file presence: $hasSolution" }
+          if ([bool]::Parse("${{ matrix.expectSln }}") -ne $hasSln) { throw "Unexpected .sln file presence: $hasSln" }
+          if ([bool]::Parse("${{ matrix.expectSlnx }}") -ne $hasSlnx) { throw "Unexpected .slnx file presence: $hasSlnx" }
           if ([bool]::Parse("${{ matrix.expectTests }}") -ne $hasTests) { throw "Unexpected test project presence: $hasTests" }
+          $solutionPath = if ($hasSln) { "$projectName.sln" } elseif ($hasSlnx) { "$projectName.slnx" } else { $null }
+          if ($solutionPath) {
+            .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -Targets $solutionPath -RestoreTargets
+            dotnet restore $solutionPath
+            dotnet build $solutionPath /p:TreatWarningsAsErrors=true
+          } else {
+            .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -DiscoverFromCurrentDirectory -RestoreTargets
+          }
           if ($hasTests) {
             dotnet test "$projectName.Tests/$projectName.Tests.csproj" /p:TreatWarningsAsErrors=true --results-directory trx-data --logger "trx;LogFileName=tests.trx"
           } else {
@@ -345,6 +411,9 @@ jobs:
           Push-Location $outDir
           dotnet new bmichaelis.aspire.minimalapi --name MinimalApi ${{ matrix.args }}
           Push-Location MinimalApi
+          $solutionFile = Get-ChildItem -Path . -File | Where-Object { $_.Extension -eq ".sln" -or $_.Extension -eq ".slnx" } | Select-Object -First 1
+          if (-not $solutionFile) { throw "Expected solution file for Aspire template format validation." }
+          .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -Targets $solutionFile.FullName -RestoreTargets
           dotnet build /p:TreatWarningsAsErrors=true
           dotnet tool restore
           dotnet ef migrations has-pending-model-changes --configuration Release --project MinimalApi.Data/MinimalApi.Data.csproj --startup-project MinimalApi.AppHost/MinimalApi.AppHost.csproj --no-build
