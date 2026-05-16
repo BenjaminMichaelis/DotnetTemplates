@@ -98,8 +98,8 @@ jobs:
           $outDir = "TestLibrary-${{ matrix.variant }}"
           mkdir $outDir
           Push-Location $outDir
-          dotnet new bmichaelis.nuget ${{ matrix.args }}
-          $projectName = Split-Path -Leaf (Get-Location)
+          $projectName = "TestLibrary${{ matrix.variant }}".Replace('-', '')
+          dotnet new bmichaelis.nuget --name $projectName --output . ${{ matrix.args }}
           $hasSolution = (Test-Path "$projectName.sln") -or (Test-Path "$projectName.slnx")
           $hasTests = Test-Path "$projectName.Tests/$projectName.Tests.csproj"
           if ([bool]::Parse("${{ matrix.expectSolution }}") -ne $hasSolution) { throw "Unexpected solution file presence: $hasSolution" }
@@ -182,8 +182,8 @@ jobs:
           $outDir = "TestQuickstartBenchmarkConsole-${{ matrix.variant }}"
           mkdir $outDir
           Push-Location $outDir
-          dotnet new bmichaelis.quickstart.benchmarkconsole ${{ matrix.args }}
-          $projectName = Split-Path -Leaf (Get-Location)
+          $projectName = "TestQuickstartBenchmarkConsole${{ matrix.variant }}".Replace('-', '')
+          dotnet new bmichaelis.quickstart.benchmarkconsole --name $projectName --output . ${{ matrix.args }}
           $hasSolution = (Test-Path "$projectName.sln") -or (Test-Path "$projectName.slnx")
           $hasTests = Test-Path "$projectName.Tests/$projectName.Tests.csproj"
           if ([bool]::Parse("${{ matrix.expectSolution }}") -ne $hasSolution) { throw "Unexpected solution file presence: $hasSolution" }
@@ -267,8 +267,8 @@ jobs:
           $outDir = "TestQuickstartConsoleApp-${{ matrix.variant }}"
           mkdir $outDir
           Push-Location $outDir
-          dotnet new bmichaelis.quickstart.consoleapp ${{ matrix.args }}
-          $projectName = Split-Path -Leaf (Get-Location)
+          $projectName = "TestQuickstartConsoleApp${{ matrix.variant }}".Replace('-', '')
+          dotnet new bmichaelis.quickstart.consoleapp --name $projectName --output . ${{ matrix.args }}
           $hasSolution = (Test-Path "$projectName.sln") -or (Test-Path "$projectName.slnx")
           $hasTests = Test-Path "$projectName.Tests/$projectName.Tests.csproj"
           if ([bool]::Parse("${{ matrix.expectSolution }}") -ne $hasSolution) { throw "Unexpected solution file presence: $hasSolution" }
