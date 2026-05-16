@@ -74,31 +74,37 @@ jobs:
             expectSln: false
             expectSlnx: true
             expectTests: true
+            reportTrxArgs: "--report-trx --report-trx-filename tests.trx"
           - variant: xunit
             args: "--tests xunit"
             expectSln: false
             expectSlnx: true
             expectTests: true
+            reportTrxArgs: "--report-xunit-trx --report-xunit-trx-filename tests.trx"
           - variant: no-tests
             args: "--no-tests"
             expectSln: false
             expectSlnx: true
             expectTests: false
+            reportTrxArgs: ""
           - variant: sln
             args: "--sln"
             expectSln: true
             expectSlnx: false
             expectTests: true
+            reportTrxArgs: "--report-trx --report-trx-filename tests.trx"
           - variant: sln-no-tests
             args: "--sln --no-tests"
             expectSln: true
             expectSlnx: false
             expectTests: false
+            reportTrxArgs: ""
           - variant: no-sln
             args: "--no-sln"
             expectSln: false
             expectSlnx: false
             expectTests: true
+            reportTrxArgs: "--report-trx --report-trx-filename tests.trx"
 
     steps:
       - name: Checkout
@@ -140,7 +146,7 @@ jobs:
             .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -DiscoverFromCurrentDirectory -RestoreTargets
           }
           if ($hasTests) {
-            dotnet test "$projectName.Tests/$projectName.Tests.csproj" /p:TreatWarningsAsErrors=true --results-directory trx-data --logger "trx;LogFileName=tests.trx"
+            dotnet test "$projectName.Tests/$projectName.Tests.csproj" /p:TreatWarningsAsErrors=true -p:TestingPlatformDotnetTestSupport=true --results-directory trx-data ${{ matrix.reportTrxArgs }}
           } else {
             dotnet build "$projectName/$projectName.csproj" /p:TreatWarningsAsErrors=true
           }
@@ -186,31 +192,37 @@ jobs:
             expectSln: false
             expectSlnx: true
             expectTests: true
+            reportTrxArgs: "--report-trx --report-trx-filename tests.trx"
           - variant: xunit
             args: "--tests xunit"
             expectSln: false
             expectSlnx: true
             expectTests: true
+            reportTrxArgs: "--report-xunit-trx --report-xunit-trx-filename tests.trx"
           - variant: no-tests
             args: "--no-tests"
             expectSln: false
             expectSlnx: true
             expectTests: false
+            reportTrxArgs: ""
           - variant: sln
             args: "--sln"
             expectSln: true
             expectSlnx: false
             expectTests: true
+            reportTrxArgs: "--report-trx --report-trx-filename tests.trx"
           - variant: sln-no-tests
             args: "--sln --no-tests"
             expectSln: true
             expectSlnx: false
             expectTests: false
+            reportTrxArgs: ""
           - variant: no-sln
             args: "--no-sln"
             expectSln: false
             expectSlnx: false
             expectTests: true
+            reportTrxArgs: "--report-trx --report-trx-filename tests.trx"
 
     steps:
       - name: Checkout
