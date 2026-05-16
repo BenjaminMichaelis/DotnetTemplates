@@ -19,7 +19,10 @@ builder.AddServiceDefaults()
 // NOTE: Do NOT also call AddApplicationInsightsTelemetry() - that is the classic AI SDK and would
 // double-report telemetry. The Azure Monitor OTel exporter (UseAzureMonitor in ServiceDefaults) is
 // the sole App Insights integration path in this template.
-builder.Services.AddServiceProfiler();
+if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
+{
+    builder.Services.AddServiceProfiler();
+}
 //#endif
 
 // Add services to the container.
