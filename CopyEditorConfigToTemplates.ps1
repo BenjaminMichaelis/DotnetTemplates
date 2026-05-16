@@ -38,7 +38,8 @@ function Compose-EditorConfigContent {
     param (
         [string]$BaseContent,
         [string]$OverrideContent,
-        [string]$TargetLineEnding
+        [string]$TargetLineEnding,
+        [string]$OverridePath
     )
 
     $baseNormalized = Convert-ToNormalizedText -Content $BaseContent -TargetLineEnding $TargetLineEnding
@@ -48,7 +49,7 @@ function Compose-EditorConfigContent {
 
     $overrideNormalized = Convert-ToNormalizedText -Content $OverrideContent -TargetLineEnding $TargetLineEnding
     if ($overrideNormalized -match "(?m)^\s*root\s*=") {
-        throw "Override file contains a disallowed root setting. Remove 'root = ...' from the override file."
+        throw "Override file '$OverridePath' contains a disallowed root setting. Remove 'root = ...' from the override file."
     }
 
     return "$baseNormalized$TargetLineEnding$TargetLineEnding# Template-specific overrides$TargetLineEnding$overrideNormalized$TargetLineEnding"
@@ -74,7 +75,7 @@ foreach ($templateDir in $templateDirs) {
         }
     }
 
-    $finalContent = Compose-EditorConfigContent -BaseContent $rootContent -OverrideContent $overrideContent -TargetLineEnding $lineEnding
+    $finalContent = Compose-EditorConfigContent -BaseContent $rootContent -OverrideContent $overrideContent -TargetLineEnding $lineEnding -OverridePath $overridePath
     $existingContent = if (Test-Path $targetPath) { Get-Content $targetPath -Raw } else { "" }
 
     if ($existingContent -ne $finalContent) {

@@ -119,6 +119,6 @@ Recommended workflow:
 
 **Manual Process:**
 1. Update the root `.editorconfig` file
-2. Run `./CopyEditorConfigToTemplates.ps1` 
-3. If a template needs custom rules, edit `.template.config/editorconfig.override` for that template
+2. If a template needs custom rules, edit `.template.config/editorconfig.override` for that template
+3. Run `./CopyEditorConfigToTemplates.ps1` (rerun this script after any override edits)
 4. Test all templates to ensure they work correctly

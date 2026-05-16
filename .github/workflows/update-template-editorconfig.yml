@@ -110,7 +110,7 @@ jobs:
           - Templates using override metadata: **$templatesWithOverrides**
           
           ## Automation Details
-          This PR was automatically created by the `update-template-editorconfig` workflow when changes were detected in the root `.editorconfig` file.
+          This PR was automatically created by the `update-template-editorconfig` workflow when changes were detected in the root `.editorconfig` file or template override metadata.
           
           Please review the changes to ensure:
           1. Templates without customizations received the updated configuration
@@ -147,7 +147,7 @@ jobs:
           - Templates using override metadata: **$templatesWithOverrides**
           
           ## Automation Details
-          This PR was automatically updated by the `update-template-editorconfig` workflow when changes were detected in the root `.editorconfig` file.
+          This PR was automatically updated by the `update-template-editorconfig` workflow when changes were detected in the root `.editorconfig` file or template override metadata.
           
           Please review the changes to ensure:
           1. Templates without customizations received the updated configuration

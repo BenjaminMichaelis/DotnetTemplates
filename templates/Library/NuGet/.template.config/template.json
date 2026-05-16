@@ -45,9 +45,6 @@
   },
   "sources": [
     {
-      "exclude": [
-        ".template.config/editorconfig.override"
-      ],
       "modifiers": [
         {
           "condition": "(no-sln)",
