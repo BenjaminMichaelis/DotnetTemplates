@@ -16,6 +16,18 @@ With Application Insights monitoring enabled:
 > dotnet new bmichaelis.aspire.minimalapi --applicationInsights true
 ```
 
+With Aspire integration tests:
+
+```cli
+> dotnet new bmichaelis.aspire.minimalapi --integration-tests true
+```
+
+Both options together:
+
+```cli
+> dotnet new bmichaelis.aspire.minimalapi --applicationInsights true --integration-tests true
+```
+
 ### Parameters
 
 [Default template options](https://learn.microsoft.com/dotnet/core/tools/dotnet-new#options)
@@ -24,6 +36,7 @@ With Application Insights monitoring enabled:
 |-----------|-------------|---------|
 | `--name` | Name of the project | Current directory name |
 | `--applicationInsights` | Add Azure Application Insights monitoring | `false` |
+| `--integration-tests` | Add Aspire integration tests using TUnit | `false` |
 
 ## What is included
 
@@ -33,6 +46,7 @@ With Application Insights monitoring enabled:
 - **Aspire AppHost** – Local orchestration with SQL Server container and DB viewer (dbGate)
 - **ServiceDefaults** – Shared OpenTelemetry, health checks, service discovery
 - **Core + Tests** – Business logic projects with TUnit tests
+- **Aspire integration tests** *(optional, `--integration-tests true`)* – TUnit-based tests that validate AppHost startup and distributed app behavior
 - **Terraform/Infra** – Azure Container Apps, Azure SQL, Application Insights, ACR
 - **GitHub Actions CI/CD** – Build, test, migrate DB, push container image
 
@@ -41,6 +55,25 @@ With Application Insights monitoring enabled:
 ```cli
 > aspire run
 ```
+
+### Running tests
+
+Run all unit tests:
+
+```cli
+> dotnet test
+```
+
+If you added integration tests (`--integration-tests true`), run them individually:
+
+```cli
+> dotnet test MinimalApi.Aspire.Tests/MinimalApi.Aspire.Tests.csproj
+```
+
+**Requirements for Aspire integration tests**:
+- Docker must be running (Aspire uses containers for infrastructure)
+- Sufficient disk space for SQL Server and other service containers
+- First run may take 1–2 minutes to download and start containers
 
 ## Container / Docker
 
