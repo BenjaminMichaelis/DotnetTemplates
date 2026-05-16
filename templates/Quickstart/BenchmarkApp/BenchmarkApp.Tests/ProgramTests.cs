@@ -1,3 +1,5 @@
+using BenchmarkApp.Console;
+
 namespace BenchmarkApp.Console.Tests;
 
 public class ProgramTests
