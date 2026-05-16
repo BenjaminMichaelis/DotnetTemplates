@@ -1,43 +1,51 @@
 # Dotnet Templates
 
-The repository contains a set of opinionated [dotnet new templates](https://learn.microsoft.com/dotnet/core/tools/custom-templates). I am happy to receive critique/feedback on the existing templates, so feel free to open issues.
+This repository contains opinionated [`dotnet new` templates](https://learn.microsoft.com/dotnet/core/tools/custom-templates), published as the `BenjaminMichaelis.Dotnet.Templates` NuGet template pack.
+
+Feedback and contributions are welcome via issues and pull requests.
 
 ## Requirements
 
-These templates require [.NET 10.0 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) or later.
+Use [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) or newer.
 
-## Installing
+## Install
 
-Use [dotnet new install](https://learn.microsoft.com/dotnet/core/tools/dotnet-new-install) to install the templates.
+Install the template pack:
 
 ```cli
 > dotnet new install BenjaminMichaelis.Dotnet.Templates
 ```
 
-To then use a template, navigate to a directory where you want to use the template and use the command
+Create a project from a template:
 
 ```cli
-> dotnet new bmichaelis.{templatename}
+> dotnet new bmichaelis.{template-name}
 ```
 
-with templatename being a name of one of the included templates listed below. Ex: `dotnet new bmichaelis.nuget`
+Example:
 
-## Included Templates (by template name, prepending `bmichaelis.` before the name as shown above)
+```cli
+> dotnet new bmichaelis.nuget
+```
 
-- [nuget](./templates/Library/NuGet/README.md)
-- [quickstart.benchmarkconsole](./templates/Quickstart/BenchmarkApp/README.md)
-- [quickstart.consoleapp](./templates/Quickstart/ConsoleApp/README.md)
-- [aspire.minimalapi](./templates/Aspire/MinimalApi/README.md)
+## Included templates
 
-## Updating
+Use the short name after `bmichaelis.`:
 
-If you have previously installed the templates and want to install the latest version, you can use [dotnet new update](https://learn.microsoft.com/dotnet/core/tools/dotnet-new-update) to update your installed templates.
+| Short name | Template docs |
+| --- | --- |
+| `nuget` | [templates/Library/NuGet](./templates/Library/NuGet/README.md) |
+| `quickstart.consoleapp` | [templates/Quickstart/ConsoleApp](./templates/Quickstart/ConsoleApp/README.md) |
+| `quickstart.benchmarkconsole` | [templates/Quickstart/BenchmarkApp](./templates/Quickstart/BenchmarkApp/README.md) |
+| `aspire.minimalapi` | [templates/Aspire/MinimalApi](./templates/Aspire/MinimalApi/README.md) |
+
+## Update installed templates
 
 ```cli
 > dotnet new update
 ```
 
-## Uninstalling
+## Uninstall
 
 ```cli
 > dotnet new uninstall BenjaminMichaelis.Dotnet.Templates
@@ -45,49 +53,54 @@ If you have previously installed the templates and want to install the latest ve
 
 ## Local testing
 
-Build the template package:
+Build the local package:
 
 ```cli
 > dotnet pack --configuration Release -o .
 ```
 
-Install the locally built template package
+Install the local package:
 
 ```cli
-> dotnet new install . --force
+> dotnet new install .\BenjaminMichaelis.Dotnet.Templates.*.nupkg --force
 ```
 
-You can now test the template by running:
+Generate and validate:
 
 ```cli
-> dotnet new bmichaelis.{templatename}
+> dotnet new bmichaelis.{template-name}
 > dotnet build
 > dotnet test --no-build
 > dotnet publish --no-build
 ```
 
-When done, you can remove the local install of the template package by running:
+Remove the local install:
 
 ```cli
-> dotnet new uninstall .
+> dotnet new uninstall .\BenjaminMichaelis.Dotnet.Templates.*.nupkg
 ```
+
+## Repository layout
+
+- `Templates.csproj`: template pack project that packs `templates/**`
+- `templates/Library/NuGet`: `bmichaelis.nuget`
+- `templates/Quickstart/ConsoleApp`: `bmichaelis.quickstart.consoleapp`
+- `templates/Quickstart/BenchmarkApp`: `bmichaelis.quickstart.benchmarkconsole`
+- `templates/Aspire/MinimalApi`: `bmichaelis.aspire.minimalapi`
 
 ## Adding a new template
 
-- [ ] Add project under the template directory
-- [ ] Update .template.config in directory
-- [ ] Copy root .editorconfig to template directory (or run `./CopyEditorConfigToTemplates.ps1`)
-- [ ] Update dependabot.yml
-- [ ] Update build.yml workflow
-- [ ] Add to README
+1. Add the template files under `templates/`
+2. Add or update `.template.config/template.json`
+3. Copy the root `.editorconfig` to the template (or run `.\CopyEditorConfigToTemplates.ps1`)
+4. Update CI matrix entries (for example, `build.yml`)
+5. Update this README with the new template
 
-### EditorConfig Management
+## EditorConfig management
 
-Each template includes an `.editorconfig` file that is based on the root repository's `.editorconfig`. This ensures consistent coding standards across all generated projects.
+Templates include `.editorconfig` files based on the root `.editorconfig` for consistent defaults.
 
-**For new templates:**
-- Copy the root `.editorconfig` to your template directory
-- Or run `./CopyEditorConfigToTemplates.ps1` to copy to all templates
+Recommended workflow:
 
 **For template-specific customizations:**
 - Keep template-specific rules in `templates/<Template>/.template.config/editorconfig.override`
