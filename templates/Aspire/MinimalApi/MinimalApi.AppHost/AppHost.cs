@@ -17,11 +17,14 @@ IResourceBuilder<IResourceWithConnectionString> db;
 // Application Insights is provisioned by Aspire in Azure and the connection string is
 // injected automatically into all referencing projects as APPLICATIONINSIGHTS_CONNECTION_STRING.
 // Locally, Aspire Dashboard receives all telemetry via OTLP instead.
-var appInsights = builder.AddAzureApplicationInsights("appinsights");
+IResourceBuilder<IResourceWithConnectionString>? appInsights = null;
 //#endif
 
 if (builder.ExecutionContext.IsPublishMode)
 {
+    //#if (applicationInsights)
+    appInsights = builder.AddAzureApplicationInsights("appinsights");
+    //#endif
     db = builder.AddAzureSqlServer().AddDatabase("MinimalApi-db");
 }
 else
@@ -52,11 +55,15 @@ else
 
 var backend = builder.AddProject<Projects.MinimalApi>("MinimalApi-backend")
     .WithDependency(db, ConnectionStrings.DatabaseKey)
-    //#if (applicationInsights)
-    .WithReference(appInsights)
-    //#endif
     .WithExternalHttpEndpoints()
     .PublishAsAzureContainerApp((infra, app) => app.Template.Scale.MaxReplicas = 1);
+
+//#if (applicationInsights)
+if (appInsights is not null)
+{
+    backend.WithReference(appInsights);
+}
+//#endif
 
 if (builder.ExecutionContext.IsPublishMode)
 {
