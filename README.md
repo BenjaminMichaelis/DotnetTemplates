@@ -90,21 +90,22 @@ Each template includes an `.editorconfig` file that is based on the root reposit
 - Or run `./CopyEditorConfigToTemplates.ps1` to copy to all templates
 
 **For template-specific customizations:**
-- Templates can have their own `.editorconfig` customizations (e.g., the NuGet template has more relaxed var usage rules)
-- When updating the root `.editorconfig`, use the `CopyEditorConfigToTemplates.ps1` script which will detect and preserve existing customizations
+- Keep template-specific rules in `templates/<Template>/.template.config/editorconfig.override`
+- Override files are authoring metadata only; generated projects still contain a single final `.editorconfig`
+- The NuGet template uses this pattern for its relaxed style severity and namespace preferences
 
 **When updating root .editorconfig:**
 
 **Automated Process (Recommended):**
 - Simply update the root `.editorconfig` file and push to main
 - The `update-template-editorconfig` GitHub Actions workflow will automatically:
-  - Detect the changes and run the copy script
+  - Detect root or override changes and run the copy script
   - Create or update a PR with the template updates
-  - Preserve existing customizations and create backups for manual review
+  - Compose each template `.editorconfig` from root baseline + optional override
   - Provide clear documentation of what was changed
 
 **Manual Process:**
 1. Update the root `.editorconfig` file
 2. Run `./CopyEditorConfigToTemplates.ps1` 
-3. Review any templates with customizations and manually merge changes if needed
+3. If a template needs custom rules, edit `.template.config/editorconfig.override` for that template
 4. Test all templates to ensure they work correctly

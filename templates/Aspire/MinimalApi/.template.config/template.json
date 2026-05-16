@@ -58,6 +58,9 @@
   },
   "sources": [
     {
+      "exclude": [
+        ".template.config/editorconfig.override"
+      ],
       "modifiers": []
     }
   ]
