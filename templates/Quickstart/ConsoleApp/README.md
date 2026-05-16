@@ -21,7 +21,7 @@ Source:
 
 ### Parameters
 
-- `--no-sln`: Don't include the solution file.
+- `--no-sln`: Don't include the default `.slnx` solution file.
 - `--no-tests`: Don't include the test project.
 
 [Default template options](https://learn.microsoft.com/dotnet/core/tools/dotnet-new#options)
@@ -31,4 +31,3 @@ Source:
 - Simple console app with minimal dependencies.
 - Includes unit tests using xUnit.
 - Ready to build, test, and run.
-- 

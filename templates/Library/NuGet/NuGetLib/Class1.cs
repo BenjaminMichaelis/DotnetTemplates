@@ -1,4 +1,4 @@
-﻿namespace NuGetLib;
+namespace NuGetLib;
 
 /// <summary>
 /// Class1

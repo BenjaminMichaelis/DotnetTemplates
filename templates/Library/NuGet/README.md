@@ -23,3 +23,9 @@ Create a new app in your current directory by running.
 1. Create a release on GitHub
 2. Add your [Nuget.org](https://www.nuget.org/account/apikeys) API key to the GitHub repository secrets as `NUGET_API_KEY` with push scope permissions
 3. Tag the release with a tag following a v*.*.*format, likely with*.*.* following a [Semver](https://semver.org/) format. ex: v1.0.0
+
+### Parameters
+
+- `--sln`: Include a legacy `.sln` file instead of the default `.slnx` file.
+- `--no-sln`: Don't include a solution file.
+- `--no-tests`: Don't include the test project.

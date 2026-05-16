@@ -1,4 +1,4 @@
-﻿namespace ConsoleApp.Console;
+namespace ConsoleApp.Console;
 
 public sealed class Program
 {

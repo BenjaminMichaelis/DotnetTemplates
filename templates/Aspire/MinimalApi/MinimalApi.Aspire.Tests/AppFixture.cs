@@ -10,9 +10,9 @@ public class AppFixture : AspireFixture<Projects.MinimalApi_AppHost>
 {
     public AppFixture()
     {
-        Environment.SetEnvironmentVariable(
-            "Auth__SigningKey",
-            "ThisIsATemplateDevelopmentSigningKeyAtLeast32Chars");
+        const string signingKey = "ThisIsATemplateDevelopmentSigningKeyAtLeast32Chars";
+        Environment.SetEnvironmentVariable("Auth__SigningKey", signingKey);
+        Environment.SetEnvironmentVariable("Parameters__auth-signing-key", signingKey);
         Environment.SetEnvironmentVariable("DisableDbGate", "true");
     }
 

@@ -40,6 +40,10 @@ jobs:
       - name: Restore .NET dependencies
         run: dotnet restore
 
+      - name: Enforce formatting
+        run: |
+          .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -DiscoverFromCurrentDirectory
+ 
       - name: Build
         run: dotnet build --no-restore --configuration Release
 

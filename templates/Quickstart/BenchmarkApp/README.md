@@ -17,6 +17,10 @@ Create a new app in your current directory by running.
 
 ### Parameters
 
+- `--sln`: Include a legacy `.sln` file instead of the default `.slnx` file.
+- `--no-sln`: Don't include a solution file.
+- `--no-tests`: Don't include the test project.
+
 [Default template options](https://learn.microsoft.com/dotnet/core/tools/dotnet-new#options)
 
 ## Key Features

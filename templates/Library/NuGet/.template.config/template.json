@@ -35,12 +35,20 @@
     "no-sln": {
       "type": "parameter",
       "dataType":"bool",
-      "defaultValue": "false"
+      "defaultValue": "false",
+      "description": "Do not include a solution file."
+    },
+    "sln": {
+      "type": "parameter",
+      "dataType":"bool",
+      "defaultValue": "false",
+      "description": "Use legacy .sln format instead of the default .slnx format."
     },
     "no-tests": {
       "type": "parameter",
       "dataType":"bool",
-      "defaultValue": "false"
+      "defaultValue": "false",
+      "description": "Do not include a test project."
     }
   },
   "sources": [
@@ -48,6 +56,19 @@
       "modifiers": [
         {
           "condition": "(no-sln)",
+          "exclude": [
+            "NuGetLib.sln",
+            "NuGetLib.slnx"
+          ]
+        },
+        {
+          "condition": "(sln && !no-sln)",
+          "exclude": [
+            "NuGetLib.slnx"
+          ]
+        },
+        {
+          "condition": "(!sln && !no-sln)",
           "exclude": [
             "NuGetLib.sln"
           ]

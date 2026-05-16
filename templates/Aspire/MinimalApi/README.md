@@ -75,6 +75,13 @@ If you added integration tests (`--integration-tests true`), run them individual
 - Sufficient disk space for SQL Server and other service containers
 - First run may take 1–2 minutes to download and start containers
 
+The AppHost passes the backend auth signing key through a secret parameter (`Auth__SigningKey`).
+Set it once for local development:
+
+```cli
+> aspire secret set Parameters:auth-signing-key "<at-least-32-char-secret>"
+```
+
 ## Container / Docker
 
 A `Dockerfile` is included in `MinimalApi/` for building the API image outside of Aspire (CI/CD pipelines, Docker Compose, manual builds).
@@ -116,7 +123,7 @@ When the template is generated with `--applicationInsights true`, the following 
 |---|---|
 | `Aspire.Hosting.Azure.ApplicationInsights` | Aspire provisions an AI resource in Azure and injects `APPLICATIONINSIGHTS_CONNECTION_STRING` automatically into the API container |
 | `Microsoft.ApplicationInsights.Profiler.AspNetCore` | CPU flame-graph profiler; uploads traces to App Insights Performance blade |
-| `builder.Services.AddServiceProfiler()` | Registers the profiler (no-op locally when no connection string is present) |
+| `builder.Services.AddServiceProfiler()` | Registers the profiler on Windows/Linux (skipped on unsupported platforms such as macOS) |
 
 ### How this works with Aspire's built-in telemetry
 
