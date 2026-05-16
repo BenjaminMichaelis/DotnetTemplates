@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.targets" />
+    <File Path="Directory.Packages.props" />
+    <File Path="global.json" />
+    <File Path="NuGet.config" />
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="BenchmarkApp.Benchmark/BenchmarkApp.Benchmark.csproj" />
+<!--#if (!no-tests) -->
+  <Project Path="BenchmarkApp.Tests/BenchmarkApp.Tests.csproj" />
+<!--#endif -->
+  <Project Path="BenchmarkApp/BenchmarkApp.csproj" />
+</Solution>
