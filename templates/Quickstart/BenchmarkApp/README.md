@@ -17,8 +17,13 @@ Create a new app in your current directory by running.
 
 ### Parameters
 
+- `--no-sln`: Don't include the solution file.
+- `--no-tests`: Don't include the test project.
+- `--tests`: Choose the test framework (`tunit` default, `xunit` for xUnit v3 + MTP v2).
+
 [Default template options](https://learn.microsoft.com/dotnet/core/tools/dotnet-new#options)
 
 ## Key Features
 
 - Should just work out of the box. Not meant to be the perfect project setup to start with, but rather a quick way to get started with benchmarking and testing out different algorithms or such.
+- Includes unit tests using TUnit by default, with xUnit v3 + MTP v2 available via `--tests xunit`.

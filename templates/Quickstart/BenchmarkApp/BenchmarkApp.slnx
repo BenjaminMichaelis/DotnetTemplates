@@ -9,7 +9,8 @@
     <File Path="README.md" />
   </Folder>
 #if (!noTests)
-  <Project Path="ConsoleApp.Tests/ConsoleApp.Tests.csproj" />
+  <Project Path="BenchmarkApp.Tests/BenchmarkApp.Tests.csproj" />
 #endif
-  <Project Path="ConsoleApp/ConsoleApp.csproj" />
+  <Project Path="BenchmarkApp.Benchmark/BenchmarkApp.Benchmark.csproj" />
+  <Project Path="BenchmarkApp/BenchmarkApp.csproj" />
 </Solution>

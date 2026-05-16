@@ -9,7 +9,7 @@
     <File Path="README.md" />
   </Folder>
 #if (!noTests)
-  <Project Path="ConsoleApp.Tests/ConsoleApp.Tests.csproj" />
+  <Project Path="NuGetLib.Tests/NuGetLib.Tests.csproj" />
 #endif
-  <Project Path="ConsoleApp/ConsoleApp.csproj" />
+  <Project Path="NuGetLib/NuGetLib.csproj" />
 </Solution>

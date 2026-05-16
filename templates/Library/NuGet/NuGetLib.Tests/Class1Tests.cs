@@ -2,8 +2,12 @@ namespace NuGetLib.Tests;
 
 public class Class1Tests
 {
+#if USE_XUNIT
     [Fact]
-    public void Method_WithPositiveValue_AddsOne()
+#else
+    [Test]
+#endif
+    public async Task Method_WithPositiveValue_AddsOne()
     {
         //Arrange
         AutoMocker mocker = new();
@@ -14,6 +18,16 @@ public class Class1Tests
         int result = class1.Method(41);
 
         //Assert
-        Assert.Equal(42, result);
+        await AssertEqual(result, 42);
+    }
+
+    private static async Task AssertEqual(int actual, int expected)
+    {
+#if USE_XUNIT
+        Assert.Equal(expected, actual);
+        await Task.CompletedTask;
+#else
+        await Assert.That(actual).IsEqualTo(expected);
+#endif
     }
 }

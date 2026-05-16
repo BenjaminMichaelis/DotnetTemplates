@@ -3,19 +3,23 @@
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
+    <OutputType>Exe</OutputType>
+    <TemplateTestFramework>TEST_FRAMEWORK_VALUE</TemplateTestFramework>
 
     <IsPublishable>false</IsPublishable>
     <IsPackable>false</IsPackable>
-    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TemplateTestFramework)' == 'xunit'">
+    <DefineConstants>$(DefineConstants);USE_XUNIT</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="coverlet.collector" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" />
     <PackageReference Include="Moq" />
     <PackageReference Include="Moq.AutoMock" />
-    <PackageReference Include="xunit" />
-    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="TUnit" Condition="'$(TemplateTestFramework)' == 'tunit'" />
+    <PackageReference Include="xunit.v3.mtp-v2" Condition="'$(TemplateTestFramework)' == 'xunit'" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="Xunit" />
+    <Using Include="Xunit" Condition="'$(TemplateTestFramework)' == 'xunit'" />
     <Using Include="Moq" />
     <Using Include="Moq.AutoMock" />
   </ItemGroup>

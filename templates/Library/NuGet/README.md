@@ -18,6 +18,12 @@ Create a new app in your current directory by running.
  dotnet new bmichaelis.nuget
 ```
 
+### Parameters
+
+- `--no-sln`: Don't include the solution file.
+- `--no-tests`: Don't include the test project.
+- `--tests`: Choose the test framework (`tunit` default, `xunit` for xUnit v3 + MTP v2).
+
 ### Generating Releases
 
 1. Create a release on GitHub

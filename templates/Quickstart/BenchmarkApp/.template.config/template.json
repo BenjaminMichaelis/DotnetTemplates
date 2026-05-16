@@ -41,6 +41,48 @@
       "type": "parameter",
       "dataType":"bool",
       "defaultValue": "false"
+    },
+    "tests": {
+      "type": "parameter",
+      "dataType":"choice",
+      "defaultValue":"tunit",
+      "description":"Test framework to include when tests are enabled.",
+      "choices":[
+        {
+          "choice":"tunit",
+          "description":"Use TUnit tests"
+        },
+        {
+          "choice":"xunit",
+          "description":"Use xUnit v3 tests with MTP v2"
+        }
+      ],
+      "replaces":"TEST_FRAMEWORK_VALUE"
+    },
+    "USE_XUNIT": {
+      "type": "computed",
+      "value": "(tests == \"xunit\")"
+    },
+    "noTests": {
+      "type": "computed",
+      "value": "(no-tests)"
+    }
+  },
+  "specialCustomOperations": {
+    "**/*.slnx": {
+      "operations": [
+        {
+          "type": "conditional",
+          "configuration": {
+            "if": ["#if"],
+            "else": ["#else"],
+            "elseif": ["#elseif"],
+            "endif": ["#endif"],
+            "trim": "true",
+            "wholeLine": "true"
+          }
+        }
+      ]
     }
   },
   "sources": [
@@ -49,7 +91,7 @@
         {
           "condition": "(no-sln)",
           "exclude": [
-            "BenchmarkApp.sln"
+            "BenchmarkApp.slnx"
           ]
         },
         {
