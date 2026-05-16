@@ -77,6 +77,7 @@ When done, you can remove the local install of the template package by running:
 - [ ] Add project under the template directory
 - [ ] Update .template.config in directory
 - [ ] Copy root .editorconfig to template directory (or run `./CopyEditorConfigToTemplates.ps1`)
+- [ ] Ensure template CI includes strict `dotnet format` checks (whitespace, style, analyzers)
 - [ ] Update dependabot.yml
 - [ ] Update build.yml workflow
 - [ ] Add to README
@@ -84,6 +85,11 @@ When done, you can remove the local install of the template package by running:
 ### EditorConfig Management
 
 Each template includes an `.editorconfig` file that is based on the root repository's `.editorconfig`. This ensures consistent coding standards across all generated projects.
+
+CI enforces formatting via strict checks:
+- `dotnet format whitespace <target> --verify-no-changes --no-restore`
+- `dotnet format style <target> --verify-no-changes --no-restore --severity info`
+- `dotnet format analyzers <target> --verify-no-changes --no-restore --severity info`
 
 **For new templates:**
 - Copy the root `.editorconfig` to your template directory

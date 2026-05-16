@@ -46,8 +46,18 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
-    - name: Build
-      run: dotnet pack --configuration Release -o . 
+    - name: Restore dependencies
+      run: dotnet restore Templates.csproj
+
+    - name: Enforce formatting
+      run: |
+        $target = "Templates.csproj"
+        dotnet format whitespace $target --verify-no-changes --no-restore
+        dotnet format style $target --verify-no-changes --no-restore --severity info
+        dotnet format analyzers $target --verify-no-changes --no-restore --severity info
+
+    - name: Pack
+      run: dotnet pack --configuration Release --no-restore -o .
     
     - name: Upload Artifacts
       uses: actions/upload-artifact@v7
@@ -98,6 +108,24 @@ jobs:
           $hasTests = Test-Path "$projectName.Tests/$projectName.Tests.csproj"
           if ([bool]::Parse("${{ matrix.expectSolution }}") -ne $hasSolution) { throw "Unexpected solution file presence: $hasSolution" }
           if ([bool]::Parse("${{ matrix.expectTests }}") -ne $hasTests) { throw "Unexpected test project presence: $hasTests" }
+          if ($hasSolution) {
+            $solutionFile = Get-ChildItem -Path . -File | Where-Object { $_.Name -eq "$projectName.sln" -or $_.Name -eq "$projectName.slnx" } | Select-Object -First 1
+            if (-not $solutionFile) { throw "Solution file expected but not found." }
+            $target = $solutionFile.FullName
+            dotnet restore $target
+            dotnet format whitespace $target --verify-no-changes --no-restore
+            dotnet format style $target --verify-no-changes --no-restore --severity info
+            dotnet format analyzers $target --verify-no-changes --no-restore --severity info
+          } else {
+            $projects = @(Get-ChildItem -Path . -Recurse -Filter *.csproj | Select-Object -ExpandProperty FullName)
+            if ($projects.Count -eq 0) { throw "No project files found for format validation." }
+            foreach ($target in $projects) {
+              dotnet restore $target
+              dotnet format whitespace $target --verify-no-changes --no-restore
+              dotnet format style $target --verify-no-changes --no-restore --severity info
+              dotnet format analyzers $target --verify-no-changes --no-restore --severity info
+            }
+          }
           if ($hasTests) {
             dotnet test "$projectName.Tests/$projectName.Tests.csproj" /p:TreatWarningsAsErrors=true
           } else {
@@ -148,6 +176,24 @@ jobs:
           $hasTests = Test-Path "$projectName.Tests/$projectName.Tests.csproj"
           if ([bool]::Parse("${{ matrix.expectSolution }}") -ne $hasSolution) { throw "Unexpected solution file presence: $hasSolution" }
           if ([bool]::Parse("${{ matrix.expectTests }}") -ne $hasTests) { throw "Unexpected test project presence: $hasTests" }
+          if ($hasSolution) {
+            $solutionFile = Get-ChildItem -Path . -File | Where-Object { $_.Name -eq "$projectName.sln" -or $_.Name -eq "$projectName.slnx" } | Select-Object -First 1
+            if (-not $solutionFile) { throw "Solution file expected but not found." }
+            $target = $solutionFile.FullName
+            dotnet restore $target
+            dotnet format whitespace $target --verify-no-changes --no-restore
+            dotnet format style $target --verify-no-changes --no-restore --severity info
+            dotnet format analyzers $target --verify-no-changes --no-restore --severity info
+          } else {
+            $projects = @(Get-ChildItem -Path . -Recurse -Filter *.csproj | Select-Object -ExpandProperty FullName)
+            if ($projects.Count -eq 0) { throw "No project files found for format validation." }
+            foreach ($target in $projects) {
+              dotnet restore $target
+              dotnet format whitespace $target --verify-no-changes --no-restore
+              dotnet format style $target --verify-no-changes --no-restore --severity info
+              dotnet format analyzers $target --verify-no-changes --no-restore --severity info
+            }
+          }
           if ($hasTests) {
             dotnet test "$projectName.Tests/$projectName.Tests.csproj" /p:TreatWarningsAsErrors=true
           } else {
@@ -199,6 +245,24 @@ jobs:
           $hasTests = Test-Path "$projectName.Tests/$projectName.Tests.csproj"
           if ([bool]::Parse("${{ matrix.expectSolution }}") -ne $hasSolution) { throw "Unexpected solution file presence: $hasSolution" }
           if ([bool]::Parse("${{ matrix.expectTests }}") -ne $hasTests) { throw "Unexpected test project presence: $hasTests" }
+          if ($hasSolution) {
+            $solutionFile = Get-ChildItem -Path . -File | Where-Object { $_.Name -eq "$projectName.sln" -or $_.Name -eq "$projectName.slnx" } | Select-Object -First 1
+            if (-not $solutionFile) { throw "Solution file expected but not found." }
+            $target = $solutionFile.FullName
+            dotnet restore $target
+            dotnet format whitespace $target --verify-no-changes --no-restore
+            dotnet format style $target --verify-no-changes --no-restore --severity info
+            dotnet format analyzers $target --verify-no-changes --no-restore --severity info
+          } else {
+            $projects = @(Get-ChildItem -Path . -Recurse -Filter *.csproj | Select-Object -ExpandProperty FullName)
+            if ($projects.Count -eq 0) { throw "No project files found for format validation." }
+            foreach ($target in $projects) {
+              dotnet restore $target
+              dotnet format whitespace $target --verify-no-changes --no-restore
+              dotnet format style $target --verify-no-changes --no-restore --severity info
+              dotnet format analyzers $target --verify-no-changes --no-restore --severity info
+            }
+          }
           if ($hasTests) {
             dotnet test "$projectName.Tests/$projectName.Tests.csproj" /p:TreatWarningsAsErrors=true
           } else {
@@ -237,5 +301,12 @@ jobs:
           Push-Location $outDir
           dotnet new bmichaelis.aspire.minimalapi --name MinimalApi ${{ matrix.args }}
           Push-Location MinimalApi
+          $solutionFile = Get-ChildItem -Path . -File | Where-Object { $_.Extension -eq ".sln" -or $_.Extension -eq ".slnx" } | Select-Object -First 1
+          if (-not $solutionFile) { throw "Expected solution file for Aspire template format validation." }
+          $target = $solutionFile.FullName
+          dotnet restore $target
+          dotnet format whitespace $target --verify-no-changes --no-restore
+          dotnet format style $target --verify-no-changes --no-restore --severity info
+          dotnet format analyzers $target --verify-no-changes --no-restore --severity info
           dotnet build /p:TreatWarningsAsErrors=true
           dotnet test --no-build /p:TreatWarningsAsErrors=true -p:TestingPlatformDotnetTestSupport=true
