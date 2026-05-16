@@ -1,3 +1,5 @@
+using NuGetLib;
+
 namespace NuGetLib.Tests;
 
 public class Class1Tests
