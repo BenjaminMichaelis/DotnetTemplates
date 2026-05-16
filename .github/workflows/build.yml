@@ -343,6 +343,8 @@ jobs:
           dotnet new bmichaelis.aspire.minimalapi --name MinimalApi ${{ matrix.args }}
           Push-Location MinimalApi
           dotnet build /p:TreatWarningsAsErrors=true
+          dotnet tool restore
+          dotnet ef migrations has-pending-model-changes --configuration Release --project MinimalApi.Data/MinimalApi.Data.csproj --startup-project MinimalApi.AppHost/MinimalApi.AppHost.csproj --no-build
           dotnet test --no-build /p:TreatWarningsAsErrors=true -p:TestingPlatformDotnetTestSupport=true --results-directory trx-data --report-trx --report-trx-filename tests.trx
 
       - name: Generate merged failure playlist from TRX
@@ -371,3 +373,14 @@ jobs:
           name: failed-tests-playlist-aspire-${{ matrix.variant }}
           path: test-results/failed-tests.playlist
           if-no-files-found: ignore
+
+  all-tests:
+    runs-on: ubuntu-latest
+    needs: [test-library, test-quickstart-benchmarkconsole, test-quickstart-consoleapp, test-aspire-minimalapi]
+    if: always()
+    steps:
+      - name: All tests passed
+        run: |
+          if ("${{ contains(needs.*.result, 'failure') }}" -eq "true" -or "${{ contains(needs.*.result, 'cancelled') }}" -eq "true") {
+            throw "One or more test jobs failed or were cancelled"
+          }
