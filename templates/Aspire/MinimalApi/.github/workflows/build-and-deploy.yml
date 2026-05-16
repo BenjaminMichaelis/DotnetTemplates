@@ -42,21 +42,7 @@ jobs:
 
       - name: Enforce formatting
         run: |
-          $solutionFile = Get-ChildItem -Path . -File | Where-Object { $_.Extension -eq ".sln" -or $_.Extension -eq ".slnx" } | Select-Object -First 1
-          if ($solutionFile) {
-            $target = $solutionFile.FullName
-            dotnet format whitespace $target --verify-no-changes --no-restore
-            dotnet format style $target --verify-no-changes --no-restore --severity info
-            dotnet format analyzers $target --verify-no-changes --no-restore --severity info
-          } else {
-            $projects = @(Get-ChildItem -Path . -Recurse -Filter *.csproj | Select-Object -ExpandProperty FullName)
-            if ($projects.Count -eq 0) { throw "No project files found for format validation." }
-            foreach ($target in $projects) {
-              dotnet format whitespace $target --verify-no-changes --no-restore
-              dotnet format style $target --verify-no-changes --no-restore --severity info
-              dotnet format analyzers $target --verify-no-changes --no-restore --severity info
-            }
-          }
+          .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -DiscoverFromCurrentDirectory
  
       - name: Build
         run: dotnet build --no-restore --configuration Release

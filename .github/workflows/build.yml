@@ -51,10 +51,7 @@ jobs:
 
     - name: Enforce formatting
       run: |
-        $target = "Templates.csproj"
-        dotnet format whitespace $target --verify-no-changes --no-restore
-        dotnet format style $target --verify-no-changes --no-restore --severity info
-        dotnet format analyzers $target --verify-no-changes --no-restore --severity info
+        .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -Targets "Templates.csproj"
 
     - name: Pack
       run: dotnet pack --configuration Release --no-restore -o .
@@ -111,20 +108,9 @@ jobs:
           if ($hasSolution) {
             $solutionFile = Get-ChildItem -Path . -File | Where-Object { $_.Name -eq "$projectName.sln" -or $_.Name -eq "$projectName.slnx" } | Select-Object -First 1
             if (-not $solutionFile) { throw "Solution file expected but not found." }
-            $target = $solutionFile.FullName
-            dotnet restore $target
-            dotnet format whitespace $target --verify-no-changes --no-restore
-            dotnet format style $target --verify-no-changes --no-restore --severity info
-            dotnet format analyzers $target --verify-no-changes --no-restore --severity info
+            .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -Targets $solutionFile.FullName -RestoreTargets
           } else {
-            $projects = @(Get-ChildItem -Path . -Recurse -Filter *.csproj | Select-Object -ExpandProperty FullName)
-            if ($projects.Count -eq 0) { throw "No project files found for format validation." }
-            foreach ($target in $projects) {
-              dotnet restore $target
-              dotnet format whitespace $target --verify-no-changes --no-restore
-              dotnet format style $target --verify-no-changes --no-restore --severity info
-              dotnet format analyzers $target --verify-no-changes --no-restore --severity info
-            }
+            .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -DiscoverFromCurrentDirectory -RestoreTargets
           }
           if ($hasTests) {
             dotnet test "$projectName.Tests/$projectName.Tests.csproj" /p:TreatWarningsAsErrors=true
@@ -179,20 +165,9 @@ jobs:
           if ($hasSolution) {
             $solutionFile = Get-ChildItem -Path . -File | Where-Object { $_.Name -eq "$projectName.sln" -or $_.Name -eq "$projectName.slnx" } | Select-Object -First 1
             if (-not $solutionFile) { throw "Solution file expected but not found." }
-            $target = $solutionFile.FullName
-            dotnet restore $target
-            dotnet format whitespace $target --verify-no-changes --no-restore
-            dotnet format style $target --verify-no-changes --no-restore --severity info
-            dotnet format analyzers $target --verify-no-changes --no-restore --severity info
+            .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -Targets $solutionFile.FullName -RestoreTargets
           } else {
-            $projects = @(Get-ChildItem -Path . -Recurse -Filter *.csproj | Select-Object -ExpandProperty FullName)
-            if ($projects.Count -eq 0) { throw "No project files found for format validation." }
-            foreach ($target in $projects) {
-              dotnet restore $target
-              dotnet format whitespace $target --verify-no-changes --no-restore
-              dotnet format style $target --verify-no-changes --no-restore --severity info
-              dotnet format analyzers $target --verify-no-changes --no-restore --severity info
-            }
+            .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -DiscoverFromCurrentDirectory -RestoreTargets
           }
           if ($hasTests) {
             dotnet test "$projectName.Tests/$projectName.Tests.csproj" /p:TreatWarningsAsErrors=true
@@ -248,20 +223,9 @@ jobs:
           if ($hasSolution) {
             $solutionFile = Get-ChildItem -Path . -File | Where-Object { $_.Name -eq "$projectName.sln" -or $_.Name -eq "$projectName.slnx" } | Select-Object -First 1
             if (-not $solutionFile) { throw "Solution file expected but not found." }
-            $target = $solutionFile.FullName
-            dotnet restore $target
-            dotnet format whitespace $target --verify-no-changes --no-restore
-            dotnet format style $target --verify-no-changes --no-restore --severity info
-            dotnet format analyzers $target --verify-no-changes --no-restore --severity info
+            .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -Targets $solutionFile.FullName -RestoreTargets
           } else {
-            $projects = @(Get-ChildItem -Path . -Recurse -Filter *.csproj | Select-Object -ExpandProperty FullName)
-            if ($projects.Count -eq 0) { throw "No project files found for format validation." }
-            foreach ($target in $projects) {
-              dotnet restore $target
-              dotnet format whitespace $target --verify-no-changes --no-restore
-              dotnet format style $target --verify-no-changes --no-restore --severity info
-              dotnet format analyzers $target --verify-no-changes --no-restore --severity info
-            }
+            .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -DiscoverFromCurrentDirectory -RestoreTargets
           }
           if ($hasTests) {
             dotnet test "$projectName.Tests/$projectName.Tests.csproj" /p:TreatWarningsAsErrors=true
@@ -303,11 +267,7 @@ jobs:
           Push-Location MinimalApi
           $solutionFile = Get-ChildItem -Path . -File | Where-Object { $_.Extension -eq ".sln" -or $_.Extension -eq ".slnx" } | Select-Object -First 1
           if (-not $solutionFile) { throw "Expected solution file for Aspire template format validation." }
-          $target = $solutionFile.FullName
-          dotnet restore $target
-          dotnet format whitespace $target --verify-no-changes --no-restore
-          dotnet format style $target --verify-no-changes --no-restore --severity info
-          dotnet format analyzers $target --verify-no-changes --no-restore --severity info
+          .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -Targets $solutionFile.FullName -RestoreTargets
           dotnet build /p:TreatWarningsAsErrors=true
           dotnet tool restore
           dotnet ef migrations has-pending-model-changes --configuration Release --project MinimalApi.Data/MinimalApi.Data.csproj --startup-project MinimalApi.AppHost/MinimalApi.AppHost.csproj --no-build
