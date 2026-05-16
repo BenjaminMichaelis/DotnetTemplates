@@ -7,6 +7,8 @@
     <File Path="global.json" />
     <File Path="NuGet.config" />
   </Folder>
+<!--#if (!no-tests) -->
   <Project Path="NuGetLib.Tests/NuGetLib.Tests.csproj" />
+<!--#endif -->
   <Project Path="NuGetLib/NuGetLib.csproj" />
 </Solution>
