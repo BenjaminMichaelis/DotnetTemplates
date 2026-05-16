@@ -106,9 +106,23 @@ CI enforces formatting via strict checks:
 - `dotnet format style <target> --verify-no-changes --no-restore --severity info`
 - `dotnet format analyzers <target> --verify-no-changes --no-restore --severity info`
 
-1. Update the root `.editorconfig`
-2. Run `.\CopyEditorConfigToTemplates.ps1`
-3. Review template-specific customizations
-4. Validate template generation and builds
+**For template-specific customizations:**
+- Keep template-specific rules in `templates/<Template>/.template.config/editorconfig.override`
+- Override files are authoring metadata only; generated projects still contain a single final `.editorconfig`
+- The NuGet template uses this pattern for its relaxed style severity and namespace preferences
 
-An automated `update-template-editorconfig` workflow also syncs template editorconfig files and opens/updates a pull request when needed.
+**When updating root .editorconfig:**
+
+**Automated Process (Recommended):**
+- Simply update the root `.editorconfig` file and push to main
+- The `update-template-editorconfig` GitHub Actions workflow will automatically:
+  - Detect root or override changes and run the copy script
+  - Create or update a PR with the template updates
+  - Compose each template `.editorconfig` from root baseline + optional override
+  - Provide clear documentation of what was changed
+
+**Manual Process:**
+1. Update the root `.editorconfig` file
+2. If a template needs custom rules, edit `.template.config/editorconfig.override` for that template
+3. Run `./CopyEditorConfigToTemplates.ps1` (rerun this script after any override edits)
+4. Test all templates to ensure they work correctly

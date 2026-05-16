@@ -55,10 +55,5 @@
       "defaultValue": "false",
       "description": "Add Azure Application Insights monitoring: Aspire auto-provisioning, the Azure Monitor OpenTelemetry exporter, and the Application Insights Profiler."
     }
-  },
-  "sources": [
-    {
-      "modifiers": []
-    }
-  ]
+  }
 }
