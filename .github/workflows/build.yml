@@ -383,16 +383,12 @@ jobs:
         include:
           - variant: default
             args: ""
-            includeIntegrationTests: false
           - variant: applicationInsights
             args: "--applicationInsights true"
-            includeIntegrationTests: false
           - variant: default-with-tests
-            args: "--integration-tests true"
-            includeIntegrationTests: true
+            args: "--integrationTests true"
           - variant: applicationInsights-with-tests
-            args: "--applicationInsights true --integration-tests true"
-            includeIntegrationTests: true
+            args: "--applicationInsights true --integrationTests true"
 
     steps:
       - name: Checkout
@@ -426,10 +422,6 @@ jobs:
           dotnet tool restore
           dotnet ef migrations has-pending-model-changes --configuration Release --project MinimalApi.Data/MinimalApi.Data.csproj --startup-project MinimalApi.AppHost/MinimalApi.AppHost.csproj --no-build
           dotnet test --no-build /p:TreatWarningsAsErrors=true -p:TestingPlatformDotnetTestSupport=true --results-directory trx-data --report-trx --report-trx-filename tests.trx
-          if ("${{ matrix.includeIntegrationTests }}" -eq "True") {
-            Write-Host "Running Aspire integration tests..."
-            dotnet test MinimalApi.Aspire.Tests/MinimalApi.Aspire.Tests.csproj /p:TreatWarningsAsErrors=true -p:TestingPlatformDotnetTestSupport=true --results-directory trx-data --report-trx --report-trx-filename aspire-tests.trx
-          }
           dotnet run --project .\MinimalApi.AppHost\MinimalApi.AppHost.csproj -- --publisher manifest --output-path .\aspire-manifest.json
           if (-not (Test-Path ".\MinimalApi.AppHost\aspire-manifest.json")) {
             throw "Aspire manifest smoke check failed: MinimalApi.AppHost\\aspire-manifest.json was not created."

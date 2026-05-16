@@ -19,13 +19,13 @@ With Application Insights monitoring enabled:
 With Aspire integration tests:
 
 ```cli
-> dotnet new bmichaelis.aspire.minimalapi --integration-tests true
+> dotnet new bmichaelis.aspire.minimalapi --integrationTests true
 ```
 
 Both options together:
 
 ```cli
-> dotnet new bmichaelis.aspire.minimalapi --applicationInsights true --integration-tests true
+> dotnet new bmichaelis.aspire.minimalapi --applicationInsights true --integrationTests true
 ```
 
 ### Parameters
@@ -36,7 +36,7 @@ Both options together:
 |-----------|-------------|---------|
 | `--name` | Name of the project | Current directory name |
 | `--applicationInsights` | Add Azure Application Insights monitoring | `false` |
-| `--integration-tests` | Add Aspire integration tests using TUnit | `false` |
+| `--integrationTests` | Add Aspire integration tests using TUnit | `false` |
 
 ## What is included
 
@@ -46,7 +46,7 @@ Both options together:
 - **Aspire AppHost** – Local orchestration with SQL Server container and DB viewer (dbGate)
 - **ServiceDefaults** – Shared OpenTelemetry, health checks, service discovery
 - **Core + Tests** – Business logic projects with TUnit tests
-- **Aspire integration tests** *(optional, `--integration-tests true`)* – TUnit-based tests that validate AppHost startup and distributed app behavior
+- **Aspire integration tests** *(optional, `--integrationTests true`)* – TUnit-based tests that validate AppHost startup and distributed app behavior
 - **Terraform/Infra** – Azure Container Apps, Azure SQL, Application Insights, ACR
 - **GitHub Actions CI/CD** – Build, test, migrate DB, push container image
 
@@ -64,7 +64,7 @@ Run all unit tests:
 > dotnet test
 ```
 
-If you added integration tests (`--integration-tests true`), run them individually:
+If you added integration tests (`--integrationTests true`), run them individually:
 
 ```cli
 > dotnet test MinimalApi.Aspire.Tests/MinimalApi.Aspire.Tests.csproj

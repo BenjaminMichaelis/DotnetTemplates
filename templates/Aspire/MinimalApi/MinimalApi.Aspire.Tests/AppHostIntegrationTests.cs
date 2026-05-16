@@ -8,7 +8,7 @@ namespace MinimalApi.Aspire.Tests;
 /// and respond to HTTP requests through the orchestrated host.
 /// </summary>
 [ClassDataSource<AppFixture>(Shared = SharedType.PerTestSession)]
-public class HealthCheckTests(AppFixture fixture)
+public class AppHostIntegrationTests(AppFixture fixture)
 {
     /// <summary>
     /// Verifies that the AppHost builds and starts successfully.

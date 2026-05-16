@@ -8,13 +8,13 @@ namespace MinimalApi.Aspire.Tests;
 /// </summary>
 public class AppFixture : AspireFixture<Projects.MinimalApi_AppHost>
 {
-    public AppFixture()
-    {
-        const string signingKey = "ThisIsATemplateDevelopmentSigningKeyAtLeast32Chars";
-        Environment.SetEnvironmentVariable("Auth__SigningKey", signingKey);
-        Environment.SetEnvironmentVariable("Parameters__auth-signing-key", signingKey);
-        Environment.SetEnvironmentVariable("DisableDbGate", "true");
-    }
+    private const string SigningKey = "ThisIsATemplateDevelopmentSigningKeyAtLeast32Chars";
+
+    protected override string[] Args =>
+    [
+        "--DisableDbGate=true",
+        $"--Parameters:auth-signing-key={SigningKey}"
+    ];
 
     /// <summary>
     /// Timeout for waiting on resources to become healthy.

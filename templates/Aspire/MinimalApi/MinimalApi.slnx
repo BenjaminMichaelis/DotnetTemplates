@@ -21,7 +21,7 @@
     <File Path=".github/workflows/deploy-infrastructure.yml" />
   </Folder>
   <Project Path="MinimalApi.AppHost/MinimalApi.AppHost.csproj" />
-  <!--#if (integration-tests)-->
+  <!--#if (integrationTests)-->
   <Project Path="MinimalApi.Aspire.Tests/MinimalApi.Aspire.Tests.csproj" />
   <!--#endif-->
   <Project Path="MinimalApi.Core.Tests/MinimalApi.Core.Tests.csproj" />
