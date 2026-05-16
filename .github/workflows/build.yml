@@ -77,6 +77,11 @@ jobs:
             expectSln: true
             expectSlnx: false
             expectTests: true
+          - variant: sln-no-tests
+            args: "--sln --no-tests"
+            expectSln: true
+            expectSlnx: false
+            expectTests: false
           - variant: no-sln
             args: "--no-sln"
             expectSln: false
@@ -142,6 +147,11 @@ jobs:
             expectSln: true
             expectSlnx: false
             expectTests: true
+          - variant: sln-no-tests
+            args: "--sln --no-tests"
+            expectSln: true
+            expectSlnx: false
+            expectTests: false
           - variant: no-sln
             args: "--no-sln"
             expectSln: false
