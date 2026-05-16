@@ -20,7 +20,7 @@ public class ProgramTests
         int result = class1.Method(41);
 
         //Assert
-        await AssertEqual(result, 42);
+        await AssertEqual(42, result);
     }
 
 #if USE_XUNIT
@@ -35,10 +35,10 @@ public class ProgramTests
         //Act
         int result = class1.Method(-2);
         //Assert
-        await AssertEqual(result, -1);
+        await AssertEqual(-1, result);
     }
 
-    private static async Task AssertEqual(int actual, int expected)
+    private static async Task AssertEqual(int expected, int actual)
     {
 #if USE_XUNIT
         Assert.Equal(expected, actual);
