@@ -46,8 +46,15 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
-    - name: Build
-      run: dotnet pack --configuration Release -o . 
+    - name: Restore dependencies
+      run: dotnet restore Templates.csproj
+
+    - name: Enforce formatting
+      run: |
+        .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -Targets "Templates.csproj"
+
+    - name: Pack
+      run: dotnet pack --configuration Release --no-restore -o .
     
     - name: Upload Artifacts
       uses: actions/upload-artifact@v7
@@ -115,8 +122,11 @@ jobs:
           if ([bool]::Parse("${{ matrix.expectTests }}") -ne $hasTests) { throw "Unexpected test project presence: $hasTests" }
           $solutionPath = if ($hasSln) { "$projectName.sln" } elseif ($hasSlnx) { "$projectName.slnx" } else { $null }
           if ($solutionPath) {
+            .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -Targets $solutionPath -RestoreTargets
             dotnet restore $solutionPath
             dotnet build $solutionPath /p:TreatWarningsAsErrors=true
+          } else {
+            .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -DiscoverFromCurrentDirectory -RestoreTargets
           }
           if ($hasTests) {
             dotnet test "$projectName.Tests/$projectName.Tests.csproj" /p:TreatWarningsAsErrors=true
@@ -185,8 +195,11 @@ jobs:
           if ([bool]::Parse("${{ matrix.expectTests }}") -ne $hasTests) { throw "Unexpected test project presence: $hasTests" }
           $solutionPath = if ($hasSln) { "$projectName.sln" } elseif ($hasSlnx) { "$projectName.slnx" } else { $null }
           if ($solutionPath) {
+            .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -Targets $solutionPath -RestoreTargets
             dotnet restore $solutionPath
             dotnet build $solutionPath /p:TreatWarningsAsErrors=true
+          } else {
+            .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -DiscoverFromCurrentDirectory -RestoreTargets
           }
           if ($hasTests) {
             dotnet test "$projectName.Tests/$projectName.Tests.csproj" /p:TreatWarningsAsErrors=true
@@ -246,8 +259,11 @@ jobs:
           if ([bool]::Parse("${{ matrix.expectTests }}") -ne $hasTests) { throw "Unexpected test project presence: $hasTests" }
           $solutionPath = if ($hasSln) { "$projectName.sln" } elseif ($hasSlnx) { "$projectName.slnx" } else { $null }
           if ($solutionPath) {
+            .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -Targets $solutionPath -RestoreTargets
             dotnet restore $solutionPath
             dotnet build $solutionPath /p:TreatWarningsAsErrors=true
+          } else {
+            .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -DiscoverFromCurrentDirectory -RestoreTargets
           }
           if ($hasTests) {
             dotnet test "$projectName.Tests/$projectName.Tests.csproj" /p:TreatWarningsAsErrors=true
@@ -287,7 +303,12 @@ jobs:
           Push-Location $outDir
           dotnet new bmichaelis.aspire.minimalapi --name MinimalApi ${{ matrix.args }}
           Push-Location MinimalApi
+          $solutionFile = Get-ChildItem -Path . -File | Where-Object { $_.Extension -eq ".sln" -or $_.Extension -eq ".slnx" } | Select-Object -First 1
+          if (-not $solutionFile) { throw "Expected solution file for Aspire template format validation." }
+          .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -Targets $solutionFile.FullName -RestoreTargets
           dotnet build /p:TreatWarningsAsErrors=true
+          dotnet tool restore
+          dotnet ef migrations has-pending-model-changes --configuration Release --project MinimalApi.Data/MinimalApi.Data.csproj --startup-project MinimalApi.AppHost/MinimalApi.AppHost.csproj --no-build
           dotnet test --no-build /p:TreatWarningsAsErrors=true -p:TestingPlatformDotnetTestSupport=true
 
   all-tests:
