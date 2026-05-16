@@ -146,7 +146,7 @@ jobs:
             .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -DiscoverFromCurrentDirectory -RestoreTargets
           }
           if ($hasTests) {
-            dotnet test "$projectName.Tests/$projectName.Tests.csproj" /p:TreatWarningsAsErrors=true -p:TestingPlatformDotnetTestSupport=true --results-directory trx-data ${{ matrix.reportTrxArgs }}
+            dotnet test "$projectName.Tests/$projectName.Tests.csproj" /p:TreatWarningsAsErrors=true --results-directory trx-data ${{ matrix.reportTrxArgs }}
           } else {
             dotnet build "$projectName/$projectName.csproj" /p:TreatWarningsAsErrors=true
           }
@@ -264,7 +264,7 @@ jobs:
             .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -DiscoverFromCurrentDirectory -RestoreTargets
           }
           if ($hasTests) {
-            dotnet test "$projectName.Tests/$projectName.Tests.csproj" /p:TreatWarningsAsErrors=true -p:TestingPlatformDotnetTestSupport=true --results-directory trx-data ${{ matrix.reportTrxArgs }}
+            dotnet test "$projectName.Tests/$projectName.Tests.csproj" /p:TreatWarningsAsErrors=true --results-directory trx-data ${{ matrix.reportTrxArgs }}
           } else {
             dotnet build "$projectName/$projectName.csproj" /p:TreatWarningsAsErrors=true
           }
@@ -371,7 +371,7 @@ jobs:
             .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -DiscoverFromCurrentDirectory -RestoreTargets
           }
           if ($hasTests) {
-            dotnet test "$projectName.Tests/$projectName.Tests.csproj" /p:TreatWarningsAsErrors=true -p:TestingPlatformDotnetTestSupport=true --results-directory trx-data ${{ matrix.reportTrxArgs }}
+            dotnet test "$projectName.Tests/$projectName.Tests.csproj" /p:TreatWarningsAsErrors=true --results-directory trx-data ${{ matrix.reportTrxArgs }}
           } else {
             dotnet build "$projectName/$projectName.csproj" /p:TreatWarningsAsErrors=true
           }
@@ -448,7 +448,7 @@ jobs:
           dotnet build /p:TreatWarningsAsErrors=true
           dotnet tool restore
           dotnet ef migrations has-pending-model-changes --configuration Release --project MinimalApi.Data/MinimalApi.Data.csproj --startup-project MinimalApi.AppHost/MinimalApi.AppHost.csproj --no-build
-          dotnet test --no-build /p:TreatWarningsAsErrors=true -p:TestingPlatformDotnetTestSupport=true --results-directory trx-data --report-trx --report-trx-filename tests.trx
+          dotnet test --no-build /p:TreatWarningsAsErrors=true --results-directory trx-data --report-trx --report-trx-filename tests.trx
 
       - name: Generate merged failure playlist from TRX
         if: always()
