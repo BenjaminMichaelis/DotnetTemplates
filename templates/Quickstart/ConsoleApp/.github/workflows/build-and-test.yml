@@ -46,6 +46,9 @@ jobs:
         uses: actions/setup-dotnet@v5
         with:
           global-json-file: "./global.json"
+
+      - name: Restore .NET Tools
+        run: dotnet tool restore
   
       - name: Restore dependencies
         run: dotnet restore
@@ -58,4 +61,30 @@ jobs:
         run: dotnet build -p:ContinuousIntegrationBuild=True --no-restore --configuration Release
   
       - name: Test
-        run: dotnet test --no-build --configuration Release --verbosity normal
+        run: dotnet test --no-build --configuration Release --verbosity normal --results-directory trx-data --logger "trx;LogFileName=tests.trx"
+
+      - name: Generate merged failure playlist from TRX
+        if: always()
+        run: |
+          $trxFiles = Get-ChildItem -Path "trx-data" -Recurse -File -Filter "*.trx" -ErrorAction SilentlyContinue |
+            Select-Object -ExpandProperty FullName
+
+          if (-not $trxFiles) {
+            Write-Host "No TRX files found. Skipping playlist generation."
+            exit 0
+          }
+
+          New-Item -ItemType Directory -Path "test-results" -Force | Out-Null
+
+          $args = @("tool", "run", "trx-to-vsplaylist", "convert")
+          $args += $trxFiles
+          $args += @("--outcome", "Failed", "--output", "test-results/failed-tests.playlist", "--skip-empty")
+          dotnet @args
+
+      - name: Upload failed test playlist
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: failed-tests-playlist
+          path: test-results/failed-tests.playlist
+          if-no-files-found: ignore
