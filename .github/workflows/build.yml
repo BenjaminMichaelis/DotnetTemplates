@@ -118,8 +118,8 @@ jobs:
           $outDir = "TestLibrary-${{ matrix.variant }}"
           mkdir $outDir
           Push-Location $outDir
-          dotnet new bmichaelis.nuget ${{ matrix.args }}
-          $projectName = Split-Path -Leaf (Get-Location)
+          $projectName = "TestLib"
+          dotnet new bmichaelis.nuget ${{ matrix.args }} --name $projectName --output .
           $hasSln = Test-Path "$projectName.sln"
           $hasSlnx = Test-Path "$projectName.slnx"
           $hasTests = Test-Path "$projectName.Tests/$projectName.Tests.csproj"
@@ -225,8 +225,8 @@ jobs:
           $outDir = "TestQuickstartBenchmarkConsole-${{ matrix.variant }}"
           mkdir $outDir
           Push-Location $outDir
-          dotnet new bmichaelis.quickstart.benchmarkconsole ${{ matrix.args }}
-          $projectName = Split-Path -Leaf (Get-Location)
+          $projectName = "TestBenchmark"
+          dotnet new bmichaelis.quickstart.benchmarkconsole ${{ matrix.args }} --name $projectName --output .
           $hasSln = Test-Path "$projectName.sln"
           $hasSlnx = Test-Path "$projectName.slnx"
           $hasTests = Test-Path "$projectName.Tests/$projectName.Tests.csproj"
@@ -323,8 +323,8 @@ jobs:
           $outDir = "TestQuickstartConsoleApp-${{ matrix.variant }}"
           mkdir $outDir
           Push-Location $outDir
-          dotnet new bmichaelis.quickstart.consoleapp ${{ matrix.args }}
-          $projectName = Split-Path -Leaf (Get-Location)
+          $projectName = "TestApp"
+          dotnet new bmichaelis.quickstart.consoleapp ${{ matrix.args }} --name $projectName --output .
           $hasSln = Test-Path "$projectName.sln"
           $hasSlnx = Test-Path "$projectName.slnx"
           $hasTests = Test-Path "$projectName.Tests/$projectName.Tests.csproj"
