@@ -1,9 +1,9 @@
-using MinimalApi.Data;
-
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
-using Microsoft.Data.Sqlite;
+
+using MinimalApi.Data;
 
 using Moq.AutoMock.Resolvers;
 

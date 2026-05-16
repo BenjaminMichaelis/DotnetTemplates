@@ -27,6 +27,6 @@ public class QuestionDto()
     public DateTimeOffset CreatedDate { get; set; }
     public DateTimeOffset? LastModifiedDate { get; set; }
 
-    [return:NotNullIfNotNull(nameof(question))]
+    [return: NotNullIfNotNull(nameof(question))]
     public static implicit operator QuestionDto?(Question? question) => question is null ? null : new(question);
 }

@@ -1,8 +1,8 @@
 using System.Collections.Concurrent;
 
-using MinimalApi.Data;
-
 using Microsoft.EntityFrameworkCore;
+
+using MinimalApi.Data;
 
 namespace MinimalApi.Core.QA;
 
@@ -106,7 +106,7 @@ public class QuestionService(IDbContextFactory<ApplicationDbContext> contextFact
 
         question.IsApproved = true;
         await context.SaveChangesAsync(cancellationToken);
-        
+
     }
 
     public async Task MarkAsAnsweredAsync(Guid questionId, string userId, CancellationToken cancellationToken)
@@ -126,7 +126,7 @@ public class QuestionService(IDbContextFactory<ApplicationDbContext> contextFact
 
         question.IsAnswered = true;
         await context.SaveChangesAsync(cancellationToken);
-        
+
     }
 
     public async Task DeleteQuestionAsync(Guid questionId, string userId, CancellationToken cancellationToken)
@@ -138,7 +138,7 @@ public class QuestionService(IDbContextFactory<ApplicationDbContext> contextFact
             .FirstOrDefaultAsync(q => q.Id == questionId, cancellationToken)
             ?? throw new InvalidOperationException("Question not found");
 
-        
+
         if (question.Room!.CreatedByUserId != userId)
         {
             throw new UnauthorizedAccessException("Only the room owner can delete questions");
@@ -160,7 +160,7 @@ public class QuestionService(IDbContextFactory<ApplicationDbContext> contextFact
         }
 
         var timeSinceLastSubmission = now - lastSubmission;
-        
+
         if (timeSinceLastSubmission >= _rateLimitWindow)
         {
             _lastSubmissionTimes[clientId] = now;

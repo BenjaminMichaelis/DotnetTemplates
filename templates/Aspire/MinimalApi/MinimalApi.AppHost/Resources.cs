@@ -28,7 +28,7 @@ public static class Resources
         {
             string? containerSuffix = builder.Configuration[ContainerSuffixKey];
             string? containerName = string.IsNullOrWhiteSpace(containerSuffix) ? "MinimalApi-sql" : $"MinimalApi-{containerSuffix}-sql";
-            
+
             return builder
                 .AddSqlServer(SqlServer)
                 .WithLifetime(ContainerLifetime.Persistent)
@@ -387,10 +387,10 @@ public static class Resources
         {
             // Determine the build configuration to use
             // Check common environment variable or default to Debug for local development
-            string configuration = Environment.GetEnvironmentVariable("DOTNET_BUILD_CONFIGURATION") 
-                ?? Environment.GetEnvironmentVariable("Configuration") 
+            string configuration = Environment.GetEnvironmentVariable("DOTNET_BUILD_CONFIGURATION")
+                ?? Environment.GetEnvironmentVariable("Configuration")
                 ?? "Debug";
-            
+
             ProcessStartInfo psi = new()
             {
                 FileName = "dotnet",
@@ -440,7 +440,7 @@ public static class Resources
             dir = dir.Parent)
         {
             if (dir.EnumerateFiles("*.sln?").Any())
-            { 
+            {
                 return dir;
             }
         }

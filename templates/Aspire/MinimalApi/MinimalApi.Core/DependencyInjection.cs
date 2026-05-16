@@ -1,11 +1,11 @@
-using MinimalApi.Core.QA;
-using MinimalApi.Data;
-
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+
+using MinimalApi.Core.QA;
+using MinimalApi.Data;
 
 namespace MinimalApi.Core;
 
@@ -13,7 +13,7 @@ public static class DependencyInjection
 {
     public static TBuilder AddDatabase<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
     {
-        var connectionString = builder.Configuration.GetConnectionString(ConnectionStrings.DatabaseKey) 
+        var connectionString = builder.Configuration.GetConnectionString(ConnectionStrings.DatabaseKey)
             ?? throw new InvalidOperationException($"Connection string '{ConnectionStrings.DatabaseKey}' not found.");
 
         void BuildDbOptions(DbContextOptionsBuilder options)

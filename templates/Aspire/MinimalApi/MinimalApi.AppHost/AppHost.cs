@@ -1,7 +1,7 @@
+using Microsoft.Extensions.DependencyInjection;
+
 using MinimalApi.AppHost;
 using MinimalApi.Core;
-
-using Microsoft.Extensions.DependencyInjection;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
