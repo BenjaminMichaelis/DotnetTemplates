@@ -1,3 +1,5 @@
+using ConsoleApp.Console;
+
 namespace ConsoleApp.Console.Tests;
 
 public class ProgramTests

@@ -35,12 +35,20 @@
     "no-sln": {
       "type": "parameter",
       "dataType":"bool",
-      "defaultValue": "false"
+      "defaultValue": "false",
+      "description": "Do not include a solution file."
+    },
+    "sln": {
+      "type": "parameter",
+      "dataType":"bool",
+      "defaultValue": "false",
+      "description": "Use legacy .sln format instead of the default .slnx format."
     },
     "no-tests": {
       "type": "parameter",
       "dataType":"bool",
-      "defaultValue": "false"
+      "defaultValue": "false",
+      "description": "Do not include a test project."
     },
     "tests": {
       "type": "parameter",
@@ -62,27 +70,6 @@
     "USE_XUNIT": {
       "type": "computed",
       "value": "(tests == \"xunit\")"
-    },
-    "noTests": {
-      "type": "computed",
-      "value": "(no-tests)"
-    }
-  },
-  "specialCustomOperations": {
-    "**/*.slnx": {
-      "operations": [
-        {
-          "type": "conditional",
-          "configuration": {
-            "if": ["#if"],
-            "else": ["#else"],
-            "elseif": ["#elseif"],
-            "endif": ["#endif"],
-            "trim": "true",
-            "wholeLine": "true"
-          }
-        }
-      ]
     }
   },
   "sources": [
@@ -91,7 +78,20 @@
         {
           "condition": "(no-sln)",
           "exclude": [
+            "NuGetLib.sln",
             "NuGetLib.slnx"
+          ]
+        },
+        {
+          "condition": "(sln && !no-sln)",
+          "exclude": [
+            "NuGetLib.slnx"
+          ]
+        },
+        {
+          "condition": "(!sln && !no-sln)",
+          "exclude": [
+            "NuGetLib.sln"
           ]
         },
         {

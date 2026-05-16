@@ -1,3 +1,5 @@
+using BenchmarkApp.Console;
+
 namespace BenchmarkApp.Console.Tests;
 
 public class ProgramTests
@@ -30,4 +32,5 @@ public class ProgramTests
         await Assert.That(actual).IsEqualTo(expected);
 #endif
     }
+
 }

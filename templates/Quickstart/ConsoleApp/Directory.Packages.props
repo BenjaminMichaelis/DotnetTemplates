@@ -11,6 +11,8 @@
   <!-- This property enables the Central Package Management feature -->
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <!-- https://learn.microsoft.com/nuget/consume-packages/Central-Package-Management#transitive-pinning -->
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
   <!--
   This defines the set of centrally managed packages.
@@ -21,9 +23,9 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageVersion>
-    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.300" />
     <PackageVersion Include="Moq" Version="4.20.72" />
-    <PackageVersion Include="Moq.AutoMock" Version="3.5.0" />
+    <PackageVersion Include="Moq.AutoMock" Version="4.0.2" />
     <PackageVersion Include="TUnit" Version="1.44.39" />
     <PackageVersion Include="xunit.v3.mtp-v2" Version="3.2.2" />
   </ItemGroup>

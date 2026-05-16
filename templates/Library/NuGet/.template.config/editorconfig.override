@@ -1,0 +1,13 @@
+# NuGet template-specific style relaxations.
+# Keep this file additive: do not include "root = ...".
+
+[*.{cs,vb}]
+dotnet_style_collection_initializer = true:suggestion
+dotnet_style_object_initializer = true:suggestion
+dotnet_style_prefer_auto_properties = true:suggestion
+dotnet_style_prefer_is_null_check_over_reference_equality_method = true:suggestion
+dotnet_style_prefer_simplified_boolean_expressions = true:suggestion
+dotnet_style_prefer_simplified_interpolation = true:suggestion
+
+[*.cs]
+csharp_style_namespace_declarations = block_scoped:silent

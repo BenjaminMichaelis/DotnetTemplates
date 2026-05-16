@@ -10,6 +10,9 @@ on:
     paths:
       - .github/workflows/copilot-setup-steps.yml
 
+permissions:
+  contents: read
+
 defaults:
   run:
     shell: pwsh
@@ -26,7 +29,7 @@ jobs:
       # If you want to clone the repository as part of your setup steps, for example to install dependencies, you'll need the `contents: read` permission.
       contents: read
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Setup .NET
       uses: actions/setup-dotnet@v5
       with:

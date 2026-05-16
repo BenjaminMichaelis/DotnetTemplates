@@ -1,3 +1,5 @@
+using NuGetLib;
+
 namespace NuGetLib.Tests;
 
 public class Class1Tests
@@ -30,4 +32,5 @@ public class Class1Tests
         await Assert.That(actual).IsEqualTo(expected);
 #endif
     }
+
 }

@@ -413,7 +413,7 @@ dotnet_diagnostic.CA1827.severity = warning
 # CA1828: Do not use CountAsync/LongCountAsync when AnyAsync can be used
 dotnet_diagnostic.CA1828.severity = warning
 
-# CA1829: CA1829: Use Length/Count property instead of Enumerable.Count method
+# CA1829: Use Length/Count property instead of Enumerable.Count method
 dotnet_diagnostic.CA1829.severity = warning
 
 # CA1836: Prefer IsEmpty over Count when available
@@ -469,7 +469,7 @@ dotnet_diagnostic.RCS1261.severity = warning
 #### IntelliTect.Analyzer Defaults ####
 #######################################
 
-# INTL0002: Fields should be PascalCase
+# INTL0001: Fields should be PascalCase
 dotnet_diagnostic.INTL0001.severity = none
 
 # INTL0059: Remove unnecessary value assignment
@@ -503,7 +503,7 @@ dotnet_diagnostic.CA1707.severity = none
 # https://learn.microsoft.com/visualstudio/ide/text-spell-checker
 spelling_exclusion_path = .\exclusions.dic
 spelling_checkable_types = strings,identifiers,comments
-# Update this to match your prefered language, you will need to ensure you have the language pack installed for the language
+# Update this to match your preferred language, you will need to ensure you have the language pack installed for the language
 spelling_languages = en-us
 # This is only the level that spelling errors occur in the Error List, it is not actually a compile-time warning/error
 spelling_error_severity = information

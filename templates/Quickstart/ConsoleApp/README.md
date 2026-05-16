@@ -21,7 +21,7 @@ Source:
 
 ### Parameters
 
-- `--no-sln`: Don't include the solution file.
+- `--no-sln`: Don't include the default `.slnx` solution file.
 - `--no-tests`: Don't include the test project.
 - `--tests`: Choose the test framework (`tunit` default, `xunit` for xUnit v3 + MTP v2).
 
@@ -32,4 +32,3 @@ Source:
 - Simple console app with minimal dependencies.
 - Includes unit tests using TUnit by default, with xUnit v3 + MTP v2 available via `--tests xunit`.
 - Ready to build, test, and run.
-- 
