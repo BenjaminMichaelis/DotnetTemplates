@@ -58,8 +58,7 @@
           "choice":"xunit",
           "description":"Use xUnit v3 tests with MTP v2"
         }
-      ],
-      "replaces":"TEST_FRAMEWORK_VALUE"
+      ]
     },
     "USE_XUNIT": {
       "type": "computed",
