@@ -93,14 +93,18 @@ Remove the local install:
 1. Add the template files under `templates/`
 2. Add or update `.template.config/template.json`
 3. Copy the root `.editorconfig` to the template (or run `.\CopyEditorConfigToTemplates.ps1`)
-4. Update CI matrix entries (for example, `build.yml`)
-5. Update this README with the new template
+4. Ensure template CI includes strict `dotnet format` checks (whitespace, style, analyzers)
+5. Update CI matrix entries (for example, `build.yml`)
+6. Update this README with the new template
 
 ## EditorConfig management
 
 Templates include `.editorconfig` files based on the root `.editorconfig` for consistent defaults.
 
-Recommended workflow:
+CI enforces formatting via strict checks:
+- `dotnet format whitespace <target> --verify-no-changes --no-restore`
+- `dotnet format style <target> --verify-no-changes --no-restore --severity info`
+- `dotnet format analyzers <target> --verify-no-changes --no-restore --severity info`
 
 1. Update the root `.editorconfig`
 2. Run `.\CopyEditorConfigToTemplates.ps1`
