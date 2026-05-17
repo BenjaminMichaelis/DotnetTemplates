@@ -85,6 +85,7 @@ Remove the local install:
 
 - `Templates.csproj`: template pack project that packs `templates/**`
 - `templates/Library/NuGet`: `bmichaelis.nuget`
+- `templates/Library/DotnetTool`: `bmichaelis.tool`
 - `templates/Quickstart/ConsoleApp`: `bmichaelis.quickstart.consoleapp`
 - `templates/Quickstart/BenchmarkApp`: `bmichaelis.quickstart.benchmarkconsole`
 - `templates/Aspire/MinimalApi`: `bmichaelis.aspire.minimalapi`
