@@ -58,13 +58,19 @@ Both options together:
 
 ### Running tests
 
-Run all unit tests:
+Run all tests (unit tests only when generated without `--integrationTests`):
 
 ```cli
 > dotnet test
 ```
 
-If you added integration tests (`--integrationTests true`), run them individually:
+When generated with `--integrationTests true`, `MinimalApi.Aspire.Tests` is part of the solution, so `dotnet test` runs both unit and integration tests. To run only unit tests without starting containers:
+
+```cli
+> dotnet test MinimalApi.Core.Tests/MinimalApi.Core.Tests.csproj
+```
+
+To run only integration tests:
 
 ```cli
 > dotnet test MinimalApi.Aspire.Tests/MinimalApi.Aspire.Tests.csproj
