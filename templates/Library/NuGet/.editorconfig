@@ -30,8 +30,8 @@ indent_size = 4
 tab_width = 4
 
 # New line preferences
-end_of_line = lf
-insert_final_newline = true
+end_of_line = crlf
+insert_final_newline = false
 
 #### .NET Coding Conventions ####
 [*.{cs,vb}]
@@ -487,16 +487,6 @@ dotnet_diagnostic.INTL0303.severity = warning
 
 # VSTHRD200: Use Async suffix for async methods
 dotnet_diagnostic.VSTHRD200.severity = warning
-
-##################################
-#### xUnit Analyzers Defaults ####
-##################################
-
-# xUnit1042: The member referenced by the MemberData attribute returns untyped data rows
-dotnet_diagnostic.xUnit1042.severity = warning
-
-# xUnit2024: Do not use boolean asserts for simple equality tests
-dotnet_diagnostic.xUnit2024.severity = warning
 
 [*Tests.cs]
 # These settings are appropriate for test projects.
