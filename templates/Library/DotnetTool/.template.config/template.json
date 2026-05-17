@@ -27,12 +27,40 @@
     "no-sln": {
       "type": "parameter",
       "dataType": "bool",
-      "defaultValue": "false"
+      "defaultValue": "false",
+      "description": "Do not include a solution file."
+    },
+    "sln": {
+      "type": "parameter",
+      "dataType": "bool",
+      "defaultValue": "false",
+      "description": "Use legacy .sln format instead of the default .slnx format."
     },
     "no-tests": {
       "type": "parameter",
       "dataType": "bool",
-      "defaultValue": "false"
+      "defaultValue": "false",
+      "description": "Do not include a test project."
+    },
+    "tests": {
+      "type": "parameter",
+      "dataType": "choice",
+      "defaultValue": "tunit",
+      "description": "Test framework to include. Ignored when --no-tests is specified.",
+      "choices": [
+        {
+          "choice": "tunit",
+          "description": "Use TUnit tests"
+        },
+        {
+          "choice": "xunit",
+          "description": "Use xUnit v3 tests with MTP v2"
+        }
+      ]
+    },
+    "USE_XUNIT": {
+      "type": "computed",
+      "value": "(tests == \"xunit\")"
     }
   },
   "sources": [
@@ -41,15 +69,34 @@
         {
           "condition": "(no-sln)",
           "exclude": [
+            "DotnetTool.sln",
             "DotnetTool.slnx"
+          ]
+        },
+        {
+          "condition": "(sln && !no-sln)",
+          "exclude": [
+            "DotnetTool.slnx"
+          ]
+        },
+        {
+          "condition": "(!sln && !no-sln)",
+          "exclude": [
+            "DotnetTool.sln"
           ]
         },
         {
           "condition": "(no-tests)",
           "exclude": [
             "DotnetTool.Tests/*",
+            "DotnetTool.sln",
             "DotnetTool.slnx",
             ".github/workflows/build-and-test.yml"
+          ]
+        },
+        {
+          "exclude": [
+            ".template.config/editorconfig.override"
           ]
         }
       ]

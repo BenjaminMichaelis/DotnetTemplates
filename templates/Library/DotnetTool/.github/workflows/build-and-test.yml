@@ -9,6 +9,9 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 defaults:
   run:
     shell: pwsh
@@ -36,18 +39,50 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
-  
+        uses: actions/checkout@v6
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
           global-json-file: "./global.json"
-  
+
+      - name: Restore .NET Tools
+        run: dotnet tool restore
+
       - name: Restore dependencies
         run: dotnet restore
-  
+
+      - name: Enforce formatting
+        run: |
+          .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -DiscoverFromCurrentDirectory
+
       - name: Build
         run: dotnet build -p:ContinuousIntegrationBuild=True --no-restore --configuration Release
-  
+
       - name: Test
-        run: dotnet test --no-build --configuration Release --verbosity normal
+        #if (USE_XUNIT)
+        run: dotnet test --no-build --configuration Release --verbosity normal --results-directory trx-data --report-xunit-trx --report-xunit-trx-filename tests.trx
+        #else
+        run: dotnet test --no-build --configuration Release --verbosity normal --results-directory trx-data --report-trx --report-trx-filename tests.trx
+        #endif
+
+      - name: Generate merged failure playlist from TRX
+        if: always()
+        run: |
+          $trxFiles = Get-ChildItem -Path "trx-data" -Recurse -File -Filter "*.trx" -ErrorAction SilentlyContinue |
+            Select-Object -ExpandProperty FullName
+
+          if (-not $trxFiles) {
+            Write-Host "No TRX files found; skipping playlist generation."
+            exit 0
+          }
+
+          dotnet trx-to-vsplaylist convert $trxFiles --output test-results/failed-tests.playlist --skip-empty
+
+      - name: Upload failure playlist
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failed-tests-playlist
+          path: test-results/failed-tests.playlist
+          if-no-files-found: ignore
