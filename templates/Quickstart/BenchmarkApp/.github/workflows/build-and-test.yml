@@ -61,7 +61,11 @@ jobs:
         run: dotnet build -p:ContinuousIntegrationBuild=True --no-restore --configuration Release
   
       - name: Test
+        #if (USE_XUNIT)
+        run: dotnet test --no-build --configuration Release --verbosity normal --results-directory trx-data --report-xunit-trx --report-xunit-trx-filename tests.trx
+        #else
         run: dotnet test --no-build --configuration Release --verbosity normal --results-directory trx-data --report-trx --report-trx-filename tests.trx
+        #endif
 
       - name: Generate merged failure playlist from TRX
         if: always()
