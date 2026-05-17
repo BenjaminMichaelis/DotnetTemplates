@@ -63,7 +63,7 @@ jobs:
       # --retry-failed-tests plus --retry-failed-tests-max-percentage <value> to skip reruns when too many tests fail:
       # https://learn.microsoft.com/dotnet/core/testing/microsoft-testing-platform-retry#retry-1
       - name: Test
-        run: dotnet test --no-build --configuration Release --verbosity normal --maximum-failed-tests 10 -p:TestingPlatformDotnetTestSupport=true --results-directory trx-data --report-trx --report-trx-filename tests.trx
+        run: dotnet test --no-build --configuration Release --verbosity normal --maximum-failed-tests 10 --results-directory trx-data --report-trx --report-trx-filename tests.trx
 
       - name: Generate merged failure playlist from TRX
         if: always()

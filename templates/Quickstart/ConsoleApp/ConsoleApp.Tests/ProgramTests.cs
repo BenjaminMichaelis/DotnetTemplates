@@ -4,8 +4,12 @@ namespace ConsoleApp.Console.Tests;
 
 public class ProgramTests
 {
+#if USE_XUNIT
     [Fact]
-    public void Method_WithPositiveValue_AddsOne()
+#else
+    [Test]
+#endif
+    public async Task Method_WithPositiveValue_AddsOne()
     {
         //Arrange
         AutoMocker mocker = new();
@@ -16,18 +20,32 @@ public class ProgramTests
         int result = class1.Method(41);
 
         //Assert
-        Assert.Equal(42, result);
+        await AssertEqual(42, result);
     }
 
+#if USE_XUNIT
     [Fact]
-    public void Method_WithNegativeValue_AddsOne()
+#else
+    [Test]
+#endif
+    public async Task Method_WithNegativeValue_AddsOne()
     {
         //Arrange
         Program class1 = new();
         //Act
         int result = class1.Method(-2);
         //Assert
-        Assert.Equal(-1, result);
+        await AssertEqual(-1, result);
+    }
+
+    private static async Task AssertEqual(int expected, int actual)
+    {
+#if USE_XUNIT
+        Assert.Equal(expected, actual);
+        await Task.CompletedTask;
+#else
+        await Assert.That(actual).IsEqualTo(expected);
+#endif
     }
 
 }

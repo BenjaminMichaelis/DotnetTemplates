@@ -49,6 +49,26 @@
       "dataType":"bool",
       "defaultValue": "false",
       "description": "Do not include a test project."
+    },
+    "tests": {
+      "type": "parameter",
+      "dataType":"choice",
+      "defaultValue":"tunit",
+      "description":"Test framework to include. Ignored when --no-tests is specified.",
+      "choices":[
+        {
+          "choice":"tunit",
+          "description":"Use TUnit tests"
+        },
+        {
+          "choice":"xunit",
+          "description":"Use xUnit v3 tests with MTP v2"
+        }
+      ]
+    },
+    "USE_XUNIT": {
+      "type": "computed",
+      "value": "(tests == \"xunit\")"
     }
   },
   "sources": [
