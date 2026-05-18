@@ -59,6 +59,7 @@ jobs:
       - name: Build
         run: dotnet build -p:ContinuousIntegrationBuild=True --no-restore --configuration Release
 
+#if (!no-tests)
       - name: Test
         #if (USE_XUNIT)
         run: dotnet test --no-build --configuration Release --verbosity normal --results-directory trx-data --report-xunit-trx --report-xunit-trx-filename tests.trx
@@ -77,6 +78,7 @@ jobs:
             exit 0
           }
 
+          New-Item -ItemType Directory -Force test-results | Out-Null
           dotnet trx-to-vsplaylist convert $trxFiles --output test-results/failed-tests.playlist --skip-empty
 
       - name: Upload failure playlist
@@ -86,3 +88,4 @@ jobs:
           name: failed-tests-playlist
           path: test-results/failed-tests.playlist
           if-no-files-found: ignore
+#endif

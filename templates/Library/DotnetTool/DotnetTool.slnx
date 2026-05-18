@@ -9,5 +9,7 @@
     <File Path="README.md" />
   </Folder>
   <Project Path="DotnetTool/DotnetTool.csproj" />
+  <!--#if (!no-tests) -->
   <Project Path="DotnetTool.Tests/DotnetTool.Tests.csproj" />
+  <!--#endif -->
 </Solution>
