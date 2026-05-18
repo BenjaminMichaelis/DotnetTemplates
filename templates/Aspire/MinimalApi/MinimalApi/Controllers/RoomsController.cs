@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using MinimalApi.Core.QA;
+
 using MinimalApi.Core.Hubs;
+using MinimalApi.Core.QA;
 using MinimalApi.Data;
 
 namespace MinimalApi.Controllers;

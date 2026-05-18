@@ -43,7 +43,8 @@
           "MinimalApi.Core/MinimalApi.Core.csproj",
           "MinimalApi.Core.Tests/MinimalApi.Core.Tests.csproj",
           "MinimalApi.Data/MinimalApi.Data.csproj",
-          "MinimalApi.ServiceDefaults/MinimalApi.ServiceDefaults.csproj"
+          "MinimalApi.ServiceDefaults/MinimalApi.ServiceDefaults.csproj",
+          "MinimalApi.Aspire.Tests/MinimalApi.Aspire.Tests.csproj:integrationTests"
         ]
       }
     }
@@ -54,6 +55,24 @@
       "datatype": "bool",
       "defaultValue": "false",
       "description": "Add Azure Application Insights monitoring: Aspire auto-provisioning, the Azure Monitor OpenTelemetry exporter, and the Application Insights Profiler."
+    },
+    "integrationTests": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "false",
+      "description": "Add Aspire integration tests using TUnit. Tests validate that the AppHost starts successfully and services respond to requests."
     }
-  }
+  },
+  "sources": [
+    {
+      "modifiers": [
+        {
+          "condition": "(!integrationTests)",
+          "exclude": [
+            "MinimalApi.Aspire.Tests/**"
+          ]
+        }
+      ]
+    }
+  ]
 }

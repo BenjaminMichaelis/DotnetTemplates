@@ -416,6 +416,10 @@ jobs:
             args: ""
           - variant: applicationInsights
             args: "--applicationInsights true"
+          - variant: default-with-integration-tests
+            args: "--integrationTests true"
+          - variant: applicationInsights-with-integration-tests
+            args: "--applicationInsights true --integrationTests true"
 
     steps:
       - name: Checkout
@@ -449,6 +453,13 @@ jobs:
           dotnet tool restore
           dotnet ef migrations has-pending-model-changes --configuration Release --project MinimalApi.Data/MinimalApi.Data.csproj --startup-project MinimalApi.AppHost/MinimalApi.AppHost.csproj --no-build
           dotnet test --no-build /p:TreatWarningsAsErrors=true --results-directory trx-data --report-trx --report-trx-filename tests.trx
+          $appHostDir = (Resolve-Path "./MinimalApi.AppHost").Path
+          $manifestPath = Join-Path $appHostDir "aspire-manifest.json"
+          $appHostProj = Join-Path $appHostDir "MinimalApi.AppHost.csproj"
+          dotnet run --project $appHostProj -- --publisher manifest --output-path $manifestPath
+          if (-not (Test-Path $manifestPath)) {
+            throw "Aspire manifest smoke check failed: $manifestPath was not created."
+          }
 
       - name: Generate merged failure playlist from TRX
         if: always()
@@ -487,3 +498,4 @@ jobs:
           if ("${{ contains(needs.*.result, 'failure') }}" -eq "true" -or "${{ contains(needs.*.result, 'cancelled') }}" -eq "true") {
             throw "One or more test jobs failed or were cancelled"
           }
+

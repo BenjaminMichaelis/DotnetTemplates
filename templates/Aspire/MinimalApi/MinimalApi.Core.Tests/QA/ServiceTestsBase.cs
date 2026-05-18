@@ -29,7 +29,7 @@ public abstract class ServiceTestsBase
             UserName = $"{userId}@example.com",
             Email = $"{userId}@example.com"
         };
-        
+
         await Mocker.InDbScopeAsync(async context =>
         {
             context.Users.Add(user);

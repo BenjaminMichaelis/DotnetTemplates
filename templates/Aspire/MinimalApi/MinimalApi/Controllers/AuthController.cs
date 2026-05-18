@@ -1,8 +1,8 @@
-using MinimalApi.Data;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+
+using MinimalApi.Data;
 
 namespace MinimalApi.Controllers;
 

@@ -1,11 +1,12 @@
-using MinimalApi.Core;
-using MinimalApi.Data;
-using MinimalApi.Middleware;
+using System.Text;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
+
+using MinimalApi.Core;
+using MinimalApi.Data;
+using MinimalApi.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,7 +47,7 @@ builder.Services.AddCors(options =>
         else
         {
             // In production, restrict to specific origins from configuration
-            var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() 
+            var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()
                 ?? ["https://yourdomain.com"];
             policy.WithOrigins(allowedOrigins)
                   .AllowAnyHeader()
@@ -111,7 +112,7 @@ authBuilder.AddJwtBearer(options =>
 });
 
 // No-op email sender for now (can be replaced with real implementation)
-builder.Services.AddScoped<IEmailSender<ApplicationUser>>(sp => 
+builder.Services.AddScoped<IEmailSender<ApplicationUser>>(sp =>
     new NoOpEmailSender<ApplicationUser>());
 
 var app = builder.Build();

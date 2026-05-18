@@ -1,6 +1,6 @@
-using MinimalApi.Core.QA;
-
 using Microsoft.EntityFrameworkCore;
+
+using MinimalApi.Core.QA;
 
 namespace MinimalApi.Core.Tests.QA;
 
@@ -339,9 +339,9 @@ public sealed class QuestionServiceTests : ServiceTestsBase
         var service = Mocker.CreateInstance<QuestionService>();
 
         await service.CanSubmitQuestionAsync(clientId);
-        
+
         await Task.Delay(TimeSpan.FromSeconds(11));
-        
+
         var result = await service.CanSubmitQuestionAsync(clientId);
         await Assert.That(result).IsTrue();
     }

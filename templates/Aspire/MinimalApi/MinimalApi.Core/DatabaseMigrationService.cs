@@ -1,8 +1,9 @@
-using MinimalApi.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+
+using MinimalApi.Data;
 
 namespace MinimalApi.Core;
 
@@ -34,7 +35,7 @@ internal sealed class DatabaseMigrationService(
         catch (Exception ex)
         {
             logger.LogError(ex, "An error occurred while applying database migrations");
-            
+
             // Stop the application if migrations fail
             lifetime.StopApplication();
             throw;

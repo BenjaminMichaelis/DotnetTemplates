@@ -1,6 +1,6 @@
-using MinimalApi.Core.QA;
-
 using Microsoft.EntityFrameworkCore;
+
+using MinimalApi.Core.QA;
 
 namespace MinimalApi.Core.Tests.QA;
 
@@ -127,7 +127,7 @@ public class RoomServiceTests : ServiceTestsBase
         await Assert.That(result.FriendlyName).IsEqualTo("New Room");
         await Assert.That(result.CreatedByUserId).IsEqualTo(user.Id);
 
-        await Mocker.InDbScopeAsync(async context => 
+        await Mocker.InDbScopeAsync(async context =>
         {
             var createdRoom = await context.Rooms.SingleAsync(x => x.Id == result.Id);
             await Assert.That(createdRoom).IsNotNull();
@@ -188,7 +188,7 @@ public class RoomServiceTests : ServiceTestsBase
         var user = await CreateUserAsync();
         var room = await CreateRoomAsync(user.Id);
         var question = await CreateQuestionAsync(room.Id, isApproved: true);
-        
+
         await Mocker.InDbScopeAsync(async context =>
         {
             var dbRoom = await context.Rooms.SingleAsync(x => x.Id == room.Id);

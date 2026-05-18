@@ -1,7 +1,7 @@
+using Microsoft.Extensions.DependencyInjection;
+
 using MinimalApi.AppHost;
 using MinimalApi.Core;
-
-using Microsoft.Extensions.DependencyInjection;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
@@ -33,25 +33,32 @@ else
     var sql = builder.AddSqlServer();
     db = sql.AddSqlDatabase();
 
-    //DBGate is a database viewer
-    var dbGate = builder.AddContainer("dbgate", "dbgate/dbgate")
-        .ExcludeFromManifest()
-        .ExcludeFromMcp()
-        .WithExplicitStart()
-        .WithLifetime(ContainerLifetime.Persistent)
-        .WithContainerName("MinimalApi-db-gate")
-        .WithHttpEndpoint(targetPort: 3000)
-        .WaitFor(sql)
-        .WithEnvironment("CONNECTIONS", "mssql")
-        .WithEnvironment("LABEL_mssql", "MS SQL")
-        .WithEnvironment("SERVER_mssql", "host.docker.internal")
-        .WithEnvironment("PORT_mssql", () => $"{sql.Resource.PrimaryEndpoint.Port}")
-        .WithEnvironment("USER_mssql", "sa")
-        .WithEnvironment("PASSWORD_mssql", sql.Resource.PasswordParameter)
-        .WithEnvironment("ENGINE_mssql", "mssql@dbgate-plugin-mssql")
-        .WithParentRelationship(sql)
-        .WithHttpHealthCheck("/")
-        ;
+    var disableDbGate = string.Equals(
+        builder.Configuration["DisableDbGate"],
+        "true",
+        StringComparison.OrdinalIgnoreCase);
+
+    if (!disableDbGate)
+    {
+        // DBGate is a database viewer.
+        var dbGate = builder.AddContainer("dbgate", "dbgate/dbgate")
+            .ExcludeFromManifest()
+            .ExcludeFromMcp()
+            .WithExplicitStart()
+            .WithLifetime(ContainerLifetime.Persistent)
+            .WithContainerName("MinimalApi-db-gate")
+            .WithHttpEndpoint(targetPort: 3000)
+            .WaitFor(sql)
+            .WithEnvironment("CONNECTIONS", "mssql")
+            .WithEnvironment("LABEL_mssql", "MS SQL")
+            .WithEnvironment("SERVER_mssql", "host.docker.internal")
+            .WithEnvironment("PORT_mssql", () => $"{sql.Resource.PrimaryEndpoint.Port}")
+            .WithEnvironment("USER_mssql", "sa")
+            .WithEnvironment("PASSWORD_mssql", sql.Resource.PasswordParameter)
+            .WithEnvironment("ENGINE_mssql", "mssql@dbgate-plugin-mssql")
+            .WithParentRelationship(sql)
+            .WithHttpHealthCheck("/");
+    }
 }
 
 var backend = builder.AddProject<Projects.MinimalApi>("MinimalApi-backend")
