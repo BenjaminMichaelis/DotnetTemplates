@@ -88,8 +88,7 @@
         {
           "condition": "(no-tests)",
           "exclude": [
-            "DotnetTool.Tests/*",
-            "DotnetTool.sln"
+            "DotnetTool.Tests/*"
           ]
         },
         {

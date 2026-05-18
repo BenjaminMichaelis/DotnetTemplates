@@ -1,5 +1,6 @@
 namespace DotnetTool.Tests;
 
+using DotnetTool;
 #if USE_XUNIT
 using Xunit;
 #endif
