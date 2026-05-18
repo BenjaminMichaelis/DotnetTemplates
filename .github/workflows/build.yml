@@ -80,7 +80,7 @@ jobs:
             expectSln: false
             expectSlnx: true
             expectTests: true
-            reportTrxArgs: "--report-xunit-trx --report-xunit-trx-filename tests.trx"
+            reportTrxArgs: "-trx trx-data/tests.trx"
           - variant: no-tests
             args: "--no-tests"
             expectSln: false
@@ -146,6 +146,9 @@ jobs:
             .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -DiscoverFromCurrentDirectory -RestoreTargets
           }
           if ($hasTests) {
+            if (-not $solutionPath) {
+              dotnet build "$projectName.Tests/$projectName.Tests.csproj" /p:TreatWarningsAsErrors=true
+            }
             dotnet run --project "$projectName.Tests/$projectName.Tests.csproj" --no-build -- --results-directory trx-data ${{ matrix.reportTrxArgs }}
           } else {
             dotnet build "$projectName/$projectName.csproj" /p:TreatWarningsAsErrors=true

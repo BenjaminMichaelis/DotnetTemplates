@@ -62,7 +62,7 @@ jobs:
 #if (!no-tests)
       - name: Test
         #if (USE_XUNIT)
-        run: dotnet run --project DotnetTool.Tests/DotnetTool.Tests.csproj --no-build --configuration Release -- --results-directory trx-data --report-xunit-trx --report-xunit-trx-filename tests.trx
+        run: dotnet run --project DotnetTool.Tests/DotnetTool.Tests.csproj --no-build --configuration Release -- -trx trx-data/tests.trx
         #else
         run: dotnet run --project DotnetTool.Tests/DotnetTool.Tests.csproj --no-build --configuration Release -- --results-directory trx-data --report-trx --report-trx-filename tests.trx
         #endif
