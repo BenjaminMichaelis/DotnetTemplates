@@ -1,6 +1,6 @@
 <!--
-  This enabled central package management. 
-  This allows for controling all NuGet packages within the Directory.Packages.props file
+  This enables central package management.
+  This allows for controlling all NuGet packages within the Directory.Packages.props file.
   See https://learn.microsoft.com/nuget/consume-packages/Central-Package-Management
   -->
 <Project>

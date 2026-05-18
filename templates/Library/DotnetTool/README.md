@@ -19,7 +19,7 @@ A base template for .NET Global Tool packages, with unit tests and GitHub Action
 - GitHub Actions deploy workflow that publishes RID-specific packages before the pointer package (required ordering)
 - Central Package Management (`Directory.Packages.props`)
 - SourceLink for debuggable symbols
-- xunit + Moq.AutoMock test project
+- TUnit test project (xunit v3 available via `--tests xunit`), with Moq.AutoMock
 
 ## Template
 
