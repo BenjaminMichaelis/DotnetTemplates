@@ -3,6 +3,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
     <OutputType>Exe</OutputType>
+    <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
 
     <IsPublishable>false</IsPublishable>
     <IsPackable>false</IsPackable>
@@ -24,6 +25,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!--#if (USE_XUNIT) -->
+    <Using Include="Xunit" />
+    <!--#endif -->
     <Using Include="Moq.AutoMock" />
   </ItemGroup>
 </Project>

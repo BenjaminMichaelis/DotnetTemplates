@@ -32,7 +32,7 @@
     <!--#if (USE_XUNIT) -->
     <PackageVersion Include="xunit.v3.mtp-v2" Version="3.2.2" />
     <!--#else -->
-    <PackageVersion Include="TUnit" Version="1.44.39" />
+    <PackageVersion Include="TUnit" Version="1.45.0" />
     <!--#endif -->
     <!--#endif -->
   </ItemGroup>
