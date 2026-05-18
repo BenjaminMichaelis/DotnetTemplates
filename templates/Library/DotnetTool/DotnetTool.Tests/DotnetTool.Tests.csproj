@@ -24,6 +24,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!--#if (USE_XUNIT) -->
+    <Using Include="Xunit" />
+    <!--#endif -->
     <Using Include="Moq.AutoMock" />
   </ItemGroup>
 </Project>

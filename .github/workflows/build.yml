@@ -146,7 +146,7 @@ jobs:
             .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -DiscoverFromCurrentDirectory -RestoreTargets
           }
           if ($hasTests) {
-            dotnet test "$projectName.Tests/$projectName.Tests.csproj" /p:TreatWarningsAsErrors=true --results-directory trx-data ${{ matrix.reportTrxArgs }}
+            dotnet run --project "$projectName.Tests/$projectName.Tests.csproj" --no-build -- --results-directory trx-data ${{ matrix.reportTrxArgs }}
           } else {
             dotnet build "$projectName/$projectName.csproj" /p:TreatWarningsAsErrors=true
           }
