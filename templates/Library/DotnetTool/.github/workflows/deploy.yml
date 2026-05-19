@@ -36,6 +36,11 @@ jobs:
       - name: Pack
         if: startsWith(github.ref, 'refs/tags/v')
         run: |
+          # MODE 1 (default, CoreCLR self-contained): a single `dotnet pack` produces all packages.
+          # For MODE 2 (AOT) or MODE 3 (Hybrid AOT + CoreCLR), you must instead run
+          # `dotnet pack -r <RID>` per platform in a matrix job and collect the output.
+          # See the csproj packaging mode comments and:
+          # https://learn.microsoft.com/en-us/dotnet/core/tools/rid-specific-tools#package-your-tool
           $packOutput = & dotnet pack -p:PackageVersion=${{ env.nugetVersion }} --configuration Release -o ${{ github.workspace }}/PackedNuget 2>&1
           $exitCode = $LASTEXITCODE
           $unexpectedErrors = $packOutput | Where-Object {
