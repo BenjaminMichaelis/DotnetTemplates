@@ -1,0 +1,102 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "BenjaminMichaelis",
+  "classifications": [
+    "Common",
+    "Tool",
+    "NuGet"
+  ],
+  "identity": "BenjaminMichaelis.Library.DotnetTool",
+  "name": "Benjamin Michaelis's .NET Global Tool",
+  "shortName": "bmichaelis.tool",
+  "tags": {
+    "language": "C#",
+    "type": "solution"
+  },
+  "preferNameDirectory": true,
+  "sourceName": "DotnetTool",
+  "symbols": {
+    "createdDate": {
+      "type": "generated",
+      "generator": "now",
+      "parameters": {
+        "format": "yyyy"
+      },
+      "replaces": "1970"
+    },
+    "no-sln": {
+      "type": "parameter",
+      "dataType": "bool",
+      "defaultValue": "false",
+      "description": "Do not include a solution file."
+    },
+    "sln": {
+      "type": "parameter",
+      "dataType": "bool",
+      "defaultValue": "false",
+      "description": "Use legacy .sln format instead of the default .slnx format."
+    },
+    "no-tests": {
+      "type": "parameter",
+      "dataType": "bool",
+      "defaultValue": "false",
+      "description": "Do not include a test project."
+    },
+    "tests": {
+      "type": "parameter",
+      "dataType": "choice",
+      "defaultValue": "tunit",
+      "description": "Test framework to include. Ignored when --no-tests is specified.",
+      "choices": [
+        {
+          "choice": "tunit",
+          "description": "Use TUnit tests"
+        },
+        {
+          "choice": "xunit",
+          "description": "Use xUnit v3 tests with MTP v2"
+        }
+      ]
+    },
+    "USE_XUNIT": {
+      "type": "computed",
+      "value": "(tests == \"xunit\")"
+    }
+  },
+  "sources": [
+    {
+      "modifiers": [
+        {
+          "condition": "(no-sln)",
+          "exclude": [
+            "DotnetTool.sln",
+            "DotnetTool.slnx"
+          ]
+        },
+        {
+          "condition": "(sln && !no-sln)",
+          "exclude": [
+            "DotnetTool.slnx"
+          ]
+        },
+        {
+          "condition": "(!sln && !no-sln)",
+          "exclude": [
+            "DotnetTool.sln"
+          ]
+        },
+        {
+          "condition": "(no-tests)",
+          "exclude": [
+            "DotnetTool.Tests/*"
+          ]
+        },
+        {
+          "exclude": [
+            ".template.config/editorconfig.override"
+          ]
+        }
+      ]
+    }
+  ]
+}

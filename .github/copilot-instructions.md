@@ -6,6 +6,7 @@ This repository builds and publishes `BenjaminMichaelis.Dotnet.Templates`, a NuG
 
 - `Templates.csproj` is the template-pack project. It packs files under `templates/**`.
 - `templates/Library/NuGet` contains the `bmichaelis.nuget` template.
+- `templates/Library/DotnetTool` contains the `bmichaelis.tool` template.
 - `templates/Quickstart/ConsoleApp` contains the `bmichaelis.quickstart.consoleapp` template.
 - `templates/Quickstart/BenchmarkApp` contains the `bmichaelis.quickstart.benchmarkconsole` template.
 - `templates/Aspire/MinimalApi` contains the `bmichaelis.aspire.minimalapi` template.

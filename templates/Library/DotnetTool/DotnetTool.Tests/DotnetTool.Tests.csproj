@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
+    <OutputType>Exe</OutputType>
+    <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+
+    <IsPublishable>false</IsPublishable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" />
+    <PackageReference Include="Moq" />
+    <PackageReference Include="Moq.AutoMock" />
+    <!--#if (USE_XUNIT) -->
+    <PackageReference Include="xunit.v3.mtp-v2" />
+    <!--#else -->
+    <PackageReference Include="TUnit" />
+    <!--#endif -->
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DotnetTool\DotnetTool.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--#if (USE_XUNIT) -->
+    <Using Include="Xunit" />
+    <!--#endif -->
+    <Using Include="Moq.AutoMock" />
+  </ItemGroup>
+</Project>
