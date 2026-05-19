@@ -1,3 +1,5 @@
+using Aspire.Hosting.EntityFrameworkCore;
+
 using Microsoft.Extensions.DependencyInjection;
 
 using MinimalApi.AppHost;
@@ -67,19 +69,20 @@ var backend = builder.AddProject<Projects.MinimalApi>("MinimalApi-backend")
     .WithExternalHttpEndpoints()
     .PublishAsAzureContainerApp((infra, app) => app.Template.Scale.MaxReplicas = 1);
 
+var backendMigrations = backend
+    .AddEFMigrations("MinimalApi-backend-migrations", "MinimalApi.Data.ApplicationDbContext")
+    .WithMigrationsProject("../MinimalApi.Data/MinimalApi.Data.csproj")
+    .RunDatabaseUpdateOnStart()
+    .PublishAsMigrationScript()
+    .PublishAsMigrationBundle();
+
+backend.WaitForCompletion(backendMigrations);
+
 //#if (applicationInsights)
 if (appInsights is not null)
 {
     backend.WithReference(appInsights);
 }
 //#endif
-
-if (builder.ExecutionContext.IsPublishMode)
-{
-    // Enable migrations on startup for Azure deployments
-    // Applying migrations on startup is not recommended for production scenarios.
-    // See: https://learn.microsoft.com/ef/core/managing-schemas/migrations/applying?tabs=dotnet-core-cli&WT.mc_id=DT-MVP-5003472
-    backend.WithEnvironment("RunMigrationsOnStartup", "true");
-}
 
 builder.Build().Run();

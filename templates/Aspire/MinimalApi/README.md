@@ -42,7 +42,7 @@ Both options together:
 
 - **API project** – ASP.NET Core Web API with controllers, CORS, Swagger/OpenAPI
 - **ASP.NET Core Identity** – Cookie + JWT authentication for API endpoints
-- **EF Core** – SQL Server data layer with migrations via AppHost
+- **EF Core** – SQL Server data layer with AppHost-native `AddEFMigrations` orchestration
 - **Aspire AppHost** – Local orchestration with SQL Server container and DB viewer (dbGate)
 - **ServiceDefaults** – Shared OpenTelemetry, health checks, service discovery
 - **Core + Tests** – Business logic projects with TUnit tests
@@ -55,6 +55,10 @@ Both options together:
 ```cli
 > aspire run
 ```
+
+When you run locally, AppHost executes pending EF Core migrations through the `MinimalApi-backend-migrations` resource and starts the backend only after migrations finish.
+
+When you run `aspire publish`, AppHost emits migration artifacts under `efmigrations/` (SQL script + migration bundle).
 
 ### Running tests
 
