@@ -23,7 +23,7 @@ Follow every item in this checklist. Do not open a PR until all items are done.
 - `global.json` — SDK version + `"test": { "runner": "Microsoft.Testing.Platform" }`.
 - `Directory.Build.props` — `LangVersion`, `net<X>.0`, NuGet metadata placeholders.
 - `Directory.Packages.props` — central package management with latest package versions.
-- `.editorconfig` — `end_of_line = lf`, `insert_final_newline = true` (CI runs `dotnet format --verify-no-changes` on ubuntu-latest; CRLF will cause failures).
+- `.editorconfig` — **do not write this file by hand.** Run `.\CopyEditorConfigToTemplates.ps1` from the repo root to regenerate it. The script copies the root `.editorconfig` into every template directory, then appends any template-specific rules from `.template.config/editorconfig.override`. If the new template needs style relaxations, add them to `.template.config/editorconfig.override` (additive only; never include `root = ...`). CI enforces `end_of_line = lf` and `insert_final_newline = true` via `dotnet format --verify-no-changes` on ubuntu-latest; CRLF line endings will cause failures.
 - `.gitignore`, `NuGet.config`, `README.md`.
 - `.config/dotnet-tools.json` — include `trx-to-vsplaylist` 1.3.0 so generated repos can produce failure playlists.
 
