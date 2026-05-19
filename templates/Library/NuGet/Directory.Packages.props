@@ -30,7 +30,7 @@
     <PackageVersion Include="Moq" Version="4.20.72" />
     <PackageVersion Include="Moq.AutoMock" Version="4.0.2" />
     <!--#if (USE_XUNIT) -->
-    <PackageVersion Include="xunit.v3.mtp-v2" Version="3.2.2" Condition="'$(TemplateRepoValidation)' != 'true'" />
+    <PackageVersion Include="xunit.v3.mtp-v2" Version="3.2.2" />
     <!--#else -->
     <PackageVersion Include="TUnit" Version="1.44.39" />
     <!--#endif -->
