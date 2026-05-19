@@ -577,6 +577,7 @@ jobs:
           if (-not (Test-Path $manifestPath)) {
             throw "Aspire manifest smoke check failed: $manifestPath was not created."
           }
+          docker build -f MinimalApi/Dockerfile -t minimalapi-smoke:${{ matrix.variant }} .
 
       - name: Generate merged failure playlist from TRX
         if: always()
