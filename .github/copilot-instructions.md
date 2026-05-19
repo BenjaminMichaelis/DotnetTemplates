@@ -28,5 +28,5 @@ This repository builds and publishes `BenjaminMichaelis.Dotnet.Templates`, a NuG
 
 ## Versioning and SDKs
 
-- The root package project and generated templates target `.NET 10`.
-- Keep templates on `C# 14` unless a template has a specific reason to require a newer language version.
+- The root package project and generated templates target latest stable .net version.
+- Keep templates on latest stable C# version unless a template has a specific reason to require a newer language version.
