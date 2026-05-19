@@ -12,6 +12,7 @@ updates:
     directories:
       - "/"
       - "/templates/Library/NuGet/.github/workflows"
+      - "/templates/Library/DotnetTool/.github/workflows"
       - "/templates/Quickstart/BenchmarkApp/.github/workflows"
       - "/templates/Quickstart/ConsoleApp/.github/workflows"
       - "/templates/Aspire/MinimalApi/.github/workflows"
@@ -23,10 +24,11 @@ updates:
             - "*-artifact"
 
 
-# Library.NuGet, Quickstart.BenchmarkApp, Quickstart.ConsoleApp, Aspire.MinimalApi Templates
+# Library.NuGet, Library.DotnetTool, Quickstart.BenchmarkApp, Quickstart.ConsoleApp, Aspire.MinimalApi Templates
   - package-ecosystem: "nuget"
     directories:
       - "/templates/Library/NuGet"
+      - "/templates/Library/DotnetTool"
       - "/templates/Quickstart/BenchmarkApp"
       - "/templates/Quickstart/ConsoleApp"
       - "/templates/Aspire/MinimalApi"
@@ -41,6 +43,7 @@ updates:
   - package-ecosystem: "dotnet-sdk"
     directories:
       - "/templates/Library/NuGet"
+      - "/templates/Library/DotnetTool"
       - "/templates/Quickstart/BenchmarkApp"
       - "/templates/Quickstart/ConsoleApp"
     schedule:
