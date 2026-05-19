@@ -119,6 +119,8 @@ docker run -p 8080:8080 \
 ### Aspire vs. standalone Docker
 When running with `aspire run`, the AppHost uses `AddProject<Projects.MinimalApi>` and Aspire handles container publishing automatically (no Dockerfile required). The `Dockerfile` is for non-Aspire workflows only.
 
+The included GitHub Actions workflow uses Docker Buildx with GitHub Actions cache (`cache-from`/`cache-to`) and BuildKit cache-mount persistence for faster repeat builds in CI.
+
 ## Azure deployment
 
 Infrastructure is managed with Terraform under `Infra/`. See `Infra/README.md` for setup instructions.

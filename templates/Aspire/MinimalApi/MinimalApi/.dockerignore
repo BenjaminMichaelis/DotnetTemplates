@@ -23,6 +23,7 @@
 .git/
 .gitattributes
 .gitignore
+.buildkit-cache/
 
 # Docs and CI (not needed in the image)
 .github/

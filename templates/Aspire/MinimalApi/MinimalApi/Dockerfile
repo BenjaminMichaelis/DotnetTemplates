@@ -14,7 +14,8 @@ COPY ["Directory.Build.props", "."]
 COPY ["Directory.Build.targets", "."]
 COPY ["Directory.Packages.props", "."]
 COPY ["NuGet.config", "."]
-RUN dotnet restore "MinimalApi/MinimalApi.csproj"
+RUN --mount=type=cache,id=minimalapi-nuget,target=/root/.nuget/packages,sharing=locked \
+    dotnet restore "MinimalApi/MinimalApi.csproj"
 
 # Copy remaining source and publish in Release mode
 COPY . .

@@ -227,8 +227,16 @@ jobs:
     needs: [build, get-infrastructure-outputs]
     if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
     environment: production
+    permissions:
+      id-token: write
+      contents: read
+      actions: write
     steps:
       - uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+        id: setup-buildx
 
       - name: Azure Login
         uses: azure/login@v3
@@ -241,12 +249,37 @@ jobs:
         run: |
           az acr login --name ${{ needs.get-infrastructure-outputs.outputs.acr_login_server }}
 
-      - name: dotnet publish
-        run: dotnet publish -r linux-x64 --self-contained -t:PublishContainer -p:ContainerRegistry=${{ needs.get-infrastructure-outputs.outputs.acr_login_server }} -p:ContainerImageTags="${{ github.sha }}"
+      - name: Restore BuildKit cache mounts
+        uses: actions/cache@v5
+        id: buildkit-cache
+        with:
+          path: .buildkit-cache
+          key: minimalapi-buildkit-${{ hashFiles('MinimalApi/Dockerfile', 'Directory.Packages.props', 'Directory.Build.props', 'Directory.Build.targets', 'NuGet.config', 'MinimalApi/**/*.csproj') }}
+          restore-keys: |
+            minimalapi-buildkit-
+
+      - name: Inject BuildKit cache mounts
+        uses: reproducible-containers/buildkit-cache-dance@v3
+        with:
+          builder: ${{ steps.setup-buildx.outputs.name }}
+          dockerfile: MinimalApi/Dockerfile
+          cache-dir: .buildkit-cache
+          skip-extraction: ${{ steps.buildkit-cache.outputs.cache-hit == 'true' }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./MinimalApi/Dockerfile
+          push: true
+          platforms: linux/amd64
+          tags: ${{ needs.get-infrastructure-outputs.outputs.acr_login_server }}/minimalapi:${{ github.sha }}
+          cache-from: type=gha,scope=minimalapi-main
+          cache-to: type=gha,mode=max,scope=minimalapi-main
 
       - name: Update Container App
         run: |
           az containerapp update `
             --name ${{ needs.get-infrastructure-outputs.outputs.backend_container_app_name }} `
             --resource-group ${{ needs.get-infrastructure-outputs.outputs.resource_group_name }} `
-            --image ${{ needs.get-infrastructure-outputs.outputs.acr_login_server }}/MinimalApi:${{ github.sha }}
+            --image ${{ needs.get-infrastructure-outputs.outputs.acr_login_server }}/minimalapi:${{ github.sha }}
