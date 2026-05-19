@@ -9,7 +9,8 @@
     <ProjectReference Include="..\MinimalApi.Data\MinimalApi.Data.csproj" />
     <ProjectReference Include="..\MinimalApi.ServiceDefaults\MinimalApi.ServiceDefaults.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
-    <PackageReference Include="Swashbuckle.AspNetCore" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Scalar.AspNetCore" />
     <!--#if (applicationInsights)-->
     <PackageReference Include="Microsoft.ApplicationInsights.Profiler.AspNetCore" />
     <!--#endif-->

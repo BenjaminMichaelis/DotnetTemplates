@@ -40,7 +40,7 @@ Both options together:
 
 ## What is included
 
-- **API project** – ASP.NET Core Web API with controllers, CORS, Swagger/OpenAPI
+- **API project** – ASP.NET Core Web API with controllers, CORS, OpenAPI, and Scalar API docs (development)
 - **ASP.NET Core Identity** – Cookie + JWT authentication for API endpoints
 - **EF Core** – SQL Server data layer with AppHost-native `AddEFMigrations` orchestration
 - **Aspire AppHost** – Local orchestration with SQL Server container and DB viewer (dbGate)
@@ -59,6 +59,10 @@ Both options together:
 When you run locally, AppHost executes pending EF Core migrations through the `MinimalApi-backend-migrations` resource and starts the backend only after migrations finish.
 
 When you run `aspire publish`, AppHost emits migration artifacts under `efmigrations/` (SQL script + migration bundle).
+
+In development, the API exposes:
+- OpenAPI document: `/openapi/v1.json`
+- Scalar UI: `/scalar`
 
 ### Running tests
 
