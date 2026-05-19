@@ -7,6 +7,12 @@ See: https://learn.microsoft.com/visualstudio/msbuild/customize-your-build
     Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))"
     Condition="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../')) != ''" />
 
+  <!-- When used in a generated project (outside the template source tree), clear TemplateRepoValidation
+       so that template-selected packages (e.g. xunit) are not accidentally suppressed. -->
+  <PropertyGroup Condition="!Exists('$(MSBuildThisFileDirectory).template.config/template.json')">
+    <TemplateRepoValidation></TemplateRepoValidation>
+  </PropertyGroup>
+
   <PropertyGroup>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
