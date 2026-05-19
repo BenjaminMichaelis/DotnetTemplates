@@ -26,10 +26,10 @@ public class Class1Tests
     private static async Task AssertEqual(int expected, int actual)
     {
 #if USE_XUNIT
-        Xunit.Assert.Equal(expected, actual);
+        Assert.Equal(expected, actual);
         await Task.CompletedTask;
 #else
-        await TUnit.Assertions.Assert.That(actual).IsEqualTo(expected);
+        await Assert.That(actual).IsEqualTo(expected);
 #endif
     }
 
