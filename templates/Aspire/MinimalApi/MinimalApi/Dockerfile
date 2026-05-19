@@ -19,7 +19,8 @@ RUN --mount=type=cache,id=minimalapi-nuget,target=/root/.nuget/packages,sharing=
 
 # Copy remaining source and publish in Release mode
 COPY . .
-RUN dotnet publish "MinimalApi/MinimalApi.csproj" \
+RUN --mount=type=cache,id=minimalapi-nuget,target=/root/.nuget/packages,sharing=locked \
+    dotnet publish "MinimalApi/MinimalApi.csproj" \
     -c Release \
     --no-restore \
     -o /app/publish
