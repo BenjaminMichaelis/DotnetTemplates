@@ -22,7 +22,6 @@ COPY . .
 RUN --mount=type=cache,id=minimalapi-nuget,target=/root/.nuget/packages,sharing=locked \
     dotnet publish "MinimalApi/MinimalApi.csproj" \
     -c Release \
-    --no-restore \
     -o /app/publish
 
 # Runtime stage: Ubuntu Noble Chiseled - distroless-like, minimal attack surface.
