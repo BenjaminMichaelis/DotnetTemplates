@@ -28,5 +28,5 @@ This repository builds and publishes `BenjaminMichaelis.Dotnet.Templates`, a NuG
 
 ## Versioning and SDKs
 
-- The root package project currently targets `net9.0`, but the repository is pinned to the .NET 10 SDK by root `global.json` to match generated templates.
-- The Aspire template targets newer .NET/Aspire versions; do not downgrade it just to match the root packaging target framework.
+- The root package project and generated templates target `.NET 10`.
+- Keep templates on `C# 14` unless a template has a specific reason to require a newer language version.

@@ -1,0 +1,5 @@
+<Project>
+  <PropertyGroup>
+    <TemplateRepoValidation>true</TemplateRepoValidation>
+  </PropertyGroup>
+</Project>

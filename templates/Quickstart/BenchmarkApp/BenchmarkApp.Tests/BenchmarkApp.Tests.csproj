@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
     <OutputType>Exe</OutputType>
 
@@ -14,7 +14,7 @@
     <PackageReference Include="Moq" />
     <PackageReference Include="Moq.AutoMock" />
     <!--#if (USE_XUNIT) -->
-    <PackageReference Include="xunit.v3.mtp-v2" />
+    <PackageReference Include="xunit.v3.mtp-v2" Condition="'$(TemplateRepoValidation)' != 'true'" />
     <!--#else -->
     <PackageReference Include="TUnit" />
     <!--#endif -->
@@ -26,7 +26,7 @@
 
   <ItemGroup>
     <!--#if (USE_XUNIT) -->
-    <Using Include="Xunit" />
+    <Using Include="Xunit" Condition="'$(TemplateRepoValidation)' != 'true'" />
     <!--#endif -->
     <Using Include="Moq" />
     <Using Include="Moq.AutoMock" />
