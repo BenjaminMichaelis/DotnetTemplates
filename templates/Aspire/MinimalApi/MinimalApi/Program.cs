@@ -3,6 +3,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using Scalar.AspNetCore;
 
 using MinimalApi.Core;
 using MinimalApi.Data;
@@ -28,8 +29,7 @@ if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
 
 // Add services to the container.
 builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddOpenApi();
 
 // Add CORS for cross-origin clients
 builder.Services.AddCors(options =>
@@ -125,8 +125,8 @@ app.UseCors("AllowedOrigins");
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.MapOpenApi();
+    app.MapScalarApiReference();
     app.UseMigrationsEndPoint();
     app.UseDeveloperExceptionPage();
 }
