@@ -112,7 +112,6 @@ jobs:
 
       - name: Test Template (${{ matrix.variant }})
         run: |
-          $PSNativeCommandUseErrorActionPreference = $true
           $repoRoot = $env:GITHUB_WORKSPACE
           $outDir = "TestAspireMinimalApi-${{ matrix.variant }}"
           mkdir $outDir

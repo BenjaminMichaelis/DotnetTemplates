@@ -58,7 +58,6 @@ jobs:
         env:
           POST_BUILD_COMMAND: ${{ inputs.post_build_command }}
         run: |
-          $PSNativeCommandUseErrorActionPreference = $true
           $repoRoot = $env:GITHUB_WORKSPACE
           $outDir = "${{ inputs.output_dir_prefix }}-${{ matrix.variant }}"
           New-Item -ItemType Directory -Path $outDir -Force | Out-Null
