@@ -270,20 +270,45 @@ foreach ($file in $templateFiles) {
         $sourceName = "Template"
     }
 
+    $projectName = $sourceName
+    $outputDirPrefix = "Test$sourceName"
+    $artifactSuffix = $shortName.Replace("bmichaelis.", "").Replace(".", "-")
+    switch ($shortName) {
+        "bmichaelis.nuget" {
+            $projectName = "TestLib"
+            $outputDirPrefix = "TestLibrary"
+            $artifactSuffix = "library"
+        }
+        "bmichaelis.tool" {
+            $projectName = "TestTool"
+            $outputDirPrefix = "TestTool"
+            $artifactSuffix = "tool"
+        }
+        "bmichaelis.quickstart.consoleapp" {
+            $projectName = "TestApp"
+            $outputDirPrefix = "TestQuickstartConsoleApp"
+            $artifactSuffix = "console"
+        }
+        "bmichaelis.quickstart.benchmarkconsole" {
+            $projectName = "TestBenchmark"
+            $outputDirPrefix = "TestQuickstartBenchmarkConsole"
+            $artifactSuffix = "benchmark"
+        }
+    }
+
     $postBuildCommand = ""
     if ($shortName -eq "bmichaelis.quickstart.benchmarkconsole") {
         $postBuildCommand = "benchmark-run"
     }
 
     $packProject = $shortName -ne "bmichaelis.tool"
-    $artifactSuffix = $shortName.Replace("bmichaelis.", "").Replace(".", "-")
     $jobName = $shortName.Replace("bmichaelis.", "")
 
     $standardTemplates += @([ordered]@{
             job_name = $jobName
             template_short_name = $shortName.Replace("bmichaelis.", "")
-            project_name = $sourceName
-            output_dir_prefix = "Test$sourceName"
+            project_name = $projectName
+            output_dir_prefix = $outputDirPrefix
             variant_matrix_json = (Get-CompactJson -Value @{ include = $variants })
             dotnet_version = "10.x"
             post_build_command = $postBuildCommand
