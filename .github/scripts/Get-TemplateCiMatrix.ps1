@@ -135,15 +135,14 @@ function New-StandardVariant {
     if ($noSln) { $templateArgs += "--no-sln" }
     elseif ($sln) { $templateArgs += "--sln" }
 
-    if ($tests -eq "None") { $templateArgs += "--tests None" }
-    elseif ($tests -eq "xunit") { $templateArgs += "--tests xunit" }
+    if ($tests -ne "tunit") { $templateArgs += "--tests $tests" }
 
     $variantParts = @()
     if ($sln) { $variantParts += "sln" }
     elseif ($noSln) { $variantParts += "no-sln" }
 
     if ($tests -eq "None") { $variantParts += "no-tests" }
-    elseif ($tests -eq "xunit") { $variantParts += "xunit" }
+    elseif ($tests -ne "tunit") { $variantParts += $tests }
     elseif (-not $sln -and -not $noSln) { $variantParts += "tunit" }
 
     $variantName = ($variantParts -join "-")
