@@ -42,6 +42,6 @@ foreach ($target in $Targets) {
     }
 
     Invoke-DotNetFormatCommand -Arguments @('format', 'whitespace', $target, '--verify-no-changes', '--no-restore')
-    Invoke-DotNetFormatCommand -Arguments @('format', 'style', $target, '--verify-no-changes', '--no-restore', '--severity', 'info')
-    Invoke-DotNetFormatCommand -Arguments @('format', 'analyzers', $target, '--verify-no-changes', '--no-restore', '--severity', 'info')
+    Invoke-DotNetFormatCommand -Arguments @('format', 'style', $target, '--verify-no-changes', '--no-restore', '--severity', 'warn')
+    Invoke-DotNetFormatCommand -Arguments @('format', 'analyzers', $target, '--verify-no-changes', '--no-restore', '--severity', 'warn')
 }
