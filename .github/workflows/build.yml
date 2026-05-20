@@ -17,9 +17,6 @@ defaults:
   run:
     shell: pwsh
 
-env:
-  DOTNET_VERSION: 10.x
-
 jobs:
   automerge:
     runs-on: ubuntu-latest
@@ -44,7 +41,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v5
       with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
+        global-json-file: ./global.json
 
     - name: Restore dependencies
       run: dotnet restore Templates.csproj
@@ -113,7 +110,6 @@ jobs:
       project_name: ${{ matrix.template.project_name }}
       output_dir_prefix: ${{ matrix.template.output_dir_prefix }}
       variant_matrix_json: ${{ matrix.template.variant_matrix_json }}
-      dotnet_version: ${{ matrix.template.dotnet_version }}
       post_build_command: ${{ matrix.template.post_build_command }}
       pack_project: ${{ matrix.template.pack_project }}
       failed_playlist_artifact_prefix: ${{ matrix.template.failed_playlist_artifact_prefix }}
@@ -131,8 +127,6 @@ jobs:
 
       - name: Setup test environment
         uses: ./.github/actions/setup-template-test
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Test Template (${{ matrix.variant }})
         run: |
