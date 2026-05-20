@@ -21,6 +21,7 @@ runs:
       uses: actions/download-artifact@v8
       with:
         name: ${{ inputs.artifact-name }}
+        path: artifacts
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v5
@@ -34,8 +35,10 @@ runs:
     - name: Install template package
       shell: pwsh
       run: |
-        $package = Get-ChildItem -Path "${{ inputs.nupkg-pattern }}" | Select-Object -First 1
+        $package = Get-ChildItem -Path artifacts -Recurse -File |
+          Where-Object { $_.Name -like "${{ inputs.nupkg-pattern }}" } |
+          Select-Object -First 1
         if (-not $package) {
-          throw "Could not find package matching pattern: ${{ inputs.nupkg-pattern }}"
+          throw "Could not find downloaded package matching pattern: ${{ inputs.nupkg-pattern }}"
         }
-        dotnet new install $package.Name
+        dotnet new install $package.FullName --force
