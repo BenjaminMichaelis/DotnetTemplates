@@ -73,7 +73,7 @@ jobs:
 
       - name: Run PSScriptAnalyzer
         run: |
-          $excludeDirs = @('templates', 'tmp-ci-test', 'repro-console', 'bin', 'obj')
+          $excludeDirs = @('tmp-ci-test', 'repro-console', 'bin', 'obj')
           $allFiles = Get-ChildItem -Path . -Recurse -Filter '*.ps1' | Where-Object {
             $rel = $_.FullName.Substring((Get-Location).Path.Length + 1)
             $topDir = ($rel -split '[/\\]')[0]
