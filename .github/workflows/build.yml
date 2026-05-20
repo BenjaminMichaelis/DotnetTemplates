@@ -62,502 +62,58 @@ jobs:
         name: NuGet
         path: ${{ github.workspace }}/*.nupkg
 
-  test-library:
+  generate-template-matrices:
     runs-on: ubuntu-latest
     needs: build
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - variant: tunit
-            args: ""
-            expectSln: false
-            expectSlnx: true
-            expectTests: true
-            reportTrxArgs: "--report-trx --report-trx-filename tests.trx"
-          - variant: xunit
-            args: "--tests xunit"
-            expectSln: false
-            expectSlnx: true
-            expectTests: true
-            reportTrxArgs: "--report-xunit-trx --report-xunit-trx-filename tests.trx"
-          - variant: no-tests
-            args: "--no-tests"
-            expectSln: false
-            expectSlnx: true
-            expectTests: false
-            reportTrxArgs: ""
-          - variant: sln
-            args: "--sln"
-            expectSln: true
-            expectSlnx: false
-            expectTests: true
-            reportTrxArgs: "--report-trx --report-trx-filename tests.trx"
-          - variant: sln-no-tests
-            args: "--sln --no-tests"
-            expectSln: true
-            expectSlnx: false
-            expectTests: false
-            reportTrxArgs: ""
-          - variant: no-sln
-            args: "--no-sln"
-            expectSln: false
-            expectSlnx: false
-            expectTests: true
-            reportTrxArgs: "--report-trx --report-trx-filename tests.trx"
-
+    outputs:
+      standard_templates: ${{ steps.generate.outputs.standard_templates }}
+      aspire_variants: ${{ steps.generate.outputs.aspire_variants }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Download NuGet Artifacts
-        uses: actions/download-artifact@v8
-        with:
-          name: NuGet
+      - id: generate
+        name: Generate dynamic template matrices
+        run: .\.github\scripts\Get-TemplateCiMatrix.ps1
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-
-      - name: Restore .NET Tools
-        run: dotnet tool restore
-
-      - name: Test Template (${{ matrix.variant }})
-        run: |
-          dotnet new install $(Get-ChildItem -Path "BenjaminMichaelis.Dotnet.Templates.*.nupkg").Name
-          $outDir = "TestLibrary-${{ matrix.variant }}"
-          mkdir $outDir
-          Push-Location $outDir
-          $projectName = "TestLib"
-          dotnet new bmichaelis.nuget ${{ matrix.args }} --name $projectName --output .
-          $hasSln = Test-Path "$projectName.sln"
-          $hasSlnx = Test-Path "$projectName.slnx"
-          $hasTests = Test-Path "$projectName.Tests/$projectName.Tests.csproj"
-          if ([bool]::Parse("${{ matrix.expectSln }}") -ne $hasSln) { throw "Unexpected .sln file presence: $hasSln" }
-          if ([bool]::Parse("${{ matrix.expectSlnx }}") -ne $hasSlnx) { throw "Unexpected .slnx file presence: $hasSlnx" }
-          if ([bool]::Parse("${{ matrix.expectTests }}") -ne $hasTests) { throw "Unexpected test project presence: $hasTests" }
-          $solutionPath = if ($hasSln) { "$projectName.sln" } elseif ($hasSlnx) { "$projectName.slnx" } else { $null }
-          if ($solutionPath) {
-            .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -Targets $solutionPath -RestoreTargets
-            dotnet restore $solutionPath
-            dotnet build $solutionPath /p:TreatWarningsAsErrors=true
-          } else {
-            .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -DiscoverFromCurrentDirectory -RestoreTargets
-          }
-          if ($hasTests) {
-            dotnet test "$projectName.Tests/$projectName.Tests.csproj" /p:TreatWarningsAsErrors=true --results-directory trx-data ${{ matrix.reportTrxArgs }}
-          } else {
-            dotnet build "$projectName/$projectName.csproj" /p:TreatWarningsAsErrors=true
-          }
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          dotnet pack "$projectName/$projectName.csproj" --configuration Release -o ./NuGet
-
-      - name: Generate merged failure playlist from TRX
-        if: always()
-        run: |
-          $trxFiles = Get-ChildItem -Path . -Recurse -File -Filter "*.trx" |
-            Where-Object { $_.FullName -like "*trx-data*" } |
-            Select-Object -ExpandProperty FullName
-
-          if (-not $trxFiles) {
-            Write-Host "No TRX files found. Skipping playlist generation."
-            exit 0
-          }
-
-          New-Item -ItemType Directory -Path "test-results" -Force | Out-Null
-
-          $args = @("tool", "run", "trx-to-vsplaylist", "convert")
-          $args += $trxFiles
-          $args += @("--outcome", "Failed", "--output", "test-results/failed-tests.playlist", "--skip-empty")
-          dotnet @args
-
-      - name: Upload failed test playlist
-        if: failure()
-        uses: actions/upload-artifact@v7
-        with:
-          name: failed-tests-playlist-library-${{ matrix.variant }}
-          path: test-results/failed-tests.playlist
-          if-no-files-found: ignore
-
-  test-tool:
-    runs-on: ubuntu-latest
-    needs: build
+  test-standard-templates:
+    name: test-${{ matrix.template.job_name }}
+    needs: [build, generate-template-matrices]
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - variant: tunit
-            args: ""
-            expectSln: false
-            expectSlnx: true
-            expectTests: true
-            reportTrxArgs: "--report-trx --report-trx-filename tests.trx"
-          - variant: xunit
-            args: "--tests xunit"
-            expectSln: false
-            expectSlnx: true
-            expectTests: true
-            reportTrxArgs: "--report-xunit-trx --report-xunit-trx-filename tests.trx"
-          - variant: no-tests
-            args: "--no-tests"
-            expectSln: false
-            expectSlnx: true
-            expectTests: false
-            reportTrxArgs: ""
-          - variant: sln
-            args: "--sln"
-            expectSln: true
-            expectSlnx: false
-            expectTests: true
-            reportTrxArgs: "--report-trx --report-trx-filename tests.trx"
-          - variant: sln-no-tests
-            args: "--sln --no-tests"
-            expectSln: true
-            expectSlnx: false
-            expectTests: false
-            reportTrxArgs: ""
-          - variant: no-sln
-            args: "--no-sln"
-            expectSln: false
-            expectSlnx: false
-            expectTests: true
-            reportTrxArgs: "--report-trx --report-trx-filename tests.trx"
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Download NuGet Artifacts
-        uses: actions/download-artifact@v8
-        with:
-          name: NuGet
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-
-      - name: Restore .NET Tools
-        run: dotnet tool restore
-
-      - name: Test Template (${{ matrix.variant }})
-        run: |
-          dotnet new install $(Get-ChildItem -Path "BenjaminMichaelis.Dotnet.Templates.*.nupkg").Name
-          $outDir = "TestTool-${{ matrix.variant }}"
-          mkdir $outDir
-          Push-Location $outDir
-          $projectName = "TestTool"
-          dotnet new bmichaelis.tool ${{ matrix.args }} --name $projectName --output .
-          $hasSln = Test-Path "$projectName.sln"
-          $hasSlnx = Test-Path "$projectName.slnx"
-          $hasTests = Test-Path "$projectName.Tests/$projectName.Tests.csproj"
-          if ([bool]::Parse("${{ matrix.expectSln }}") -ne $hasSln) { throw "Unexpected .sln file presence: $hasSln" }
-          if ([bool]::Parse("${{ matrix.expectSlnx }}") -ne $hasSlnx) { throw "Unexpected .slnx file presence: $hasSlnx" }
-          if ([bool]::Parse("${{ matrix.expectTests }}") -ne $hasTests) { throw "Unexpected test project presence: $hasTests" }
-          $solutionPath = if ($hasSln) { "$projectName.sln" } elseif ($hasSlnx) { "$projectName.slnx" } else { $null }
-          if ($solutionPath) {
-            .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -Targets $solutionPath -RestoreTargets
-            dotnet restore $solutionPath
-            dotnet build $solutionPath /p:TreatWarningsAsErrors=true
-          } else {
-            .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -DiscoverFromCurrentDirectory -RestoreTargets
-          }
-          if ($hasTests) {
-            dotnet test "$projectName.Tests/$projectName.Tests.csproj" /p:TreatWarningsAsErrors=true --results-directory trx-data ${{ matrix.reportTrxArgs }}
-          } else {
-            dotnet build "$projectName/$projectName.csproj" /p:TreatWarningsAsErrors=true
-          }
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
-      - name: Generate merged failure playlist from TRX
-        if: always()
-        run: |
-          $trxFiles = Get-ChildItem -Path . -Recurse -File -Filter "*.trx" |
-            Where-Object { $_.FullName -like "*trx-data*" } |
-            Select-Object -ExpandProperty FullName
-
-          if (-not $trxFiles) {
-            Write-Host "No TRX files found. Skipping playlist generation."
-            exit 0
-          }
-
-          New-Item -ItemType Directory -Path "test-results" -Force | Out-Null
-
-          $args = @("tool", "run", "trx-to-vsplaylist", "convert")
-          $args += $trxFiles
-          $args += @("--outcome", "Failed", "--output", "test-results/failed-tests.playlist", "--skip-empty")
-          dotnet @args
-
-      - name: Upload failed test playlist
-        if: failure()
-        uses: actions/upload-artifact@v7
-        with:
-          name: failed-tests-playlist-tool-${{ matrix.variant }}
-          path: test-results/failed-tests.playlist
-          if-no-files-found: ignore
-
-  test-quickstart-benchmarkconsole:
-    runs-on: ubuntu-latest
-    needs: build
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - variant: tunit
-            args: ""
-            expectSln: false
-            expectSlnx: true
-            expectTests: true
-            reportTrxArgs: "--report-trx --report-trx-filename tests.trx"
-          - variant: xunit
-            args: "--tests xunit"
-            expectSln: false
-            expectSlnx: true
-            expectTests: true
-            reportTrxArgs: "--report-xunit-trx --report-xunit-trx-filename tests.trx"
-          - variant: no-tests
-            args: "--no-tests"
-            expectSln: false
-            expectSlnx: true
-            expectTests: false
-            reportTrxArgs: ""
-          - variant: sln
-            args: "--sln"
-            expectSln: true
-            expectSlnx: false
-            expectTests: true
-            reportTrxArgs: "--report-trx --report-trx-filename tests.trx"
-          - variant: sln-no-tests
-            args: "--sln --no-tests"
-            expectSln: true
-            expectSlnx: false
-            expectTests: false
-            reportTrxArgs: ""
-          - variant: no-sln
-            args: "--no-sln"
-            expectSln: false
-            expectSlnx: false
-            expectTests: true
-            reportTrxArgs: "--report-trx --report-trx-filename tests.trx"
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Download NuGet Artifacts
-        uses: actions/download-artifact@v8
-        with:
-          name: NuGet
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-
-      - name: Restore .NET Tools
-        run: dotnet tool restore
-
-      - name: Test Template (${{ matrix.variant }})
-        run: |
-          dotnet new install $(Get-ChildItem -Path "BenjaminMichaelis.Dotnet.Templates.*.nupkg").Name
-          $outDir = "TestQuickstartBenchmarkConsole-${{ matrix.variant }}"
-          mkdir $outDir
-          Push-Location $outDir
-          $projectName = "TestBenchmark"
-          dotnet new bmichaelis.quickstart.benchmarkconsole ${{ matrix.args }} --name $projectName --output .
-          $hasSln = Test-Path "$projectName.sln"
-          $hasSlnx = Test-Path "$projectName.slnx"
-          $hasTests = Test-Path "$projectName.Tests/$projectName.Tests.csproj"
-          if ([bool]::Parse("${{ matrix.expectSln }}") -ne $hasSln) { throw "Unexpected .sln file presence: $hasSln" }
-          if ([bool]::Parse("${{ matrix.expectSlnx }}") -ne $hasSlnx) { throw "Unexpected .slnx file presence: $hasSlnx" }
-          if ([bool]::Parse("${{ matrix.expectTests }}") -ne $hasTests) { throw "Unexpected test project presence: $hasTests" }
-          $solutionPath = if ($hasSln) { "$projectName.sln" } elseif ($hasSlnx) { "$projectName.slnx" } else { $null }
-          if ($solutionPath) {
-            .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -Targets $solutionPath -RestoreTargets
-            dotnet restore $solutionPath
-            dotnet build $solutionPath /p:TreatWarningsAsErrors=true
-          } else {
-            .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -DiscoverFromCurrentDirectory -RestoreTargets
-          }
-          if ($hasTests) {
-            dotnet test "$projectName.Tests/$projectName.Tests.csproj" /p:TreatWarningsAsErrors=true --results-directory trx-data ${{ matrix.reportTrxArgs }}
-          } else {
-            dotnet build "$projectName/$projectName.csproj" /p:TreatWarningsAsErrors=true
-          }
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          dotnet run --project "$projectName/$projectName.csproj" -c Release
-          dotnet pack "$projectName/$projectName.csproj" --configuration Release -o ./NuGet
-
-      - name: Generate merged failure playlist from TRX
-        if: always()
-        run: |
-          $trxFiles = Get-ChildItem -Path . -Recurse -File -Filter "*.trx" |
-            Where-Object { $_.FullName -like "*trx-data*" } |
-            Select-Object -ExpandProperty FullName
-
-          if (-not $trxFiles) {
-            Write-Host "No TRX files found. Skipping playlist generation."
-            exit 0
-          }
-
-          New-Item -ItemType Directory -Path "test-results" -Force | Out-Null
-
-          $args = @("tool", "run", "trx-to-vsplaylist", "convert")
-          $args += $trxFiles
-          $args += @("--outcome", "Failed", "--output", "test-results/failed-tests.playlist", "--skip-empty")
-          dotnet @args
-
-      - name: Upload failed test playlist
-        if: failure()
-        uses: actions/upload-artifact@v7
-        with:
-          name: failed-tests-playlist-benchmark-${{ matrix.variant }}
-          path: test-results/failed-tests.playlist
-          if-no-files-found: ignore
-
-  test-quickstart-consoleapp:
-    runs-on: ubuntu-latest
-    needs: build
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - variant: tunit
-            args: ""
-            expectSln: false
-            expectSlnx: true
-            expectTests: true
-            reportTrxArgs: "--report-trx --report-trx-filename tests.trx"
-          - variant: xunit
-            args: "--tests xunit"
-            expectSln: false
-            expectSlnx: true
-            expectTests: true
-            reportTrxArgs: "--report-xunit-trx --report-xunit-trx-filename tests.trx"
-          - variant: no-tests
-            args: "--no-tests"
-            expectSln: false
-            expectSlnx: true
-            expectTests: false
-            reportTrxArgs: ""
-          - variant: no-sln
-            args: "--no-sln"
-            expectSln: false
-            expectSlnx: false
-            expectTests: true
-            reportTrxArgs: "--report-trx --report-trx-filename tests.trx"
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Download NuGet Artifacts
-        uses: actions/download-artifact@v8
-        with:
-          name: NuGet
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-
-      - name: Restore .NET Tools
-        run: dotnet tool restore
-
-      - name: Test Template (${{ matrix.variant }})
-        run: |
-          dotnet new install $(Get-ChildItem -Path "BenjaminMichaelis.Dotnet.Templates.*.nupkg").Name
-          $outDir = "TestQuickstartConsoleApp-${{ matrix.variant }}"
-          mkdir $outDir
-          Push-Location $outDir
-          $projectName = "TestApp"
-          dotnet new bmichaelis.quickstart.consoleapp ${{ matrix.args }} --name $projectName --output .
-          $hasSln = Test-Path "$projectName.sln"
-          $hasSlnx = Test-Path "$projectName.slnx"
-          $hasTests = Test-Path "$projectName.Tests/$projectName.Tests.csproj"
-          if ([bool]::Parse("${{ matrix.expectSln }}") -ne $hasSln) { throw "Unexpected .sln file presence: $hasSln" }
-          if ([bool]::Parse("${{ matrix.expectSlnx }}") -ne $hasSlnx) { throw "Unexpected .slnx file presence: $hasSlnx" }
-          if ([bool]::Parse("${{ matrix.expectTests }}") -ne $hasTests) { throw "Unexpected test project presence: $hasTests" }
-          $solutionPath = if ($hasSln) { "$projectName.sln" } elseif ($hasSlnx) { "$projectName.slnx" } else { $null }
-          if ($solutionPath) {
-            .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -Targets $solutionPath -RestoreTargets
-            dotnet restore $solutionPath
-            dotnet build $solutionPath /p:TreatWarningsAsErrors=true
-          } else {
-            .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -DiscoverFromCurrentDirectory -RestoreTargets
-          }
-          if ($hasTests) {
-            dotnet test "$projectName.Tests/$projectName.Tests.csproj" /p:TreatWarningsAsErrors=true --results-directory trx-data ${{ matrix.reportTrxArgs }}
-          } else {
-            dotnet build "$projectName/$projectName.csproj" /p:TreatWarningsAsErrors=true
-          }
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          dotnet pack "$projectName/$projectName.csproj" --configuration Release -o ./NuGet
-
-      - name: Generate merged failure playlist from TRX
-        if: always()
-        run: |
-          $trxFiles = Get-ChildItem -Path . -Recurse -File -Filter "*.trx" |
-            Where-Object { $_.FullName -like "*trx-data*" } |
-            Select-Object -ExpandProperty FullName
-
-          if (-not $trxFiles) {
-            Write-Host "No TRX files found. Skipping playlist generation."
-            exit 0
-          }
-
-          New-Item -ItemType Directory -Path "test-results" -Force | Out-Null
-
-          $args = @("tool", "run", "trx-to-vsplaylist", "convert")
-          $args += $trxFiles
-          $args += @("--outcome", "Failed", "--output", "test-results/failed-tests.playlist", "--skip-empty")
-          dotnet @args
-
-      - name: Upload failed test playlist
-        if: failure()
-        uses: actions/upload-artifact@v7
-        with:
-          name: failed-tests-playlist-console-${{ matrix.variant }}
-          path: test-results/failed-tests.playlist
-          if-no-files-found: ignore
+        template: ${{ fromJSON(needs.generate-template-matrices.outputs.standard_templates) }}
+    uses: ./.github/workflows/template-validation.yml
+    with:
+      template_short_name: ${{ matrix.template.template_short_name }}
+      project_name: ${{ matrix.template.project_name }}
+      output_dir_prefix: ${{ matrix.template.output_dir_prefix }}
+      variant_matrix_json: ${{ matrix.template.variant_matrix_json }}
+      dotnet_version: ${{ matrix.template.dotnet_version }}
+      post_build_command: ${{ matrix.template.post_build_command }}
+      pack_project: ${{ matrix.template.pack_project }}
+      failed_playlist_artifact_prefix: ${{ matrix.template.failed_playlist_artifact_prefix }}
 
   test-aspire-minimalapi:
     runs-on: ubuntu-latest
-    needs: build
+    needs: [build, generate-template-matrices]
     strategy:
       fail-fast: false   # run all variants even if one fails — want the full picture
-      matrix:
-        include:
-          - variant: default
-            args: ""
-          - variant: applicationInsights
-            args: "--applicationInsights true"
-          - variant: default-with-integration-tests
-            args: "--integrationTests true"
-          - variant: applicationInsights-with-integration-tests
-            args: "--applicationInsights true --integrationTests true"
+      matrix: ${{ fromJSON(needs.generate-template-matrices.outputs.aspire_variants) }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Download NuGet Artifacts
-        uses: actions/download-artifact@v8
+      - name: Setup test environment
+        uses: ./.github/actions/setup-template-test
         with:
-          name: NuGet
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: 10.x
-
-      - name: Restore .NET Tools
-        run: dotnet tool restore
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Test Template (${{ matrix.variant }})
         run: |
-          dotnet new install $(Get-ChildItem -Path "BenjaminMichaelis.Dotnet.Templates.*.nupkg").Name
+          $PSNativeCommandUseErrorActionPreference = $true
+          $repoRoot = $env:GITHUB_WORKSPACE
           $outDir = "TestAspireMinimalApi-${{ matrix.variant }}"
           mkdir $outDir
           Push-Location $outDir
@@ -565,7 +121,7 @@ jobs:
           Push-Location MinimalApi
           $solutionFile = Get-ChildItem -Path . -File | Where-Object { $_.Extension -eq ".sln" -or $_.Extension -eq ".slnx" } | Select-Object -First 1
           if (-not $solutionFile) { throw "Expected solution file for Aspire template format validation." }
-          .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -Targets $solutionFile.FullName -RestoreTargets
+          & "$repoRoot/.github/scripts/Invoke-DotNetFormatStrict.ps1" -Targets $solutionFile.FullName -RestoreTargets
           dotnet build /p:TreatWarningsAsErrors=true
           dotnet tool restore
           dotnet ef migrations has-pending-model-changes --configuration Release --project MinimalApi.Data/MinimalApi.Data.csproj --startup-project MinimalApi.AppHost/MinimalApi.AppHost.csproj --no-build
@@ -581,22 +137,7 @@ jobs:
 
       - name: Generate merged failure playlist from TRX
         if: always()
-        run: |
-          $trxFiles = Get-ChildItem -Path . -Recurse -File -Filter "*.trx" |
-            Where-Object { $_.FullName -like "*trx-data*" } |
-            Select-Object -ExpandProperty FullName
-
-          if (-not $trxFiles) {
-            Write-Host "No TRX files found. Skipping playlist generation."
-            exit 0
-          }
-
-          New-Item -ItemType Directory -Path "test-results" -Force | Out-Null
-
-          $args = @("tool", "run", "trx-to-vsplaylist", "convert")
-          $args += $trxFiles
-          $args += @("--outcome", "Failed", "--output", "test-results/failed-tests.playlist", "--skip-empty")
-          dotnet @args
+        uses: ./.github/actions/trx-playlist
 
       - name: Upload failed test playlist
         if: failure()
@@ -608,7 +149,7 @@ jobs:
 
   all-tests:
     runs-on: ubuntu-latest
-    needs: [test-library, test-tool, test-quickstart-benchmarkconsole, test-quickstart-consoleapp, test-aspire-minimalapi]
+    needs: [test-standard-templates, test-aspire-minimalapi]
     if: always()
     steps:
       - name: All tests passed
