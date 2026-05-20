@@ -14,7 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-#if (!no-tests)
+#if (tests != "None")
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkApp.Tests", "BenchmarkApp.Tests\BenchmarkApp.Tests.csproj", "{29ED9E74-DD82-4D2F-99DC-B0865BBF680C}"
 EndProject
 #endif
@@ -28,7 +28,7 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-#if (!no-tests)
+#if (tests != "None")
 		{29ED9E74-DD82-4D2F-99DC-B0865BBF680C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{29ED9E74-DD82-4D2F-99DC-B0865BBF680C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{29ED9E74-DD82-4D2F-99DC-B0865BBF680C}.Release|Any CPU.ActiveCfg = Release|Any CPU
