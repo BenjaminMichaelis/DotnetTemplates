@@ -101,7 +101,7 @@ jobs:
             dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore -p:CodeAnalysisTreatWarningsAsErrors=true -p:TreatWarningsAsErrors=true -p:MSBuildTreatWarningsAsErrors=true
 
       - name: Set Version
         run: |
@@ -130,7 +130,7 @@ jobs:
 
       - name: Pack
         if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'schedule'
-        run: dotnet pack -p:PackageVersion=${{ env.nugetVersion }} --configuration Release -p:CodeAnalysisTreatWarningsAsErrors=true -p:TreatWarningsAsErrors=true -p:MSBuildTreatWarningsAsErrors=true -o ${{ github.workspace }}/BenjaminMichaelis.PackedTemplates
+        run: dotnet pack -p:PackageVersion=${{ env.nugetVersion }} --configuration Release --no-restore -p:CodeAnalysisTreatWarningsAsErrors=true -p:TreatWarningsAsErrors=true -p:MSBuildTreatWarningsAsErrors=true -o ${{ github.workspace }}/BenjaminMichaelis.PackedTemplates
 
       - name: Upload Artifacts
         if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'schedule'

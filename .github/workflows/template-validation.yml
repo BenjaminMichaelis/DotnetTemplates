@@ -81,7 +81,6 @@ jobs:
           $solutionPath = if ($hasSln) { "$projectName.sln" } elseif ($hasSlnx) { "$projectName.slnx" } else { $null }
           if ($solutionPath) {
             & "$repoRoot/.github/scripts/Invoke-DotNetFormatStrict.ps1" -Targets $solutionPath -RestoreTargets
-            dotnet restore $solutionPath
             dotnet build $solutionPath ${{ inputs.warnings_as_errors_msbuild_args }}
           } else {
             & "$repoRoot/.github/scripts/Invoke-DotNetFormatStrict.ps1" -DiscoverFromCurrentDirectory -RestoreTargets

@@ -47,7 +47,7 @@ jobs:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
     - name: Restore dependencies
-      run: dotnet restore Templates.csproj
+      run: dotnet restore Templates.csproj -p:CodeAnalysisTreatWarningsAsErrors=true -p:TreatWarningsAsErrors=true -p:MSBuildTreatWarningsAsErrors=true
 
     - name: Enforce formatting
       run: |
