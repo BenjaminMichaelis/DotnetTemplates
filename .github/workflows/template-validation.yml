@@ -55,6 +55,8 @@ jobs:
           dotnet-version: ${{ inputs.dotnet_version }}
 
       - name: Validate template (${{ matrix.variant }})
+        env:
+          POST_BUILD_COMMAND: ${{ inputs.post_build_command }}
         run: |
           $PSNativeCommandUseErrorActionPreference = $true
           $repoRoot = $env:GITHUB_WORKSPACE
@@ -89,14 +91,13 @@ jobs:
           }
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-          switch ("${{ inputs.post_build_command }}") {
-            "" { }
-            "benchmark-run" {
-              dotnet run --project "$projectName/$projectName.csproj" -c Release
-            }
-            default {
-              throw "Unknown post_build_command action '${{ inputs.post_build_command }}'"
-            }
+          $postBuildAction = ([string]$env:POST_BUILD_COMMAND).Trim()
+          if ($postBuildAction -eq "") {
+            # No post-build action requested.
+          } elseif ($postBuildAction -eq "benchmark-run") {
+            dotnet run --project "$projectName/$projectName.csproj" -c Release
+          } else {
+            throw "Unknown post_build_command action '$postBuildAction'"
           }
 
           if ("${{ inputs.pack_project }}" -eq "true") {
