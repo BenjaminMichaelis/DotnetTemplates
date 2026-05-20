@@ -1,4 +1,5 @@
 ﻿using System.Security.Cryptography;
+
 using BenchmarkDotNet.Attributes;
 
 namespace BenchmarkApp;
