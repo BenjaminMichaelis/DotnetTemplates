@@ -19,7 +19,7 @@ Follow every item in this checklist. Do not open a PR until all items are done.
 - `templates/<Category>/<Name>/` — all template source files live here.
 - `.template.config/template.json` — short name, parameters, and source modifiers.
   - Every parameter combination must be covered by a CI matrix variant.
-  - When adding `--no-tests`, do **not** exclude the solution file or CI workflow — use in-file `#if (!no-tests)` guards instead.
+  - When adding `--tests None`, do **not** exclude the solution file or CI workflow — use in-file `#if (tests != "None")` guards instead.
 - `global.json` — SDK version + `"test": { "runner": "Microsoft.Testing.Platform" }`.
 - `Directory.Build.props` — `LangVersion`, `net<X>.0`, NuGet metadata placeholders.
 - `Directory.Packages.props` — central package management with latest package versions.
@@ -38,7 +38,7 @@ Follow every item in this checklist. Do not open a PR until all items are done.
   - Test with MTP flags: `--report-trx --report-trx-filename tests.trx` (or `--report-xunit-trx` for xunit)
   - Generate merged failure playlist from TRX files → `test-results/failed-tests.playlist`
   - Upload playlist artifact on failure with `actions/upload-artifact@v7`
-  - Wrap Test/playlist/upload steps in `#if (!no-tests)` if the template has a `--no-tests` option
+  - Wrap Test/playlist/upload steps in `#if (tests != "None")` if the template has a `--tests None` option
 - **`deploy.yml`**: `permissions: contents: read`, `actions/checkout@v6`
 - **`copilot-setup-steps.yml`**: `actions/checkout@v6`
 

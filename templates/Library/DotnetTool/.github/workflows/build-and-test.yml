@@ -59,7 +59,7 @@ jobs:
       - name: Build
         run: dotnet build -p:ContinuousIntegrationBuild=True --no-restore --configuration Release
 
-#if (!no-tests)
+#if (tests != "None")
       - name: Test
         #if (USE_XUNIT)
         run: dotnet test --no-build --configuration Release --verbosity normal --results-directory trx-data --report-xunit-trx --report-xunit-trx-filename tests.trx

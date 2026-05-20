@@ -9,7 +9,7 @@
     <File Path="README.md" />
   </Folder>
   <Project Path="DotnetTool/DotnetTool.csproj" />
-  <!--#if (!no-tests) -->
+  <!--#if (tests != "None") -->
   <Project Path="DotnetTool.Tests/DotnetTool.Tests.csproj" />
   <!--#endif -->
 </Solution>

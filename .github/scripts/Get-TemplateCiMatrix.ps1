@@ -104,10 +104,8 @@ function New-NormalizedStandardCombinationKey {
         }
     }
 
-    if ($normalized.ContainsKey("no-tests") -and [bool]$normalized["no-tests"]) {
-        if ($normalized.ContainsKey("tests")) {
-            $normalized["tests"] = "tunit"
-        }
+    if ($normalized.ContainsKey("tests") -and ($normalized["tests"] -eq "None")) {
+        # Do not process tests further when None is selected
     }
 
     $parts = @()
@@ -124,33 +122,27 @@ function New-StandardVariant {
 
     $hasNoSln = $Combo.ContainsKey("no-sln")
     $hasSln = $Combo.ContainsKey("sln")
-    $hasNoTests = $Combo.ContainsKey("no-tests")
     $hasTests = $Combo.ContainsKey("tests")
 
     $noSln = $hasNoSln -and [bool]$Combo["no-sln"]
     $sln = $hasSln -and [bool]$Combo["sln"] -and -not $noSln
-    $noTests = $hasNoTests -and [bool]$Combo["no-tests"]
     $tests = if ($hasTests) { [string]$Combo["tests"] } else { "tunit" }
     if ([string]::IsNullOrWhiteSpace($tests)) {
         $tests = "tunit"
-    }
-    if ($tests -notin @("tunit", "xunit")) {
-        throw "Unsupported test choice '$tests'. Update CI matrix generator handling."
     }
 
     $templateArgs = @()
     if ($noSln) { $templateArgs += "--no-sln" }
     elseif ($sln) { $templateArgs += "--sln" }
 
-    if ($noTests) { $templateArgs += "--no-tests" }
-    elseif ($tests -eq "xunit") { $templateArgs += "--tests xunit" }
+    if ($tests -ne "tunit") { $templateArgs += "--tests $tests" }
 
     $variantParts = @()
     if ($sln) { $variantParts += "sln" }
     elseif ($noSln) { $variantParts += "no-sln" }
 
-    if ($noTests) { $variantParts += "no-tests" }
-    elseif ($tests -eq "xunit") { $variantParts += "xunit" }
+    if ($tests -eq "None") { $variantParts += "no-tests" }
+    elseif ($tests -ne "tunit") { $variantParts += $tests }
     elseif (-not $sln -and -not $noSln) { $variantParts += "tunit" }
 
     $variantName = ($variantParts -join "-")
@@ -163,8 +155,8 @@ function New-StandardVariant {
         args = ($templateArgs -join " ")
         expectSln = $sln
         expectSlnx = (-not $noSln -and -not $sln)
-        expectTests = (-not $noTests)
-        reportTrxArgs = if ($noTests) { "" } elseif ($tests -eq "xunit") { "--report-xunit-trx --report-xunit-trx-filename tests.trx" } else { "--report-trx --report-trx-filename tests.trx" }
+        expectTests = ($tests -ne "None")
+        reportTrxArgs = if ($tests -eq "None") { "" } elseif ($tests -eq "xunit") { "--report-xunit-trx --report-xunit-trx-filename tests.trx" } else { "--report-trx --report-trx-filename tests.trx" }
     }
 }
 
@@ -235,7 +227,7 @@ foreach ($file in $templateFiles) {
         continue
     }
 
-    $allowedStandard = @("no-sln", "sln", "no-tests", "tests")
+    $allowedStandard = @("no-sln", "sln", "tests")
     $unknownStandard = @($paramDefs.Keys | Where-Object { $_ -notin $allowedStandard })
     if ($unknownStandard.Count -gt 0) {
         throw "Unhandled standard template parameters for '$shortName': $($unknownStandard -join ', ')"
