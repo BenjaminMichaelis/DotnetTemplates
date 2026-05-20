@@ -273,28 +273,6 @@ foreach ($file in $templateFiles) {
     $projectName = $sourceName
     $outputDirPrefix = "Test$sourceName"
     $artifactSuffix = $shortName.Replace("bmichaelis.", "").Replace(".", "-")
-    switch ($shortName) {
-        "bmichaelis.nuget" {
-            $projectName = "TestLib"
-            $outputDirPrefix = "TestLibrary"
-            $artifactSuffix = "library"
-        }
-        "bmichaelis.tool" {
-            $projectName = "TestTool"
-            $outputDirPrefix = "TestTool"
-            $artifactSuffix = "tool"
-        }
-        "bmichaelis.quickstart.consoleapp" {
-            $projectName = "TestApp"
-            $outputDirPrefix = "TestQuickstartConsoleApp"
-            $artifactSuffix = "console"
-        }
-        "bmichaelis.quickstart.benchmarkconsole" {
-            $projectName = "TestBenchmark"
-            $outputDirPrefix = "TestQuickstartBenchmarkConsole"
-            $artifactSuffix = "benchmark"
-        }
-    }
 
     $postBuildCommand = ""
     if ($shortName -eq "bmichaelis.quickstart.benchmarkconsole") {
