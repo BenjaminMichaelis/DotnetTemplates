@@ -200,7 +200,7 @@ function New-AspireVariants {
 $schemaPath = Join-Path ([System.IO.Path]::GetTempPath()) "dotnet-template-schema.json"
 Invoke-WebRequest -Uri $SchemaUrl -OutFile $schemaPath
 
-$templateFiles = Get-ChildItem -Path $TemplateRoot -Recurse -Filter "template.json" | Where-Object { $_.FullName -match "\\.template\.config\\template\.json$" }
+$templateFiles = Get-ChildItem -Path $TemplateRoot -Recurse -Filter "template.json" | Where-Object { $_.FullName -match "[\\/]\.template\.config[\\/]template\.json$" }
 if (-not $templateFiles) {
     throw "No template.json files found under '$TemplateRoot'."
 }
