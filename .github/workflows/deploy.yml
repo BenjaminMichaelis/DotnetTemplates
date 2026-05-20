@@ -14,9 +14,6 @@ defaults:
   run:
     shell: pwsh
 
-env:
-  DOTNET_VERSION: 10.x
-
 jobs:
   check-for-changes:
     runs-on: ubuntu-latest
@@ -98,7 +95,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
-            dotnet-version: ${{ env.DOTNET_VERSION }}
+            global-json-file: ./global.json
 
       - name: Restore dependencies
         run: dotnet restore -p:CodeAnalysisTreatWarningsAsErrors=true -p:TreatWarningsAsErrors=true -p:MSBuildTreatWarningsAsErrors=true

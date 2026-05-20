@@ -15,10 +15,6 @@ on:
       variant_matrix_json:
         required: true
         type: string
-      dotnet_version:
-        required: false
-        type: string
-        default: 10.x
       warnings_as_errors_msbuild_args:
         required: false
         type: string
@@ -55,8 +51,6 @@ jobs:
 
       - name: Setup test environment
         uses: ./.github/actions/setup-template-test
-        with:
-          dotnet-version: ${{ inputs.dotnet_version }}
 
       - name: Validate template (${{ matrix.variant }})
         env:

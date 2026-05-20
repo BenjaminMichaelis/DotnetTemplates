@@ -52,10 +52,11 @@ jobs:
 
       - name: Check for Pending Database Changes
         run: |
-          dotnet ef migrations has-pending-model-changes `
+          dotnet tool run dotnet-ef migrations has-pending-model-changes `
             --configuration Release `
             --project MinimalApi.Data/MinimalApi.Data.csproj `
-           --startup-project MinimalApi.AppHost/MinimalApi.AppHost.csproj
+            --startup-project MinimalApi.AppHost/MinimalApi.AppHost.csproj `
+            --no-build
 
       # Microsoft Testing Platform can stop the run once 10 tests fail in CI:
       # https://learn.microsoft.com/dotnet/core/testing/microsoft-testing-platform-cli-options

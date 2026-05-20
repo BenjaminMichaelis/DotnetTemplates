@@ -294,7 +294,6 @@ foreach ($file in $templateFiles) {
             project_name = $projectName
             output_dir_prefix = $outputDirPrefix
             variant_matrix_json = (Get-CompactJson -Value @{ include = $variants })
-            dotnet_version = "10.x"
             post_build_command = $postBuildCommand
             pack_project = $packProject
             failed_playlist_artifact_prefix = "failed-tests-playlist-$artifactSuffix"
