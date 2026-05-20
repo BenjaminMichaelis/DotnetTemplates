@@ -1,0 +1,116 @@
+name: Template Validation
+
+on:
+  workflow_call:
+    inputs:
+      template_short_name:
+        required: true
+        type: string
+      project_name:
+        required: true
+        type: string
+      output_dir_prefix:
+        required: true
+        type: string
+      variant_matrix_json:
+        required: true
+        type: string
+      dotnet_version:
+        required: false
+        type: string
+        default: 10.x
+      post_build_command:
+        required: false
+        type: string
+        default: ""
+      pack_project:
+        required: false
+        type: boolean
+        default: false
+      failed_playlist_artifact_prefix:
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  test-template:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(inputs.variant_matrix_json) }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup test environment
+        uses: ./.github/actions/setup-template-test
+        with:
+          dotnet-version: ${{ inputs.dotnet_version }}
+
+      - name: Validate template (${{ matrix.variant }})
+        env:
+          POST_BUILD_COMMAND: ${{ inputs.post_build_command }}
+        run: |
+          $repoRoot = $env:GITHUB_WORKSPACE
+          $outDir = "${{ inputs.output_dir_prefix }}-${{ matrix.variant }}"
+          New-Item -ItemType Directory -Path $outDir -Force | Out-Null
+          Push-Location $outDir
+
+          $projectName = "${{ inputs.project_name }}"
+          dotnet new bmichaelis.${{ inputs.template_short_name }} ${{ matrix.args }} --name $projectName --output .
+
+          $hasSln = Test-Path "$projectName.sln"
+          $hasSlnx = Test-Path "$projectName.slnx"
+          $hasTests = Test-Path "$projectName.Tests/$projectName.Tests.csproj"
+
+          if ([bool]::Parse("${{ matrix.expectSln }}") -ne $hasSln) { throw "Unexpected .sln file presence: $hasSln" }
+          if ([bool]::Parse("${{ matrix.expectSlnx }}") -ne $hasSlnx) { throw "Unexpected .slnx file presence: $hasSlnx" }
+          if ([bool]::Parse("${{ matrix.expectTests }}") -ne $hasTests) { throw "Unexpected test project presence: $hasTests" }
+
+          $solutionPath = if ($hasSln) { "$projectName.sln" } elseif ($hasSlnx) { "$projectName.slnx" } else { $null }
+          if ($solutionPath) {
+            & "$repoRoot/.github/scripts/Invoke-DotNetFormatStrict.ps1" -Targets $solutionPath -RestoreTargets
+            dotnet restore $solutionPath
+            dotnet build $solutionPath /p:TreatWarningsAsErrors=true
+          } else {
+            & "$repoRoot/.github/scripts/Invoke-DotNetFormatStrict.ps1" -DiscoverFromCurrentDirectory -RestoreTargets
+          }
+
+          if ($hasTests) {
+            dotnet test "$projectName.Tests/$projectName.Tests.csproj" /p:TreatWarningsAsErrors=true --results-directory trx-data ${{ matrix.reportTrxArgs }}
+          } else {
+            dotnet build "$projectName/$projectName.csproj" /p:TreatWarningsAsErrors=true
+          }
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+          $postBuildAction = ([string]$env:POST_BUILD_COMMAND).Trim()
+          if ($postBuildAction -eq "") {
+            # No post-build action requested.
+          } elseif ($postBuildAction -eq "benchmark-run") {
+            dotnet run --project "$projectName/$projectName.csproj" -c Release
+          } else {
+            throw "Unknown post_build_command action '$postBuildAction'"
+          }
+
+          if ("${{ inputs.pack_project }}" -eq "true") {
+            dotnet pack "$projectName/$projectName.csproj" --configuration Release -o ./NuGet
+          }
+
+      - name: Generate merged failure playlist from TRX
+        if: always()
+        uses: ./.github/actions/trx-playlist
+
+      - name: Upload failed test playlist
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ inputs.failed_playlist_artifact_prefix }}-${{ matrix.variant }}
+          path: test-results/failed-tests.playlist
+          if-no-files-found: ignore

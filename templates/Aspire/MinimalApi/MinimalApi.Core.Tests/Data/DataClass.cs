@@ -12,5 +12,6 @@ public class DataClass : IAsyncInitializer, IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         await Console.Out.WriteLineAsync("And when the class is finished with, we can clean up any resources.");
+        GC.SuppressFinalize(this);
     }
 }

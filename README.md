@@ -96,7 +96,7 @@ Remove the local install:
 2. Add or update `.template.config/template.json`
 3. Copy the root `.editorconfig` to the template (or run `.\CopyEditorConfigToTemplates.ps1`)
 4. Ensure template CI includes strict `dotnet format` checks (whitespace, style, analyzers)
-5. Update CI matrix entries (for example, `build.yml`)
+5. Update CI reusable workflow inputs/matrix JSON (in `build.yml` and `.github/workflows/template-validation.yml`)
 6. Update this README with the new template
 
 ## EditorConfig management
@@ -107,6 +107,12 @@ CI enforces formatting via strict checks:
 - `dotnet format whitespace <target> --verify-no-changes --no-restore`
 - `dotnet format style <target> --verify-no-changes --no-restore --severity info`
 - `dotnet format analyzers <target> --verify-no-changes --no-restore --severity info`
+
+CI architecture is intentionally DRY and schema-driven:
+- `build.yml` orchestrates package build, dynamic matrix generation, and top-level test gates
+- `.github/scripts/Get-TemplateCiMatrix.ps1` discovers template options from `template.json`, validates against the template schema, and emits workflow matrices
+- `.github/workflows/template-validation.yml` is the reusable workflow for standard template validation variants
+- `.github/actions/setup-template-test` and `.github/actions/trx-playlist` provide reusable native GitHub Actions setup and test-result handling
 
 **For template-specific customizations:**
 - Keep template-specific rules in `templates/<Template>/.template.config/editorconfig.override`

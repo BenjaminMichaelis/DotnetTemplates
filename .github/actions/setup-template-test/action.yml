@@ -1,0 +1,44 @@
+name: Setup template test environment
+description: Checkout, download template package artifact, setup .NET, restore tools, and install template pack.
+
+inputs:
+  dotnet-version:
+    description: .NET SDK version to install
+    required: true
+  artifact-name:
+    description: Build artifact name containing template nupkg
+    required: false
+    default: NuGet
+  nupkg-pattern:
+    description: File glob pattern used to locate the package
+    required: false
+    default: BenjaminMichaelis.Dotnet.Templates.*.nupkg
+
+runs:
+  using: composite
+  steps:
+    - name: Download NuGet Artifacts
+      uses: actions/download-artifact@v8
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: artifacts
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: ${{ inputs.dotnet-version }}
+
+    - name: Restore .NET Tools
+      shell: pwsh
+      run: dotnet tool restore
+
+    - name: Install template package
+      shell: pwsh
+      run: |
+        $package = Get-ChildItem -Path artifacts -Recurse -File |
+          Where-Object { $_.Name -like "${{ inputs.nupkg-pattern }}" } |
+          Select-Object -First 1
+        if (-not $package) {
+          throw "Could not find downloaded package matching pattern: ${{ inputs.nupkg-pattern }}"
+        }
+        dotnet new install $package.FullName --force

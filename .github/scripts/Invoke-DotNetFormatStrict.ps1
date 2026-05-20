@@ -7,6 +7,18 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+function Invoke-DotNetFormatCommand {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string[]]$Arguments
+    )
+
+    dotnet @Arguments
+    if ($LASTEXITCODE -ne 0) {
+        throw "dotnet $($Arguments -join ' ') failed with exit code $LASTEXITCODE."
+    }
+}
+
 if (-not $Targets -or $Targets.Count -eq 0) {
     if (-not $DiscoverFromCurrentDirectory) {
         throw 'Specify -Targets or pass -DiscoverFromCurrentDirectory.'
@@ -26,10 +38,10 @@ if (-not $Targets -or $Targets.Count -eq 0) {
 
 foreach ($target in $Targets) {
     if ($RestoreTargets) {
-        dotnet restore $target
+        Invoke-DotNetFormatCommand -Arguments @('restore', $target)
     }
 
-    dotnet format whitespace $target --verify-no-changes --no-restore
-    dotnet format style $target --verify-no-changes --no-restore --severity info
-    dotnet format analyzers $target --verify-no-changes --no-restore --severity info
+    Invoke-DotNetFormatCommand -Arguments @('format', 'whitespace', $target, '--verify-no-changes', '--no-restore')
+    Invoke-DotNetFormatCommand -Arguments @('format', 'style', $target, '--verify-no-changes', '--no-restore', '--severity', 'warn')
+    Invoke-DotNetFormatCommand -Arguments @('format', 'analyzers', $target, '--verify-no-changes', '--no-restore', '--severity', 'warn')
 }

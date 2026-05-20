@@ -1,4 +1,4 @@
-#!/usr/bin/env pwsh
+﻿#!/usr/bin/env pwsh
 
 # Script to copy the root .editorconfig to all template directories
 # This should be run when the root .editorconfig or template override files are updated.
@@ -34,7 +34,7 @@ function Convert-ToNormalizedText {
     return ($normalized -replace "`n", $TargetLineEnding)
 }
 
-function Compose-EditorConfigContent {
+function Build-EditorConfigContent {
     param (
         [string]$BaseContent,
         [string]$OverrideContent,
@@ -58,9 +58,9 @@ function Compose-EditorConfigContent {
 $changedTemplates = New-Object System.Collections.Generic.List[string]
 $templatesWithOverrides = New-Object System.Collections.Generic.List[string]
 
-Write-Host "Found template directories:"
-$templateDirs | ForEach-Object { Write-Host "  - $($_.FullName)" }
-Write-Host ""
+Write-Output "Found template directories:"
+$templateDirs | ForEach-Object { Write-Output "  - $($_.FullName)" }
+Write-Output ""
 
 foreach ($templateDir in $templateDirs) {
     $targetPath = Join-Path $templateDir.FullName ".editorconfig"
@@ -75,15 +75,15 @@ foreach ($templateDir in $templateDirs) {
         }
     }
 
-    $finalContent = Compose-EditorConfigContent -BaseContent $rootContent -OverrideContent $overrideContent -TargetLineEnding $lineEnding -OverridePath $overridePath
+    $finalContent = Build-EditorConfigContent -BaseContent $rootContent -OverrideContent $overrideContent -TargetLineEnding $lineEnding -OverridePath $overridePath
     $existingContent = if (Test-Path $targetPath) { Get-Content $targetPath -Raw } else { "" }
 
     if ($existingContent -ne $finalContent) {
         Set-Content -Path $targetPath -Value $finalContent -NoNewline
         $changedTemplates.Add($relativeTemplatePath)
-        Write-Host "✓ Updated .editorconfig for $relativeTemplatePath"
+        Write-Output "✓ Updated .editorconfig for $relativeTemplatePath"
     } else {
-        Write-Host "✓ No changes needed for $relativeTemplatePath"
+        Write-Output "✓ No changes needed for $relativeTemplatePath"
     }
 }
 
@@ -97,9 +97,9 @@ if ($env:GITHUB_OUTPUT) {
     "templates_with_overrides=$templatesWithOverridesValue" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 }
 
-Write-Host ""
+Write-Output ""
 if ($changedTemplates.Count -gt 0) {
-    Write-Host "✓ Script completed with updates: $changedTemplatesValue"
+    Write-Output "✓ Script completed with updates: $changedTemplatesValue"
 } else {
-    Write-Host "✓ Script completed. All template .editorconfig files are up to date."
+    Write-Output "✓ Script completed. All template .editorconfig files are up to date."
 }

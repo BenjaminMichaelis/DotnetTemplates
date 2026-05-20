@@ -6,7 +6,7 @@ public sealed class Program
     {
     }
 
-    public int Method(int value)
+    public static int Method(int value)
     {
         return value + 1;
     }

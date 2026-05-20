@@ -11,13 +11,8 @@ public class Class1Tests
 #endif
     public async Task Method_WithPositiveValue_AddsOne()
     {
-        //Arrange
-        AutoMocker mocker = new();
-
-        Class1 class1 = mocker.CreateInstance<Class1>();
-
         //Act
-        int result = class1.Method(41);
+        int result = Class1.Method(41);
 
         //Assert
         await AssertEqual(42, result);
