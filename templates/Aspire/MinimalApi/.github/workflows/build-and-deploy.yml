@@ -52,7 +52,7 @@ jobs:
 
       - name: Check for Pending Database Changes
         run: |
-          dotnet ef migrations has-pending-model-changes `
+          dotnet tool run dotnet-ef migrations has-pending-model-changes `
             --configuration Release `
             --project MinimalApi.Data/MinimalApi.Data.csproj `
            --startup-project MinimalApi.AppHost/MinimalApi.AppHost.csproj
