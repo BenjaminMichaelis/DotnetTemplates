@@ -141,7 +141,7 @@ jobs:
           & "$repoRoot/.github/scripts/Invoke-DotNetFormatStrict.ps1" -Targets $solutionFile.FullName -RestoreTargets
           dotnet build /p:TreatWarningsAsErrors=true
           dotnet tool restore
-          dotnet ef migrations has-pending-model-changes --configuration Release --project MinimalApi.Data/MinimalApi.Data.csproj --startup-project MinimalApi.AppHost/MinimalApi.AppHost.csproj --no-build
+          dotnet tool run dotnet-ef migrations has-pending-model-changes --configuration Release --project MinimalApi.Data/MinimalApi.Data.csproj --startup-project MinimalApi.AppHost/MinimalApi.AppHost.csproj --no-build
           dotnet test --no-build /p:TreatWarningsAsErrors=true --results-directory trx-data --report-trx --report-trx-filename tests.trx
           $appHostDir = (Resolve-Path "./MinimalApi.AppHost").Path
           $manifestPath = Join-Path $appHostDir "aspire-manifest.json"
