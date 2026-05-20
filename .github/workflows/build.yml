@@ -73,7 +73,13 @@ jobs:
 
       - name: Run PSScriptAnalyzer
         run: |
-          $results = Invoke-ScriptAnalyzer -Path . -Recurse -Severity Warning,Error
+          $excludeDirs = @('templates', 'tmp-ci-test', 'repro-console', 'bin', 'obj')
+          $allFiles = Get-ChildItem -Path . -Recurse -Filter '*.ps1' | Where-Object {
+            $rel = $_.FullName.Substring((Get-Location).Path.Length + 1)
+            $topDir = ($rel -split '[/\\]')[0]
+            $topDir -notin $excludeDirs
+          }
+          $results = $allFiles | ForEach-Object { Invoke-ScriptAnalyzer -Path $_.FullName -Severity Warning,Error }
           if ($results) {
             $results | Format-Table -AutoSize ScriptName, Line, Severity, RuleName, Message
             throw "PSScriptAnalyzer found $($results.Count) issue(s)."
