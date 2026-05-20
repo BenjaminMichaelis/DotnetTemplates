@@ -8,7 +8,7 @@ public class Class1
     /// <summary>
     /// Method
     /// </summary>
-    public int Method(int value)
+    public static int Method(int value)
     {
         return value + 1;
     }

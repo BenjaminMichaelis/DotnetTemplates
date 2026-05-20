@@ -507,6 +507,9 @@ dotnet_diagnostic.VSTHRD200.severity = none
 # CA1707: Identifiers should not contain underscores
 dotnet_diagnostic.CA1707.severity = none
 
+# CA1822: Test methods cannot be static (TUnit requirement)
+dotnet_diagnostic.CA1822.severity = none
+
 ###############
 # Spell Check #
 ###############
