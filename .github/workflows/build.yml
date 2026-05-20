@@ -19,6 +19,7 @@ defaults:
 
 env:
   DOTNET_VERSION: 10.x
+  CI_WARNING_PROPERTIES: -p:CodeAnalysisTreatWarningsAsErrors=true -p:TreatWarningsAsErrors=true -p:MSBuildTreatWarningsAsErrors=true
 
 jobs:
   automerge:
@@ -54,7 +55,7 @@ jobs:
         .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -Targets "Templates.csproj"
 
     - name: Pack
-      run: dotnet pack --configuration Release --no-restore -o .
+      run: dotnet pack --configuration Release --no-restore ${{ env.CI_WARNING_PROPERTIES }} -o .
     
     - name: Upload Artifacts
       uses: actions/upload-artifact@v7
@@ -114,6 +115,7 @@ jobs:
       output_dir_prefix: ${{ matrix.template.output_dir_prefix }}
       variant_matrix_json: ${{ matrix.template.variant_matrix_json }}
       dotnet_version: ${{ matrix.template.dotnet_version }}
+      warnings_as_errors_msbuild_args: ${{ env.CI_WARNING_PROPERTIES }}
       post_build_command: ${{ matrix.template.post_build_command }}
       pack_project: ${{ matrix.template.pack_project }}
       failed_playlist_artifact_prefix: ${{ matrix.template.failed_playlist_artifact_prefix }}
@@ -145,10 +147,10 @@ jobs:
           $solutionFile = Get-ChildItem -Path . -File | Where-Object { $_.Extension -eq ".sln" -or $_.Extension -eq ".slnx" } | Select-Object -First 1
           if (-not $solutionFile) { throw "Expected solution file for Aspire template format validation." }
           & "$repoRoot/.github/scripts/Invoke-DotNetFormatStrict.ps1" -Targets $solutionFile.FullName -RestoreTargets
-          dotnet build /p:TreatWarningsAsErrors=true
+          dotnet build ${{ env.CI_WARNING_PROPERTIES }}
           dotnet tool restore
           dotnet ef migrations has-pending-model-changes --configuration Release --project MinimalApi.Data/MinimalApi.Data.csproj --startup-project MinimalApi.AppHost/MinimalApi.AppHost.csproj --no-build
-          dotnet test --no-build /p:TreatWarningsAsErrors=true --results-directory trx-data --report-trx --report-trx-filename tests.trx
+          dotnet test --no-build ${{ env.CI_WARNING_PROPERTIES }} --results-directory trx-data --report-trx --report-trx-filename tests.trx
           $appHostDir = (Resolve-Path "./MinimalApi.AppHost").Path
           $manifestPath = Join-Path $appHostDir "aspire-manifest.json"
           $appHostProj = Join-Path $appHostDir "MinimalApi.AppHost.csproj"

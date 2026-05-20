@@ -19,6 +19,10 @@ on:
         required: false
         type: string
         default: 10.x
+      warnings_as_errors_msbuild_args:
+        required: false
+        type: string
+        default: -p:CodeAnalysisTreatWarningsAsErrors=true -p:TreatWarningsAsErrors=true -p:MSBuildTreatWarningsAsErrors=true
       post_build_command:
         required: false
         type: string
@@ -78,15 +82,15 @@ jobs:
           if ($solutionPath) {
             & "$repoRoot/.github/scripts/Invoke-DotNetFormatStrict.ps1" -Targets $solutionPath -RestoreTargets
             dotnet restore $solutionPath
-            dotnet build $solutionPath /p:TreatWarningsAsErrors=true
+            dotnet build $solutionPath ${{ inputs.warnings_as_errors_msbuild_args }}
           } else {
             & "$repoRoot/.github/scripts/Invoke-DotNetFormatStrict.ps1" -DiscoverFromCurrentDirectory -RestoreTargets
           }
 
           if ($hasTests) {
-            dotnet test "$projectName.Tests/$projectName.Tests.csproj" /p:TreatWarningsAsErrors=true --results-directory trx-data ${{ matrix.reportTrxArgs }}
+            dotnet test "$projectName.Tests/$projectName.Tests.csproj" ${{ inputs.warnings_as_errors_msbuild_args }} --results-directory trx-data ${{ matrix.reportTrxArgs }}
           } else {
-            dotnet build "$projectName/$projectName.csproj" /p:TreatWarningsAsErrors=true
+            dotnet build "$projectName/$projectName.csproj" ${{ inputs.warnings_as_errors_msbuild_args }}
           }
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
@@ -100,7 +104,7 @@ jobs:
           }
 
           if ("${{ inputs.pack_project }}" -eq "true") {
-            dotnet pack "$projectName/$projectName.csproj" --configuration Release -o ./NuGet
+            dotnet pack "$projectName/$projectName.csproj" --configuration Release ${{ inputs.warnings_as_errors_msbuild_args }} -o ./NuGet
           }
 
       - name: Generate merged failure playlist from TRX

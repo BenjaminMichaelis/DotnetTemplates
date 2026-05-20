@@ -16,6 +16,7 @@ defaults:
 
 env:
   DOTNET_VERSION: 10.x
+  CI_WARNING_PROPERTIES: -p:CodeAnalysisTreatWarningsAsErrors=true -p:TreatWarningsAsErrors=true -p:MSBuildTreatWarningsAsErrors=true
 
 jobs:
   check-for-changes:
@@ -130,7 +131,7 @@ jobs:
 
       - name: Pack
         if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'schedule'
-        run: dotnet pack -p:PackageVersion=${{ env.nugetVersion }} --configuration Release -o ${{ github.workspace }}/BenjaminMichaelis.PackedTemplates
+        run: dotnet pack -p:PackageVersion=${{ env.nugetVersion }} --configuration Release ${{ env.CI_WARNING_PROPERTIES }} -o ${{ github.workspace }}/BenjaminMichaelis.PackedTemplates
 
       - name: Upload Artifacts
         if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'schedule'
