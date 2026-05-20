@@ -11,7 +11,7 @@ function Get-CompactJson {
     return ($Value | ConvertTo-Json -Depth 100 -Compress)
 }
 
-function Get-TemplateParameters {
+function Get-TemplateParameter {
     param([object]$TemplateJson)
 
     $result = @{}
@@ -89,6 +89,8 @@ function Get-CartesianProduct {
 }
 
 function New-NormalizedStandardCombinationKey {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '')]
+    [CmdletBinding()]
     param([hashtable]$Combo)
 
     $normalized = @{}
@@ -116,6 +118,8 @@ function New-NormalizedStandardCombinationKey {
 }
 
 function New-StandardVariant {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '')]
+    [CmdletBinding()]
     param([hashtable]$Combo)
 
     $hasNoSln = $Combo.ContainsKey("no-sln")
@@ -134,12 +138,12 @@ function New-StandardVariant {
         throw "Unsupported test choice '$tests'. Update CI matrix generator handling."
     }
 
-    $args = @()
-    if ($noSln) { $args += "--no-sln" }
-    elseif ($sln) { $args += "--sln" }
+    $templateArgs = @()
+    if ($noSln) { $templateArgs += "--no-sln" }
+    elseif ($sln) { $templateArgs += "--sln" }
 
-    if ($noTests) { $args += "--no-tests" }
-    elseif ($tests -eq "xunit") { $args += "--tests xunit" }
+    if ($noTests) { $templateArgs += "--no-tests" }
+    elseif ($tests -eq "xunit") { $templateArgs += "--tests xunit" }
 
     $variantParts = @()
     if ($sln) { $variantParts += "sln" }
@@ -156,7 +160,7 @@ function New-StandardVariant {
 
     return [ordered]@{
         variant = $variantName
-        args = ($args -join " ")
+        args = ($templateArgs -join " ")
         expectSln = $sln
         expectSlnx = (-not $noSln -and -not $sln)
         expectTests = (-not $noTests)
@@ -164,7 +168,9 @@ function New-StandardVariant {
     }
 }
 
-function New-AspireVariants {
+function New-AspireVariant {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '')]
+    [CmdletBinding()]
     param([hashtable]$ParamDefinitions)
 
     $allowed = @("applicationInsights", "integrationTests")
@@ -180,9 +186,9 @@ function New-AspireVariants {
     $combos = Get-CartesianProduct -Domains $domains
     $variants = @()
     foreach ($combo in $combos) {
-        $args = @()
-        if ([bool]$combo.applicationInsights) { $args += "--applicationInsights true" }
-        if ([bool]$combo.integrationTests) { $args += "--integrationTests true" }
+        $templateArgs = @()
+        if ([bool]$combo.applicationInsights) { $templateArgs += "--applicationInsights true" }
+        if ([bool]$combo.integrationTests) { $templateArgs += "--integrationTests true" }
 
         $name = @()
         if ([bool]$combo.applicationInsights) { $name += "applicationInsights" } else { $name += "default" }
@@ -191,7 +197,7 @@ function New-AspireVariants {
 
         $variants += @([ordered]@{
                 variant = $variantName
-                args = ($args -join " ")
+                args = ($templateArgs -join " ")
             })
     }
     return @($variants | Sort-Object variant)
@@ -221,10 +227,10 @@ foreach ($file in $templateFiles) {
     }
 
     $shortName = [string]$template.shortName
-    $paramDefs = Get-TemplateParameters -TemplateJson $template
+    $paramDefs = Get-TemplateParameter -TemplateJson $template
 
     if ($shortName -eq "bmichaelis.aspire.minimalapi") {
-        $aspireVariants = New-AspireVariants -ParamDefinitions $paramDefs
+        $aspireVariants = New-AspireVariant -ParamDefinitions $paramDefs
         $aspireVariantMatrix = @{ include = $aspireVariants }
         continue
     }
