@@ -22,7 +22,7 @@ This repository builds and publishes `BenjaminMichaelis.Dotnet.Templates`, a NuG
 ## Template authoring guidelines
 
 - Keep `template.json` symbols and source modifiers covered by CI matrix variants.
-- When adding an option such as `no-sln` or `no-tests`, test both the default path and the option-enabled path.
+- When adding an option such as `no-sln` or `--tests None`, test both the default path and the option-enabled path.
 - Keep generated template files self-contained; do not rely on files outside the generated project.
 - Keep template `Directory.Packages.props` and `Directory.Build.props` consistent across similar templates unless a template has a clear reason to differ.
 - Copy root `.editorconfig` changes into templates with `CopyEditorConfigToTemplates.ps1`.

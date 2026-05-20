@@ -22,8 +22,7 @@ Source:
 ### Parameters
 
 - `--no-sln`: Don't include the default `.slnx` solution file.
-- `--no-tests`: Don't include the test project.
-- `--tests`: Choose the test framework (`tunit` default, `xunit` for xUnit v3 + MTP v2).
+- `--tests`: Choose the test framework (`tunit` default, `xunit` for xUnit v3 + MTP v2, `None` to exclude test project).
 
 [Default template options](https://learn.microsoft.com/dotnet/core/tools/dotnet-new#options)
 
