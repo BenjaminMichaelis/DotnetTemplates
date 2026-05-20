@@ -36,24 +36,27 @@ internal static class AspireExtensions
             processInfo.RedirectStandardError = true;
 
             var logger = serviceProvider.GetResourceLogger(resource);
-            logger.LogInformation("Running: {ProcessInfo}", processInfo.ToDisplayString());
+            if (logger.IsEnabled(LogLevel.Information))
+            {
+                logger.LogInformation("Running: {ProcessInfo}", processInfo.ToDisplayString());
+            }
             try
             {
                 if (Process.Start(processInfo) is { } process)
                 {
                     process.OutputDataReceived += (sender, e) =>
                     {
-                        if (!string.IsNullOrWhiteSpace(e.Data))
+                        if (!string.IsNullOrWhiteSpace(e.Data) && logger.IsEnabled(LogLevel.Information))
                         {
-                            logger.LogInformation(e.Data);
+                            logger.LogInformation("{Output}", e.Data);
                         }
                     };
 
                     process.ErrorDataReceived += (sender, e) =>
                     {
-                        if (!string.IsNullOrWhiteSpace(e.Data))
+                        if (!string.IsNullOrWhiteSpace(e.Data) && logger.IsEnabled(LogLevel.Error))
                         {
-                            logger.LogError(e.Data);
+                            logger.LogError("{Output}", e.Data);
                         }
                     };
 

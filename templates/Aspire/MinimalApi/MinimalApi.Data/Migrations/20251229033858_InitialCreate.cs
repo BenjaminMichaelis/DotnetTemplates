@@ -9,6 +9,7 @@ namespace MinimalApi.Data.Migrations;
 /// <inheritdoc />
 public partial class InitialCreate : Migration
 {
+    private static readonly string[] s_questionsCompositeIndex = ["RoomId", "IsApproved", "IsAnswered"];
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
     {
@@ -275,7 +276,7 @@ public partial class InitialCreate : Migration
         migrationBuilder.CreateIndex(
             name: "IX_Questions_RoomId_IsApproved_IsAnswered",
             table: "Questions",
-            columns: new[] { "RoomId", "IsApproved", "IsAnswered" });
+            columns: s_questionsCompositeIndex);
 
         migrationBuilder.CreateIndex(
             name: "IX_Rooms_CreatedByUserId",
