@@ -163,7 +163,10 @@ function New-StandardVariant {
 function New-AspireVariant {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '')]
     [CmdletBinding()]
-    param([hashtable]$ParamDefinitions)
+    param(
+        [hashtable]$ParamDefinitions,
+        [string]$GlobalJsonPath
+    )
 
     $allowed = @("applicationInsights", "integrationTests")
     $unknown = @($ParamDefinitions.Keys | Where-Object { $_ -notin $allowed })
@@ -190,6 +193,7 @@ function New-AspireVariant {
         $variants += @([ordered]@{
                 variant = $variantName
                 args = ($templateArgs -join " ")
+                global_json_file = $GlobalJsonPath.Replace('\', '/')
             })
     }
     return @($variants | Sort-Object variant)
@@ -222,7 +226,12 @@ foreach ($file in $templateFiles) {
     $paramDefs = Get-TemplateParameter -TemplateJson $template
 
     if ($shortName -eq "bmichaelis.aspire.minimalapi") {
-        $aspireVariants = New-AspireVariant -ParamDefinitions $paramDefs
+        $templateRootPath = Split-Path -Path $file.DirectoryName -Parent
+        $aspireGlobalJsonPath = Join-Path $templateRootPath "global.json"
+        if (-not (Test-Path -Path $aspireGlobalJsonPath -PathType Leaf)) {
+            throw "Missing global.json for template '$shortName' at '$aspireGlobalJsonPath'"
+        }
+        $aspireVariants = New-AspireVariant -ParamDefinitions $paramDefs -GlobalJsonPath $aspireGlobalJsonPath
         $aspireVariantMatrix = @{ include = $aspireVariants }
         continue
     }

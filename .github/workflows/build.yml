@@ -130,7 +130,7 @@ jobs:
       - name: Setup test environment
         uses: ./.github/actions/setup-template-test
         with:
-          global-json-file: ./templates/Aspire/MinimalApi/global.json
+          global-json-file: ${{ matrix.global_json_file }}
 
       - name: Test Template (${{ matrix.variant }})
         run: |
