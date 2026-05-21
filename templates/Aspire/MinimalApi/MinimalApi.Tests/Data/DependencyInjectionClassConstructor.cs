@@ -1,6 +1,6 @@
 using TUnit.Core.Interfaces;
 
-namespace MinimalApi.Core.Tests;
+namespace MinimalApi.Tests;
 
 public class DependencyInjectionClassConstructor : IClassConstructor
 {
@@ -11,3 +11,5 @@ public class DependencyInjectionClassConstructor : IClassConstructor
         throw new NotImplementedException();
     }
 }
+
+

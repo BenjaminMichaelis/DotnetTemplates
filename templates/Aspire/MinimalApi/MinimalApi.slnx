@@ -24,9 +24,10 @@
   <!--#if (integrationTests)-->
   <Project Path="MinimalApi.Aspire.Tests/MinimalApi.Aspire.Tests.csproj" />
   <!--#endif-->
-  <Project Path="MinimalApi.Core.Tests/MinimalApi.Core.Tests.csproj" />
+  <Project Path="MinimalApi.Tests/MinimalApi.Tests.csproj" />
   <Project Path="MinimalApi.Core/MinimalApi.Core.csproj" />
   <Project Path="MinimalApi.Data/MinimalApi.Data.csproj" />
   <Project Path="MinimalApi.ServiceDefaults/MinimalApi.ServiceDefaults.csproj" />
   <Project Path="MinimalApi/MinimalApi.csproj" />
 </Solution>
+

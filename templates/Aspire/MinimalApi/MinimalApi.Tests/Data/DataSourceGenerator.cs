@@ -1,4 +1,4 @@
-namespace MinimalApi.Core.Tests.Data;
+namespace MinimalApi.Tests.Data;
 
 public class DataGenerator : DataSourceGeneratorAttribute<int, int, int>
 {
@@ -9,3 +9,5 @@ public class DataGenerator : DataSourceGeneratorAttribute<int, int, int>
         yield return () => (4, 5, 9);
     }
 }
+
+

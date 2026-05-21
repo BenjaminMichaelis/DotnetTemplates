@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace MinimalApi.Core.Tests.Hubs;
+namespace MinimalApi.Tests.Hubs;
 
 public abstract class SerializationTestsBase<TDto>
     where TDto : class, new()
@@ -31,3 +31,5 @@ public abstract class SerializationTestsBase<TDto>
         await AssertAreEqual(dto, deserializedDto!);
     }
 }
+
+

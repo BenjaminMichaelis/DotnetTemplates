@@ -41,7 +41,7 @@
           "MinimalApi/MinimalApi.csproj",
           "MinimalApi.AppHost/MinimalApi.AppHost.csproj",
           "MinimalApi.Core/MinimalApi.Core.csproj",
-          "MinimalApi.Core.Tests/MinimalApi.Core.Tests.csproj",
+          "MinimalApi.Tests/MinimalApi.Tests.csproj",
           "MinimalApi.Data/MinimalApi.Data.csproj",
           "MinimalApi.ServiceDefaults/MinimalApi.ServiceDefaults.csproj",
           "MinimalApi.Aspire.Tests/MinimalApi.Aspire.Tests.csproj:integrationTests"

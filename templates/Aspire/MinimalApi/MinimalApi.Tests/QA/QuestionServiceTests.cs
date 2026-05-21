@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 using MinimalApi.Core.QA;
 
-namespace MinimalApi.Core.Tests.QA;
+namespace MinimalApi.Tests.QA;
 
 public sealed class QuestionServiceTests : ServiceTestsBase
 {
@@ -346,3 +346,5 @@ public sealed class QuestionServiceTests : ServiceTestsBase
         await Assert.That(result).IsTrue();
     }
 }
+
+

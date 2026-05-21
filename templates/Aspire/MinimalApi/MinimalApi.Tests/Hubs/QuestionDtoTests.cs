@@ -1,6 +1,6 @@
 using MinimalApi.Core.Hubs;
 
-namespace MinimalApi.Core.Tests.Hubs;
+namespace MinimalApi.Tests.Hubs;
 
 [InheritsTests]
 public class QuestionDtoTests : SerializationTestsBase<QuestionDto>
@@ -29,3 +29,5 @@ public class QuestionDtoTests : SerializationTestsBase<QuestionDto>
         };
     }
 }
+
+

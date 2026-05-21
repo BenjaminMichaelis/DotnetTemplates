@@ -1,6 +1,6 @@
 using MinimalApi.Data;
 
-namespace MinimalApi.Core.Tests.QA;
+namespace MinimalApi.Tests.QA;
 
 public abstract class ServiceTestsBase
 {
@@ -84,3 +84,5 @@ public abstract class ServiceTestsBase
         return question;
     }
 }
+
+

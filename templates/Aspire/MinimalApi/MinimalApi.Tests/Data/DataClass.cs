@@ -1,6 +1,6 @@
 using TUnit.Core.Interfaces;
 
-namespace MinimalApi.Core.Tests;
+namespace MinimalApi.Tests;
 
 public class DataClass : IAsyncInitializer, IAsyncDisposable
 {
@@ -15,3 +15,5 @@ public class DataClass : IAsyncInitializer, IAsyncDisposable
         GC.SuppressFinalize(this);
     }
 }
+
+

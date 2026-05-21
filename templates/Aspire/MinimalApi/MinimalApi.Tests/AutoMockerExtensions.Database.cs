@@ -7,7 +7,7 @@ using MinimalApi.Data;
 
 using Moq.AutoMock.Resolvers;
 
-namespace MinimalApi.Core.Tests;
+namespace MinimalApi.Tests;
 
 public static partial class AutoMockerExtensions
 {
@@ -127,3 +127,5 @@ file sealed class SqliteConnectionResolver<TContext> : IMockResolver, IDisposabl
         GC.SuppressFinalize(this);
     }
 }
+
+

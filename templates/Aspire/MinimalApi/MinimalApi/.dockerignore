@@ -42,4 +42,5 @@ Infra/
 **/.dockerignore
 
 # Test projects (not deployed)
-MinimalApi.Core.Tests/
+MinimalApi.Tests/
+

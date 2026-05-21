@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 using MinimalApi.Core.QA;
 
-namespace MinimalApi.Core.Tests.QA;
+namespace MinimalApi.Tests.QA;
 
 public class RoomServiceTests : ServiceTestsBase
 {
@@ -338,3 +338,5 @@ public class RoomServiceTests : ServiceTestsBase
             .WithMessage("Only the room owner can delete the room");
     }
 }
+
+

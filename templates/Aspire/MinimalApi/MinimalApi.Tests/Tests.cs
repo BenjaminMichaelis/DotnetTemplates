@@ -1,6 +1,6 @@
-using MinimalApi.Core.Tests.Data;
+using MinimalApi.Tests.Data;
 
-namespace MinimalApi.Core.Tests;
+namespace MinimalApi.Tests;
 
 public class Tests
 {
@@ -63,3 +63,5 @@ public class Tests
         yield return (3, 1, 4);
     }
 }
+
+

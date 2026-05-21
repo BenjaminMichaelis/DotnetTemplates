@@ -1,6 +1,6 @@
 using MinimalApi.Core.Hubs;
 
-namespace MinimalApi.Core.Tests.Hubs;
+namespace MinimalApi.Tests.Hubs;
 
 [InheritsTests]
 public class RoomDtoTests : SerializationTestsBase<RoomDto>
@@ -26,3 +26,5 @@ public class RoomDtoTests : SerializationTestsBase<RoomDto>
         };
     }
 }
+
+
