@@ -118,7 +118,10 @@ function New-NormalizedStandardCombinationKey {
 function New-StandardVariant {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '')]
     [CmdletBinding()]
-    param([hashtable]$Combo)
+    param(
+        [hashtable]$Combo,
+        [hashtable]$Capabilities
+    )
 
     $hasNoSln = $Combo.ContainsKey("no-sln")
     $hasSln = $Combo.ContainsKey("sln")
@@ -145,12 +148,24 @@ function New-StandardVariant {
     elseif ($tests -ne "tunit") { $variantParts += $tests }
     elseif (-not $sln -and -not $noSln) { $variantParts += "tunit" }
 
+    # Handle arbitrary bool parameters (like Aspire's applicationInsights, integrationTests)
+    $knownParams = @("no-sln", "sln", "tests")
+    foreach ($key in ($Combo.Keys | Sort-Object)) {
+        if ($key -notin $knownParams) {
+            $val = [bool]$Combo[$key]
+            if ($val) {
+                $templateArgs += "--$key true"
+                $variantParts += $key
+            }
+        }
+    }
+
     $variantName = ($variantParts -join "-")
     if ([string]::IsNullOrWhiteSpace($variantName)) {
         $variantName = "default"
     }
 
-    return [ordered]@{
+    $result = [ordered]@{
         variant = $variantName
         args = ($templateArgs -join " ")
         expectSln = $sln
@@ -158,41 +173,45 @@ function New-StandardVariant {
         expectTests = ($tests -ne "None")
         reportTrxArgs = if ($tests -eq "None") { "" } elseif ($tests -eq "xunit") { "--report-xunit-trx --report-xunit-trx-filename tests.trx" } else { "--report-trx --report-trx-filename tests.trx" }
     }
+
+    # Add capability flags
+    if ($Capabilities) {
+        $result.hasAspireHost = $Capabilities.hasAspireHost
+        $result.hasEfMigrations = $Capabilities.hasEfMigrations
+        $result.hasDockerfile = $Capabilities.hasDockerfile
+    }
+
+    return $result
 }
 
-function New-AspireVariant {
+function Get-TemplateCapabilities {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '')]
     [CmdletBinding()]
-    param([hashtable]$ParamDefinitions)
+    param([string]$TemplateDir)
 
-    $allowed = @("applicationInsights", "integrationTests")
-    $unknown = @($ParamDefinitions.Keys | Where-Object { $_ -notin $allowed })
-    if ($unknown.Count -gt 0) {
-        throw "Unhandled Aspire parameters detected: $($unknown -join ', ')"
+    $capabilities = [ordered]@{
+        hasAspireHost = $false
+        hasEfMigrations = $false
+        hasDockerfile = $false
     }
 
-    $domains = @{
-        applicationInsights = @($false, $true)
-        integrationTests = @($false, $true)
+    $csprojFiles = @(Get-ChildItem -Path $TemplateDir -Recurse -Filter "*.csproj" -ErrorAction SilentlyContinue)
+    foreach ($csproj in $csprojFiles) {
+        $content = Get-Content -Path $csproj.FullName -Raw
+        if ($content -match 'Sdk\s*=\s*"Aspire\.AppHost\.Sdk' -or $content -match 'PackageReference.*Include\s*=\s*"Aspire\.Hosting') {
+            $capabilities.hasAspireHost = $true
+        }
+        if ($content -match 'EntityFrameworkCore\.Design') {
+            $capabilities.hasEfMigrations = $true
+        }
     }
-    $combos = Get-CartesianProduct -Domains $domains
-    $variants = @()
-    foreach ($combo in $combos) {
-        $templateArgs = @()
-        if ([bool]$combo.applicationInsights) { $templateArgs += "--applicationInsights true" }
-        if ([bool]$combo.integrationTests) { $templateArgs += "--integrationTests true" }
 
-        $name = @()
-        if ([bool]$combo.applicationInsights) { $name += "applicationInsights" } else { $name += "default" }
-        if ([bool]$combo.integrationTests) { $name += "with-integration-tests" }
-        $variantName = $name -join "-"
-
-        $variants += @([ordered]@{
-                variant = $variantName
-                args = ($templateArgs -join " ")
-            })
+    $dockerfile = Get-ChildItem -Path $TemplateDir -Recurse -Filter "Dockerfile" -ErrorAction SilentlyContinue
+    if ($dockerfile) {
+        $capabilities.hasDockerfile = $true
     }
-    return @($variants | Sort-Object variant)
+
+    return $capabilities
 }
 
 $schemaPath = Join-Path ([System.IO.Path]::GetTempPath()) "dotnet-template-schema.json"
@@ -204,7 +223,11 @@ if (-not $templateFiles) {
 }
 
 $standardTemplates = @()
-$aspireVariantMatrix = $null
+$capabilityFlags = @{
+    hasAspireHost = $false
+    hasEfMigrations = $false
+    hasDockerfile = $false
+}
 
 foreach ($file in $templateFiles) {
     $jsonText = Get-Content -Path $file.FullName -Raw
@@ -220,19 +243,18 @@ foreach ($file in $templateFiles) {
 
     $shortName = [string]$template.shortName
     $paramDefs = Get-TemplateParameter -TemplateJson $template
+    $templateDir = Split-Path -Parent $file.FullName | Split-Path -Parent
 
-    if ($shortName -eq "bmichaelis.aspire.minimalapi") {
-        $aspireVariants = New-AspireVariant -ParamDefinitions $paramDefs
-        $aspireVariantMatrix = @{ include = $aspireVariants }
-        continue
+    # Detect template capabilities
+    $capabilities = Get-TemplateCapabilities -TemplateDir $templateDir
+    foreach ($flag in $capabilities.Keys) {
+        if ($capabilities[$flag]) {
+            $capabilityFlags[$flag] = $true
+        }
     }
 
+    # Allow arbitrary bool parameters (no longer restrict to standard set)
     $allowedStandard = @("no-sln", "sln", "tests")
-    $unknownStandard = @($paramDefs.Keys | Where-Object { $_ -notin $allowedStandard })
-    if ($unknownStandard.Count -gt 0) {
-        throw "Unhandled standard template parameters for '$shortName': $($unknownStandard -join ', ')"
-    }
-
     $domains = @{}
     foreach ($entry in $paramDefs.GetEnumerator()) {
         $domains[$entry.Key] = $entry.Value.values
@@ -256,7 +278,7 @@ foreach ($file in $templateFiles) {
 
     $variants = @()
     foreach ($combo in $deduped.Values) {
-        $variants += @(New-StandardVariant -Combo $combo)
+        $variants += @(New-StandardVariant -Combo $combo -Capabilities $capabilities)
     }
     $variants = @($variants | Sort-Object variant)
     if (-not $variants) {
@@ -292,19 +314,23 @@ foreach ($file in $templateFiles) {
         })
 }
 
-if ($null -eq $aspireVariantMatrix) {
-    throw "Aspire template variants were not generated."
+# Validate that all capabilities are detected at least once
+if (-not $capabilityFlags.hasAspireHost) {
+    throw "No templates detected with Aspire.AppHost support. This likely indicates a detection bug in Get-TemplateCapabilities."
+}
+if (-not $capabilityFlags.hasEfMigrations) {
+    throw "No templates detected with EntityFrameworkCore.Design. This likely indicates a detection bug in Get-TemplateCapabilities."
+}
+if (-not $capabilityFlags.hasDockerfile) {
+    throw "No templates detected with Dockerfile. This likely indicates a detection bug in Get-TemplateCapabilities."
 }
 
 $standardTemplates = @($standardTemplates | Sort-Object job_name)
 $standardJson = Get-CompactJson -Value $standardTemplates
-$aspireJson = Get-CompactJson -Value $aspireVariantMatrix
 
 if (-not $env:GITHUB_OUTPUT) {
     Write-Output "standard_templates=$standardJson"
-    Write-Output "aspire_variants=$aspireJson"
     return
 }
 
 "standard_templates=$standardJson" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
-"aspire_variants=$aspireJson" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append

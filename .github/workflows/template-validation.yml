@@ -100,6 +100,40 @@ jobs:
             dotnet pack "$projectName/$projectName.csproj" --configuration Release ${{ inputs.warnings_as_errors_msbuild_args }} -o ./NuGet
           }
 
+      - name: Validate Aspire manifest
+        if: ${{ matrix.hasAspireHost == true }}
+        run: |
+          $appHostProj = Get-ChildItem -Recurse -Filter "*.AppHost.csproj" | Select-Object -First 1
+          if (-not $appHostProj) { throw "AppHost project not found" }
+          $manifestPath = Join-Path $appHostProj.DirectoryName "aspire-manifest.json"
+          dotnet run --project $appHostProj.FullName -- --publisher manifest --output-path $manifestPath
+          if (-not (Test-Path $manifestPath)) {
+            throw "Aspire manifest smoke check failed: $manifestPath was not created."
+          }
+
+      - name: Validate Docker build
+        if: ${{ matrix.hasDockerfile == true }}
+        run: |
+          $dockerfile = Get-ChildItem -Recurse -Filter "Dockerfile" | Select-Object -First 1
+          if (-not $dockerfile) { throw "Dockerfile not found" }
+          docker build -f $dockerfile.FullName -t smoke:${{ matrix.variant }} (Resolve-Path .).Path
+
+      - name: Validate EF migrations
+        if: ${{ matrix.hasEfMigrations == true }}
+        run: |
+          $appHostProj = Get-ChildItem -Recurse -Filter "*.AppHost.csproj" | Select-Object -First 1
+          if (-not $appHostProj) { throw "AppHost project not found" }
+          $efProjects = @(Get-ChildItem -Recurse -Filter "*.csproj" |
+            Where-Object { (Get-Content $_.FullName -Raw) -match "EntityFrameworkCore\.Design" })
+          if ($efProjects.Count -eq 0) { throw "No EF projects found" }
+          dotnet tool restore
+          foreach ($proj in $efProjects) {
+            Write-Host "Checking EF migrations for $($proj.Name)"
+            dotnet tool run dotnet-ef migrations has-pending-model-changes --configuration Release --project $proj.FullName --startup-project $appHostProj.FullName --no-build
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+
+
       - name: Generate merged failure playlist from TRX
         if: always()
         uses: ./.github/actions/trx-playlist
