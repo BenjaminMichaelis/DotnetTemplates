@@ -102,6 +102,7 @@ jobs:
 
       - name: Validate Aspire manifest
         if: ${{ matrix.hasAspireHost == true }}
+        working-directory: ${{ inputs.output_dir_prefix }}-${{ matrix.variant }}
         run: |
           $appHostProj = Get-ChildItem -Recurse -Filter "*.AppHost.csproj" | Select-Object -First 1
           if (-not $appHostProj) { throw "AppHost project not found" }
@@ -113,15 +114,17 @@ jobs:
 
       - name: Validate Docker build
         if: ${{ matrix.hasDockerfile == true }}
+        working-directory: ${{ inputs.output_dir_prefix }}-${{ matrix.variant }}
         run: |
           $dockerfile = Get-ChildItem -Recurse -Filter "Dockerfile" | Select-Object -First 1
           if (-not $dockerfile) { throw "Dockerfile not found" }
-          $contextDir = Split-Path -Parent $dockerfile.FullName
-          docker build -f $dockerfile.FullName -t smoke:${{ matrix.variant }} $contextDir
+          $buildContext = (Get-Location).Path
+          docker build -f $dockerfile.FullName -t smoke:${{ matrix.variant }} $buildContext
           if ($LASTEXITCODE -ne 0) { throw "Docker build failed with exit code $LASTEXITCODE" }
 
       - name: Validate EF migrations
         if: ${{ matrix.hasEfMigrations == true }}
+        working-directory: ${{ inputs.output_dir_prefix }}-${{ matrix.variant }}
         run: |
           $efProjects = @(Get-ChildItem -Recurse -Filter "*.csproj" |
             Where-Object { (Get-Content $_.FullName -Raw) -match "EntityFrameworkCore\.Design" } |
@@ -157,4 +160,5 @@ jobs:
           name: ${{ inputs.failed_playlist_artifact_prefix }}-${{ matrix.variant }}
           path: test-results/failed-tests.playlist
           if-no-files-found: ignore
+
 

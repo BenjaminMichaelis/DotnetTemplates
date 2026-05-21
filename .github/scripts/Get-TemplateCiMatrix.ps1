@@ -256,7 +256,6 @@ foreach ($file in $templateFiles) {
     }
 
     # Allow arbitrary bool parameters (no longer restrict to standard set)
-    $allowedStandard = @("no-sln", "sln", "tests")
     $domains = @{}
     foreach ($entry in $paramDefs.GetEnumerator()) {
         $domains[$entry.Key] = $entry.Value.values
