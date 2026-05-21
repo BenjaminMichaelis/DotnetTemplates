@@ -105,7 +105,7 @@ jobs:
         run: |
           $appHostProj = Get-ChildItem -Recurse -Filter "*.AppHost.csproj" | Select-Object -First 1
           if (-not $appHostProj) { throw "AppHost project not found" }
-          $manifestPath = Join-Path $appHostProj.DirectoryName "aspire-manifest.json"
+          $manifestPath = Join-Path (Get-Location).Path "aspire-manifest.json"
           dotnet run --project $appHostProj.FullName -- --publisher manifest --output-path $manifestPath
           if (-not (Test-Path $manifestPath)) {
             throw "Aspire manifest smoke check failed: $manifestPath was not created."
@@ -116,7 +116,9 @@ jobs:
         run: |
           $dockerfile = Get-ChildItem -Recurse -Filter "Dockerfile" | Select-Object -First 1
           if (-not $dockerfile) { throw "Dockerfile not found" }
-          docker build -f $dockerfile.FullName -t smoke:${{ matrix.variant }} (Resolve-Path .).Path
+          $contextDir = Split-Path -Parent $dockerfile.FullName
+          docker build -f $dockerfile.FullName -t smoke:${{ matrix.variant }} $contextDir
+          if ($LASTEXITCODE -ne 0) { throw "Docker build failed with exit code $LASTEXITCODE" }
 
       - name: Validate EF migrations
         if: ${{ matrix.hasEfMigrations == true }}
@@ -124,13 +126,14 @@ jobs:
           $appHostProj = Get-ChildItem -Recurse -Filter "*.AppHost.csproj" | Select-Object -First 1
           if (-not $appHostProj) { throw "AppHost project not found" }
           $efProjects = @(Get-ChildItem -Recurse -Filter "*.csproj" |
-            Where-Object { (Get-Content $_.FullName -Raw) -match "EntityFrameworkCore\.Design" })
-          if ($efProjects.Count -eq 0) { throw "No EF projects found" }
+            Where-Object { (Get-Content $_.FullName -Raw) -match "EntityFrameworkCore\.Design" } |
+            Sort-Object FullName -Unique)
+          if ($efProjects.Count -eq 0) { throw "No EF projects found despite hasEfMigrations flag" }
           dotnet tool restore
           foreach ($proj in $efProjects) {
             Write-Host "Checking EF migrations for $($proj.Name)"
             dotnet tool run dotnet-ef migrations has-pending-model-changes --configuration Release --project $proj.FullName --startup-project $appHostProj.FullName --no-build
-            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            if ($LASTEXITCODE -ne 0) { throw "EF validation failed for $($proj.Name)" }
           }
 
 

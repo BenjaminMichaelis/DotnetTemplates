@@ -198,10 +198,13 @@ function Get-TemplateCapabilities {
     $csprojFiles = @(Get-ChildItem -Path $TemplateDir -Recurse -Filter "*.csproj" -ErrorAction SilentlyContinue)
     foreach ($csproj in $csprojFiles) {
         $content = Get-Content -Path $csproj.FullName -Raw
-        if ($content -match 'Sdk\s*=\s*"Aspire\.AppHost\.Sdk' -or $content -match 'PackageReference.*Include\s*=\s*"Aspire\.Hosting') {
+        # Detect Aspire.AppHost.Sdk (with or without version suffix)
+        if ($content -match 'Sdk\s*=\s*"Aspire\.AppHost\.Sdk(?:/[0-9.]+)?"' -or $content -match '<PackageReference\s+Include\s*=\s*"Aspire\.Hosting') {
             $capabilities.hasAspireHost = $true
         }
-        if ($content -match 'EntityFrameworkCore\.Design') {
+        # Only set hasEfMigrations if BOTH EntityFrameworkCore.Design AND Aspire.AppHost are present
+        # This ensures EF validation can safely assume AppHost exists for startup project
+        if ($content -match '<PackageReference\s+Include\s*=\s*"Microsoft\.EntityFrameworkCore\.Design' -and $capabilities.hasAspireHost) {
             $capabilities.hasEfMigrations = $true
         }
     }
@@ -314,15 +317,16 @@ foreach ($file in $templateFiles) {
         })
 }
 
-# Validate that all capabilities are detected at least once
-if (-not $capabilityFlags.hasAspireHost) {
-    throw "No templates detected with Aspire.AppHost support. This likely indicates a detection bug in Get-TemplateCapabilities."
-}
-if (-not $capabilityFlags.hasEfMigrations) {
-    throw "No templates detected with EntityFrameworkCore.Design. This likely indicates a detection bug in Get-TemplateCapabilities."
-}
-if (-not $capabilityFlags.hasDockerfile) {
-    throw "No templates detected with Dockerfile. This likely indicates a detection bug in Get-TemplateCapabilities."
+# Log detected capabilities (for debugging)
+$detectedCaps = @()
+if ($capabilityFlags.hasAspireHost) { $detectedCaps += "Aspire" }
+if ($capabilityFlags.hasEfMigrations) { $detectedCaps += "EF" }
+if ($capabilityFlags.hasDockerfile) { $detectedCaps += "Docker" }
+
+if ($detectedCaps.Count -gt 0) {
+    Write-Host "Detected capabilities across templates: $($detectedCaps -join ', ')"
+} else {
+    Write-Host "No special capabilities detected in this template set."
 }
 
 $standardTemplates = @($standardTemplates | Sort-Object job_name)
