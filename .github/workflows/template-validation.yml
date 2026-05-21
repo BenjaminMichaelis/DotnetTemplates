@@ -141,7 +141,7 @@ jobs:
           dotnet tool restore
           foreach ($proj in $efProjects) {
             Write-Host "Checking EF migrations for $($proj.Name) with startup $($startupProj.Name)"
-            dotnet tool run dotnet-ef migrations has-pending-model-changes --configuration Release --project $proj.FullName --startup-project $startupProj.FullName --no-build
+            dotnet tool run dotnet-ef migrations has-pending-model-changes --project $proj.FullName --startup-project $startupProj.FullName --no-build
             if ($LASTEXITCODE -ne 0) { throw "EF validation failed for $($proj.Name)" }
           }
 
@@ -157,3 +157,4 @@ jobs:
           name: ${{ inputs.failed_playlist_artifact_prefix }}-${{ matrix.variant }}
           path: test-results/failed-tests.playlist
           if-no-files-found: ignore
+
