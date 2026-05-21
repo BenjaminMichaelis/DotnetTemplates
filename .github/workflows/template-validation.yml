@@ -15,6 +15,9 @@ on:
       variant_matrix_json:
         required: true
         type: string
+      global_json_file:
+        required: true
+        type: string
       warnings_as_errors_msbuild_args:
         required: false
         type: string
@@ -51,6 +54,8 @@ jobs:
 
       - name: Setup test environment
         uses: ./.github/actions/setup-template-test
+        with:
+          global-json-file: ${{ inputs.global_json_file }}
 
       - name: Validate template (${{ matrix.variant }})
         env:

@@ -15,6 +15,10 @@ Create a new app in your current directory by running.
  dotnet new bmichaelis.quickstart.benchmarkconsole
 ```
 
+## .NET SDK version
+
+This template includes a `global.json` file. To update the SDK version used by generated projects and CI validation, update `templates/Quickstart/BenchmarkApp/global.json`.
+
 ### Parameters
 
 - `--sln`: Include a legacy `.sln` file instead of the default `.slnx` file.

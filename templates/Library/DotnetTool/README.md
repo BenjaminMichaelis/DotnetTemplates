@@ -29,6 +29,10 @@ Create a new tool in your current directory by running:
 dotnet new bmichaelis.tool
 ```
 
+## .NET SDK version
+
+This template includes a `global.json` file. To update the SDK version used by generated projects and CI validation, update `templates/Library/DotnetTool/global.json`.
+
 ## Building and packing locally
 
 ```cli

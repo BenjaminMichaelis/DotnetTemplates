@@ -28,6 +28,10 @@ Both options together:
 > dotnet new bmichaelis.aspire.minimalapi --applicationInsights true --integrationTests true
 ```
 
+## .NET SDK version
+
+This template includes a `global.json` file. To update the SDK version used by generated projects and CI validation, update `templates/Aspire/MinimalApi/global.json`.
+
 ### Parameters
 
 [Default template options](https://learn.microsoft.com/dotnet/core/tools/dotnet-new#options)

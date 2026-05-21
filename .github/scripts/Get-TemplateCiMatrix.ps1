@@ -271,6 +271,12 @@ foreach ($file in $templateFiles) {
     $projectName = $sourceName
     $outputDirPrefix = "Test$sourceName"
     $artifactSuffix = $shortName.Replace("bmichaelis.", "").Replace(".", "-")
+    $templateRootPath = Split-Path -Path $file.DirectoryName -Parent
+    $globalJsonPath = Join-Path $templateRootPath "global.json"
+
+    if (-not (Test-Path -Path $globalJsonPath -PathType Leaf)) {
+        throw "Missing global.json for template '$shortName' at '$globalJsonPath'"
+    }
 
     $postBuildCommand = ""
     if ($shortName -eq "bmichaelis.quickstart.benchmarkconsole") {
@@ -286,6 +292,7 @@ foreach ($file in $templateFiles) {
             project_name = $projectName
             output_dir_prefix = $outputDirPrefix
             variant_matrix_json = (Get-CompactJson -Value @{ include = $variants })
+            global_json_file = $globalJsonPath.Replace('\', '/')
             post_build_command = $postBuildCommand
             pack_project = $packProject
             failed_playlist_artifact_prefix = "failed-tests-playlist-$artifactSuffix"

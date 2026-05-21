@@ -15,6 +15,10 @@ Create a new app in your current directory by running.
  dotnet new bmichaelis.quickstart.consoleapp
 ```
 
+## .NET SDK version
+
+This template includes a `global.json` file. To update the SDK version used by generated projects and CI validation, update `templates/Quickstart/ConsoleApp/global.json`.
+
 Source: 
 - [DotnetTemplates](https://github.com/BenjaminMichaelis/DotnetTemplates)
 - [NuGet](https://www.nuget.org/packages/BenjaminMichaelis.Dotnet.Templates)
