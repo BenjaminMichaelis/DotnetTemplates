@@ -123,16 +123,25 @@ jobs:
       - name: Validate EF migrations
         if: ${{ matrix.hasEfMigrations == true }}
         run: |
-          $appHostProj = Get-ChildItem -Recurse -Filter "*.AppHost.csproj" | Select-Object -First 1
-          if (-not $appHostProj) { throw "AppHost project not found" }
           $efProjects = @(Get-ChildItem -Recurse -Filter "*.csproj" |
             Where-Object { (Get-Content $_.FullName -Raw) -match "EntityFrameworkCore\.Design" } |
             Sort-Object FullName -Unique)
           if ($efProjects.Count -eq 0) { throw "No EF projects found despite hasEfMigrations flag" }
+          
+          # Try to find AppHost project first (for Aspire apps with EF)
+          $startupProj = Get-ChildItem -Recurse -Filter "*.AppHost.csproj" | Select-Object -First 1
+          
+          # If no AppHost, use the first EF project as startup
+          if (-not $startupProj) {
+            $startupProj = $efProjects[0]
+          }
+          
+          if (-not $startupProj) { throw "No startup project found for EF validation" }
+          
           dotnet tool restore
           foreach ($proj in $efProjects) {
-            Write-Host "Checking EF migrations for $($proj.Name)"
-            dotnet tool run dotnet-ef migrations has-pending-model-changes --configuration Release --project $proj.FullName --startup-project $appHostProj.FullName --no-build
+            Write-Host "Checking EF migrations for $($proj.Name) with startup $($startupProj.Name)"
+            dotnet tool run dotnet-ef migrations has-pending-model-changes --configuration Release --project $proj.FullName --startup-project $startupProj.FullName --no-build
             if ($LASTEXITCODE -ne 0) { throw "EF validation failed for $($proj.Name)" }
           }
 

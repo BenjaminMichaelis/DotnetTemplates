@@ -202,9 +202,8 @@ function Get-TemplateCapabilities {
         if ($content -match 'Sdk\s*=\s*"Aspire\.AppHost\.Sdk(?:/[0-9.]+)?"' -or $content -match '<PackageReference\s+Include\s*=\s*"Aspire\.Hosting') {
             $capabilities.hasAspireHost = $true
         }
-        # Only set hasEfMigrations if BOTH EntityFrameworkCore.Design AND Aspire.AppHost are present
-        # This ensures EF validation can safely assume AppHost exists for startup project
-        if ($content -match '<PackageReference\s+Include\s*=\s*"Microsoft\.EntityFrameworkCore\.Design' -and $capabilities.hasAspireHost) {
+        # Detect EntityFrameworkCore.Design independently of Aspire
+        if ($content -match '<PackageReference\s+Include\s*=\s*"Microsoft\.EntityFrameworkCore\.Design') {
             $capabilities.hasEfMigrations = $true
         }
     }
