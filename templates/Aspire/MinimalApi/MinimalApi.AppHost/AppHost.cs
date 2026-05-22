@@ -72,6 +72,7 @@ var backend = builder.AddProject<Projects.MinimalApi>("MinimalApi-backend")
 if (!builder.ExecutionContext.IsPublishMode)
 {
     backend.WithEnvironment("ASPNETCORE_ENVIRONMENT", "Development");
+    backend.WithEnvironment("DOTNET_ENVIRONMENT", "Development");
 }
 
 // Mark endpoints as external only during publish (Azure Container Apps deployment).
