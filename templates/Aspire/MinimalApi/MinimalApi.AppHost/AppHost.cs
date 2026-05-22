@@ -67,6 +67,7 @@ else
 var backend = builder.AddProject<Projects.MinimalApi>("MinimalApi-backend")
     .WithDependency(db, ConnectionStrings.DatabaseKey)
     .WithEnvironment("Auth__SigningKey", authSigningKey)
+    .WithHttpHealthCheck("/health")
     .PublishAsAzureContainerApp((infra, app) => app.Template.Scale.MaxReplicas = 1);
 
 // Mark endpoints as external only during publish (Azure Container Apps deployment).
