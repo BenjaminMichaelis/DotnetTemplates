@@ -132,7 +132,7 @@ jobs:
         working-directory: ${{ inputs.output_dir_prefix }}-${{ matrix.variant }}
         run: |
           $efProjects = @(Get-ChildItem -Recurse -Filter "*.csproj" |
-            Where-Object { (Get-Content $_.FullName -Raw) -match "EntityFrameworkCore\.Design" } |
+            Where-Object { (Get-Content $_.FullName -Raw) -match "EntityFrameworkCore\.Design" -and (Test-Path (Join-Path $_.DirectoryName "Migrations")) } |
             Sort-Object FullName -Unique)
           if ($efProjects.Count -eq 0) { throw "No EF projects found despite hasEfMigrations flag" }
           

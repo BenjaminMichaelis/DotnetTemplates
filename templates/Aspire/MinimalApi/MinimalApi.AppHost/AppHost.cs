@@ -15,6 +15,7 @@ builder.AddMUIDocs().WithParentRelationship(docsGroup);
 var authSigningKey = builder.AddParameter("auth-signing-key", secret: true);
 
 IResourceBuilder<IResourceWithConnectionString> db;
+IResourceBuilder<SqlServerServerResource>? sql = null;
 
 //#if (applicationInsights)
 // Application Insights is provisioned by Aspire in Azure and the connection string is
@@ -32,7 +33,7 @@ if (builder.ExecutionContext.IsPublishMode)
 }
 else
 {
-    var sql = builder.AddSqlServer();
+    sql = builder.AddSqlServer();
     db = sql.AddSqlDatabase();
 
     var disableDbGate = string.Equals(
@@ -75,6 +76,11 @@ var backendMigrations = backend
     .RunDatabaseUpdateOnStart()
     .PublishAsMigrationScript()
     .PublishAsMigrationBundle();
+
+if (sql is not null)
+{
+    backendMigrations.WaitFor(sql);
+}
 
 backend.WaitForCompletion(backendMigrations);
 
