@@ -21,4 +21,16 @@ public class AppFixture : AspireFixture<Projects.MinimalApi_AppHost>
     /// Adjust this based on your infrastructure startup time.
     /// </summary>
     protected override TimeSpan ResourceTimeout => TimeSpan.FromMinutes(2);
+
+    /// <summary>
+    /// Only wait for the SQL server and API backend to be healthy.
+    /// The migration resource (MinimalApi-backend-migrations) is a one-shot resource that
+    /// transitions to Finished (not Healthy) on success. Waiting for it to be healthy would
+    /// always fail. The backend already waits for the migration to complete via
+    /// WaitForCompletion, so if migration fails the backend will not become healthy either.
+    /// </summary>
+    protected override ResourceWaitBehavior WaitBehavior => ResourceWaitBehavior.Named;
+
+    protected override IEnumerable<string> ResourcesToWaitFor() =>
+        ["MinimalApi-sql", "MinimalApi-backend"];
 }
