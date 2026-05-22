@@ -69,6 +69,11 @@ var backend = builder.AddProject<Projects.MinimalApi>("MinimalApi-backend")
     .WithEnvironment("Auth__SigningKey", authSigningKey)
     .PublishAsAzureContainerApp((infra, app) => app.Template.Scale.MaxReplicas = 1);
 
+if (!builder.ExecutionContext.IsPublishMode)
+{
+    backend.WithEnvironment("ASPNETCORE_ENVIRONMENT", "Development");
+}
+
 // Mark endpoints as external only during publish (Azure Container Apps deployment).
 // In run/test mode, Aspire's internal proxy handles routing. Calling
 // WithExternalHttpEndpoints() unconditionally causes the ef-tool to inherit
