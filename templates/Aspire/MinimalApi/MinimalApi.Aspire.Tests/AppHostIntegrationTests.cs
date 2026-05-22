@@ -1,3 +1,5 @@
+using Aspire.Hosting.Testing;
+
 using TUnit.Aspire;
 
 namespace MinimalApi.Aspire.Tests;
@@ -28,8 +30,23 @@ public class AppHostIntegrationTests(AppFixture fixture)
     [Test]
     public async Task ApiHealthCheckReturnsOk()
     {
-        var httpClient = fixture.CreateHttpClient("MinimalApi-backend", "http");
+        var endpoint = fixture.App.GetEndpoint("MinimalApi-backend", "http");
+        await Assert.That(endpoint).IsNotNull();
+
+        Console.WriteLine($"MinimalApi-backend http endpoint: {endpoint}");
+
+        using var httpClient = new HttpClient(new HttpClientHandler
+        {
+            AllowAutoRedirect = false
+        })
+        {
+            BaseAddress = endpoint,
+            Timeout = TimeSpan.FromSeconds(30)
+        };
+
         var response = await httpClient.GetAsync("/health");
+        Console.WriteLine($"GET /health returned {(int)response.StatusCode} {response.StatusCode}");
+
         await Assert.That(response.StatusCode).IsEqualTo(System.Net.HttpStatusCode.OK);
     }
 }
