@@ -7,7 +7,7 @@ using MinimalApi.Data;
 
 using Moq.AutoMock.Resolvers;
 
-namespace MinimalApi.Tests;
+namespace MinimalApi.Core.Tests;
 
 public static class AutoMockerExtensions
 {

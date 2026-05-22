@@ -66,7 +66,7 @@ jobs:
 
           $hasSln = Test-Path "$projectName.sln"
           $hasSlnx = Test-Path "$projectName.slnx"
-          $hasTests = Test-Path "$projectName.Tests/$projectName.Tests.csproj"
+          $hasTests = (@(Get-ChildItem -Recurse -Filter "*.Tests.csproj")).Count -gt 0
 
           if ([bool]::Parse("${{ matrix.expectSln }}") -ne $hasSln) { throw "Unexpected .sln file presence: $hasSln" }
           if ([bool]::Parse("${{ matrix.expectSlnx }}") -ne $hasSlnx) { throw "Unexpected .slnx file presence: $hasSlnx" }
@@ -84,7 +84,8 @@ jobs:
             if ($solutionPath) {
               dotnet test $solutionPath ${{ inputs.warnings_as_errors_msbuild_args }} --no-build --results-directory trx-data ${{ matrix.reportTrxArgs }}
             } else {
-              dotnet test "$projectName.Tests/$projectName.Tests.csproj" ${{ inputs.warnings_as_errors_msbuild_args }} --results-directory trx-data ${{ matrix.reportTrxArgs }}
+              $testProj = Get-ChildItem -Recurse -Filter "*.Tests.csproj" | Select-Object -First 1
+              dotnet test $testProj.FullName ${{ inputs.warnings_as_errors_msbuild_args }} --results-directory trx-data ${{ matrix.reportTrxArgs }}
             }
           } else {
             dotnet build "$projectName/$projectName.csproj" ${{ inputs.warnings_as_errors_msbuild_args }}

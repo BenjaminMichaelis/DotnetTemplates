@@ -1,4 +1,4 @@
-namespace MinimalApi.Tests.Data;
+namespace MinimalApi.Core.Tests.Data;
 
 public class DataGenerator : DataSourceGeneratorAttribute<int, int, int>
 {

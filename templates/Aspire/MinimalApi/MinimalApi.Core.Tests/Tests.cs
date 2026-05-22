@@ -1,6 +1,6 @@
-using MinimalApi.Tests.Data;
+using MinimalApi.Core.Tests.Data;
 
-namespace MinimalApi.Tests;
+namespace MinimalApi.Core.Tests;
 
 public class Tests
 {

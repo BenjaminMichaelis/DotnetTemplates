@@ -1,6 +1,6 @@
 using TUnit.Core.Interfaces;
 
-namespace MinimalApi.Tests;
+namespace MinimalApi.Core.Tests;
 
 public class DataClass : IAsyncInitializer, IAsyncDisposable
 {

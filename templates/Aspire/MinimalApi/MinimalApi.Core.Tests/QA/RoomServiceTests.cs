@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 using MinimalApi.Core.QA;
 
-namespace MinimalApi.Tests.QA;
+namespace MinimalApi.Core.Tests.QA;
 
 public class RoomServiceTests : ServiceTestsBase
 {

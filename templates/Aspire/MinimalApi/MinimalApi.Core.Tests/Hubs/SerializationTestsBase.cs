@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace MinimalApi.Tests.Hubs;
+namespace MinimalApi.Core.Tests.Hubs;
 
 public abstract class SerializationTestsBase<TDto>
     where TDto : class, new()
