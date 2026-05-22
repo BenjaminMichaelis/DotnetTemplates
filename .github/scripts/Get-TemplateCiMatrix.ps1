@@ -165,10 +165,7 @@ function New-StandardVariant {
         $variantName = "default"
     }
 
-    # For Aspire templates with integrationTests parameter, only expect tests when integrationTests=true
-    $hasIntegrationTestsParam = $Combo.ContainsKey("integrationTests")
-    $integrationTests = if ($hasIntegrationTestsParam) { [bool]$Combo["integrationTests"] } else { $false }
-    $shouldExpectTests = ($tests -ne "None") -and (-not $hasIntegrationTestsParam -or $integrationTests)
+    $shouldExpectTests = ($tests -ne "None")
 
     $result = [ordered]@{
         variant = $variantName
