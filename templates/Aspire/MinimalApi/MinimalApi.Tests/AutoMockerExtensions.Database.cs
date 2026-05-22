@@ -9,7 +9,7 @@ using Moq.AutoMock.Resolvers;
 
 namespace MinimalApi.Tests;
 
-public static partial class AutoMockerExtensions
+public static class AutoMockerExtensions
 {
     extension(AutoMocker mocker)
     {
