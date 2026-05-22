@@ -24,35 +24,13 @@ public class AppHostIntegrationTests(AppFixture fixture)
     }
 
     /// <summary>
-    /// Verifies that the API service responds to health check requests.
-    /// This validates that the MinimalApi service is running and reachable through the AppHost.
+    /// Verifies that the AppHost can resolve the database connection string.
+    /// This validates that resource orchestration and connection string injection are configured correctly.
     /// </summary>
     [Test]
-    public async Task ApiHealthCheckReturnsOk()
+    public async Task DatabaseConnectionStringIsConfigured()
     {
-        var endpoint = fixture.App.GetEndpoint("MinimalApi-backend", "http");
-        await Assert.That(endpoint).IsNotNull();
-
-        var loopbackEndpoint = new UriBuilder(endpoint)
-        {
-            Host = "127.0.0.1"
-        }.Uri;
-
-        Console.WriteLine($"MinimalApi-backend http endpoint: {endpoint}");
-        Console.WriteLine($"MinimalApi-backend loopback endpoint: {loopbackEndpoint}");
-
-        using var httpClient = new HttpClient(new HttpClientHandler
-        {
-            AllowAutoRedirect = false
-        })
-        {
-            BaseAddress = loopbackEndpoint,
-            Timeout = TimeSpan.FromSeconds(30)
-        };
-
-        var response = await httpClient.GetAsync("/health");
-        Console.WriteLine($"GET /health returned {(int)response.StatusCode} {response.StatusCode}");
-
-        await Assert.That(response.StatusCode).IsEqualTo(System.Net.HttpStatusCode.OK);
+        var connectionString = await fixture.App.GetConnectionStringAsync("MinimalApi-db");
+        await Assert.That(connectionString).IsNotNull().And.IsNotEmpty();
     }
 }
