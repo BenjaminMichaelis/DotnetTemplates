@@ -81,7 +81,11 @@ jobs:
           }
 
           if ($hasTests) {
-            dotnet test "$projectName.Tests/$projectName.Tests.csproj" ${{ inputs.warnings_as_errors_msbuild_args }} --results-directory trx-data ${{ matrix.reportTrxArgs }}
+            if ($solutionPath) {
+              dotnet test $solutionPath ${{ inputs.warnings_as_errors_msbuild_args }} --no-build --results-directory trx-data ${{ matrix.reportTrxArgs }}
+            } else {
+              dotnet test "$projectName.Tests/$projectName.Tests.csproj" ${{ inputs.warnings_as_errors_msbuild_args }} --results-directory trx-data ${{ matrix.reportTrxArgs }}
+            }
           } else {
             dotnet build "$projectName/$projectName.csproj" ${{ inputs.warnings_as_errors_msbuild_args }}
           }
