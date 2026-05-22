@@ -67,8 +67,17 @@ else
 var backend = builder.AddProject<Projects.MinimalApi>("MinimalApi-backend")
     .WithDependency(db, ConnectionStrings.DatabaseKey)
     .WithEnvironment("Auth__SigningKey", authSigningKey)
-    .WithExternalHttpEndpoints()
     .PublishAsAzureContainerApp((infra, app) => app.Template.Scale.MaxReplicas = 1);
+
+// Mark endpoints as external only during publish (Azure Container Apps deployment).
+// In run/test mode, Aspire's internal proxy handles routing. Calling
+// WithExternalHttpEndpoints() unconditionally causes the ef-tool to inherit
+// an ASPNETCORE_URLS that references MinimalApi-backend-https, which the
+// ef-tool doesn't produce, causing DCP substitution failures.
+if (builder.ExecutionContext.IsPublishMode)
+{
+    backend.WithExternalHttpEndpoints();
+}
 
 var backendMigrations = backend
     .AddEFMigrations("MinimalApi-backend-migrations", "MinimalApi.Data.ApplicationDbContext")
