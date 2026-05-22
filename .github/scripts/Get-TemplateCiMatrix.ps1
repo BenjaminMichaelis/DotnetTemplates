@@ -305,7 +305,7 @@ foreach ($file in $templateFiles) {
         $postBuildCommand = "benchmark-run"
     }
 
-    $packProject = $shortName -ne "bmichaelis.tool"
+    $packProject = $shortName -in @("bmichaelis.nuget", "bmichaelis.quickstart.consoleapp", "bmichaelis.quickstart.benchmarkconsole")
     $jobName = $shortName.Replace("bmichaelis.", "")
 
     $standardTemplates += @([ordered]@{
