@@ -11,41 +11,43 @@ namespace MinimalApi.Core;
 
 public static class DependencyInjection
 {
-    public static TBuilder AddDatabase<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
+    extension<TBuilder>(TBuilder builder) where TBuilder : IHostApplicationBuilder
     {
-        var connectionString = builder.Configuration.GetConnectionString(ConnectionStrings.DatabaseKey)
-            ?? throw new InvalidOperationException($"Connection string '{ConnectionStrings.DatabaseKey}' not found.");
-
-        void BuildDbOptions(DbContextOptionsBuilder options)
+        public TBuilder AddDatabase()
         {
-            options.UseAzureSql(connectionString);
+            var connectionString = builder.Configuration.GetConnectionString(ConnectionStrings.DatabaseKey)
+                ?? throw new InvalidOperationException($"Connection string '{ConnectionStrings.DatabaseKey}' not found.");
+
+            void BuildDbOptions(DbContextOptionsBuilder options)
+            {
+                options.UseAzureSql(connectionString);
+            }
+            builder.Services.AddDbContextFactory<ApplicationDbContext>(BuildDbOptions);
+            builder.Services.AddDbContextPool<ApplicationDbContext>(BuildDbOptions);
+
+            if (builder.Environment.IsDevelopment())
+            {
+                builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+            }
+
+            builder.Services.AddIdentityCore<ApplicationUser>(options =>
+            {
+                options.SignIn.RequireConfirmedAccount = true;
+                options.Stores.SchemaVersion = IdentitySchemaVersions.Version3;
+            })
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddSignInManager()
+            .AddDefaultTokenProviders();
+
+            return builder;
         }
-        builder.Services.AddDbContextFactory<ApplicationDbContext>(BuildDbOptions);
-        builder.Services.AddDbContextPool<ApplicationDbContext>(BuildDbOptions);
 
-        if (builder.Environment.IsDevelopment())
+        public TBuilder AddQAServices()
         {
-            builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+            builder.Services.AddScoped<IRoomService, RoomService>();
+            builder.Services.AddScoped<IQuestionService, QuestionService>();
+
+            return builder;
         }
-
-        builder.Services.AddIdentityCore<ApplicationUser>(options =>
-        {
-            options.SignIn.RequireConfirmedAccount = true;
-            options.Stores.SchemaVersion = IdentitySchemaVersions.Version3;
-        })
-        .AddEntityFrameworkStores<ApplicationDbContext>()
-        .AddSignInManager()
-        .AddDefaultTokenProviders();
-
-        return builder;
     }
-
-    public static TBuilder AddQAServices<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
-    {
-        builder.Services.AddScoped<IRoomService, RoomService>();
-        builder.Services.AddScoped<IQuestionService, QuestionService>();
-
-        return builder;
-    }
-
 }
