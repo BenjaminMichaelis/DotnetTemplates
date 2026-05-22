@@ -80,7 +80,10 @@ if (builder.ExecutionContext.IsPublishMode)
 }
 
 var backendMigrations = backend
-    .AddEFMigrations("MinimalApi-backend-migrations", "MinimalApi.Data.ApplicationDbContext")
+    .AddEFMigrations(
+        "MinimalApi-backend-migrations",
+        "MinimalApi.Data.ApplicationDbContext",
+        efTool => efTool.WithEnvironment("ASPNETCORE_URLS", string.Empty))
     .WithMigrationsProject("../MinimalApi.Data/MinimalApi.Data.csproj")
     .RunDatabaseUpdateOnStart()
     .PublishAsMigrationScript()

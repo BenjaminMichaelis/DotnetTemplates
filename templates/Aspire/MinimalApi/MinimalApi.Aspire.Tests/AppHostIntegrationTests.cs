@@ -28,7 +28,7 @@ public class AppHostIntegrationTests(AppFixture fixture)
     [Test]
     public async Task ApiHealthCheckReturnsOk()
     {
-        var httpClient = fixture.CreateHttpClient("MinimalApi-backend");
+        var httpClient = fixture.CreateHttpClient("MinimalApi-backend", "http");
         var response = await httpClient.GetAsync("/health");
         await Assert.That(response.StatusCode).IsEqualTo(System.Net.HttpStatusCode.OK);
     }
