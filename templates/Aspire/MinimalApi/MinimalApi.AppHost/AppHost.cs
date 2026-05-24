@@ -64,29 +64,42 @@ else
     }
 }
 
-var backend = builder.AddProject<Projects.MinimalApi>("MinimalApi-backend")
-    .WithDependency(db, ConnectionStrings.DatabaseKey)
-    .WithEnvironment("Auth__SigningKey", authSigningKey)
+var backend = builder.AddProject<Projects.MinimalApi>(
+        "MinimalApi-backend",
+        options => options.ExcludeLaunchProfile = true)
+    .WaitFor(db)
     .PublishAsAzureContainerApp((infra, app) => app.Template.Scale.MaxReplicas = 1);
-
-if (!builder.ExecutionContext.IsPublishMode)
-{
-    backend.WithEnvironment("ASPNETCORE_ENVIRONMENT", "Development");
-    backend.WithEnvironment("DOTNET_ENVIRONMENT", "Development");
-}
 
 var backendMigrations = backend
     .AddEFMigrations(
         "MinimalApi-backend-migrations",
-        "MinimalApi.Data.ApplicationDbContext",
-        efTool => efTool.WithEnvironment("ASPNETCORE_URLS", string.Empty))
+        "MinimalApi.Data.ApplicationDbContext")
     .WithMigrationsProject("../MinimalApi.Data/MinimalApi.Data.csproj")
     .RunDatabaseUpdateOnStart()
     .PublishAsMigrationScript()
     .PublishAsMigrationBundle();
 
-// Keep external endpoint configuration after AddEFMigrations so the EF tool does not
-// inherit backend endpoint substitutions that it cannot produce.
+backend.WithEnvironment("Auth__SigningKey", authSigningKey);
+
+if (!builder.ExecutionContext.IsPublishMode)
+{
+    backend.WithEnvironment("ASPNETCORE_ENVIRONMENT", "Development");
+    backend.WithEnvironment("DOTNET_ENVIRONMENT", "Development");
+    backend.WithEnvironment(async context =>
+    {
+        context.EnvironmentVariables[$"ConnectionStrings__{ConnectionStrings.DatabaseKey}"] =
+            await db.Resource.GetConnectionStringAsync(context.CancellationToken)
+            ?? throw new InvalidOperationException($"Connection string '{ConnectionStrings.DatabaseKey}' could not be resolved.");
+    });
+}
+else
+{
+    backend.WithEnvironment($"ConnectionStrings__{ConnectionStrings.DatabaseKey}", db);
+}
+
+backend.WithHttpEndpoint(port: 5285, targetPort: 5285, name: "http", env: "ASPNETCORE_HTTP_PORTS", isProxied: false);
+backend.WithHttpHealthCheck("/alive");
+
 if (builder.ExecutionContext.IsPublishMode)
 {
     backend.WithExternalHttpEndpoints();

@@ -13,14 +13,17 @@ namespace MinimalApi.Aspire.Tests;
 public class AppHostIntegrationTests(AppFixture fixture)
 {
     /// <summary>
-    /// Verifies that the AppHost builds and starts successfully.
-    /// This is a smoke test that ensures all resources are orchestrated correctly.
+    /// Verifies that the backend is reachable through Aspire orchestration.
+    /// The liveness endpoint proves HTTP reachability without coupling the test to database readiness checks.
     /// </summary>
     [Test]
-    public async Task AppHostStartsSuccessfully()
+    public async Task BackendAliveEndpointReturnsSuccess()
     {
-        var app = fixture.App;
-        await Assert.That(app).IsNotNull();
+        using var client = fixture.CreateHttpClient("MinimalApi-backend", "http");
+
+        using var response = await client.GetAsync("/alive");
+
+        await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.OK);
     }
 
     /// <summary>

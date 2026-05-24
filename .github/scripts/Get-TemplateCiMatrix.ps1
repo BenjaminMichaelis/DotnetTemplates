@@ -186,6 +186,102 @@ function New-StandardVariant {
     return $result
 }
 
+function Test-TruthyMsBuildValue {
+    param([object]$Value)
+
+    if ($null -eq $Value) {
+        return $false
+    }
+
+    return ([string]$Value).Trim().Equals("true", [System.StringComparison]::OrdinalIgnoreCase)
+}
+
+function Test-FalsyMsBuildValue {
+    param([object]$Value)
+
+    if ($null -eq $Value) {
+        return $false
+    }
+
+    return ([string]$Value).Trim().Equals("false", [System.StringComparison]::OrdinalIgnoreCase)
+}
+
+function Get-MsBuildPropertyValues {
+    param(
+        [xml]$ProjectXml,
+        [string]$PropertyName
+    )
+
+    $values = @()
+    foreach ($propertyGroup in @($ProjectXml.Project.PropertyGroup)) {
+        if ($null -eq $propertyGroup) {
+            continue
+        }
+
+        foreach ($property in @($propertyGroup.SelectNodes($PropertyName))) {
+            if ($null -ne $property) {
+                $values += @([string]$property.InnerText)
+            }
+        }
+    }
+
+    return $values
+}
+
+function Test-TemplatePrimaryProjectPackable {
+    param(
+        [string]$TemplateDir,
+        [string]$SourceName
+    )
+
+    if ([string]::IsNullOrWhiteSpace($SourceName)) {
+        $SourceName = "Template"
+    }
+
+    $primaryProject = Join-Path (Join-Path $TemplateDir $SourceName) "$SourceName.csproj"
+    if (-not (Test-Path -Path $primaryProject -PathType Leaf)) {
+        return $false
+    }
+
+    [xml]$projectXml = Get-Content -Path $primaryProject -Raw
+    $sdk = [string]$projectXml.Project.GetAttribute("Sdk")
+
+    $isPackableValues = @(Get-MsBuildPropertyValues -ProjectXml $projectXml -PropertyName "IsPackable")
+    if ($isPackableValues | Where-Object { Test-FalsyMsBuildValue -Value $_ }) {
+        return $false
+    }
+
+    $packAsToolValues = @(Get-MsBuildPropertyValues -ProjectXml $projectXml -PropertyName "PackAsTool")
+    if ($packAsToolValues | Where-Object { Test-TruthyMsBuildValue -Value $_ }) {
+        $runtimeIdentifierValues = @(
+            Get-MsBuildPropertyValues -ProjectXml $projectXml -PropertyName "RuntimeIdentifier"
+            Get-MsBuildPropertyValues -ProjectXml $projectXml -PropertyName "RuntimeIdentifiers"
+            Get-MsBuildPropertyValues -ProjectXml $projectXml -PropertyName "ToolPackageRuntimeIdentifiers"
+        )
+
+        if ($runtimeIdentifierValues | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }) {
+            return $false
+        }
+
+        return $true
+    }
+
+    if ($isPackableValues | Where-Object { Test-TruthyMsBuildValue -Value $_ }) {
+        return $true
+    }
+
+    if ($sdk -match '(^|;)Aspire\.AppHost\.Sdk($|/|;)' -or $sdk -match '(^|;)Microsoft\.NET\.Sdk\.Web($|/|;)') {
+        return $false
+    }
+
+    $outputTypeValues = @(Get-MsBuildPropertyValues -ProjectXml $projectXml -PropertyName "OutputType")
+    if ($outputTypeValues | Where-Object { $_.Trim() -in @("Exe", "WinExe") }) {
+        return $false
+    }
+
+    return ($sdk -match '(^|;)Microsoft\.NET\.Sdk($|/|;)')
+}
+
 function Get-TemplateCapabilities {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '')]
     [CmdletBinding()]
@@ -302,7 +398,7 @@ foreach ($file in $templateFiles) {
         $postBuildCommand = "benchmark-run"
     }
 
-    $packProject = $shortName -in @("bmichaelis.nuget", "bmichaelis.quickstart.consoleapp", "bmichaelis.quickstart.benchmarkconsole")
+    $packProject = Test-TemplatePrimaryProjectPackable -TemplateDir $templateDir -SourceName $sourceName
     $jobName = $shortName.Replace("bmichaelis.", "")
 
     $standardTemplates += @([ordered]@{

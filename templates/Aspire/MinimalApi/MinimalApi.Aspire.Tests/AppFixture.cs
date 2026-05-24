@@ -20,7 +20,7 @@ public class AppFixture : AspireFixture<Projects.MinimalApi_AppHost>
     /// Timeout for waiting on resources to become healthy.
     /// Adjust this based on your infrastructure startup time.
     /// </summary>
-    protected override TimeSpan ResourceTimeout => TimeSpan.FromMinutes(2);
+    protected override TimeSpan ResourceTimeout => TimeSpan.FromMinutes(5);
 
     /// <summary>
     /// Only wait for the SQL server and API backend to be healthy.
