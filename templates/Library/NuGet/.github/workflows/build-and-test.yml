@@ -61,7 +61,7 @@ jobs:
         run: dotnet build -p:ContinuousIntegrationBuild=True --no-restore --configuration Release
   
       - name: Enable Automated Test Report Artifact Upload
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env['ACTIONS_RUNTIME_TOKEN']);
