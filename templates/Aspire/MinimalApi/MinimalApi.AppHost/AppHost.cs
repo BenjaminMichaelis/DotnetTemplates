@@ -11,7 +11,6 @@ builder.AddAzureContainerAppEnvironment("MinimalApi-cae");
 
 var docsGroup = builder.AddLogicalGroup("docs");
 builder.AddAspireDocs().WithParentRelationship(docsGroup);
-builder.AddMUIDocs().WithParentRelationship(docsGroup);
 var authSigningKey = builder.AddParameter("auth-signing-key", secret: true);
 
 IResourceBuilder<IResourceWithConnectionString> db;
