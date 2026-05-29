@@ -110,6 +110,7 @@ jobs:
       project_name: ${{ matrix.template.project_name }}
       output_dir_prefix: ${{ matrix.template.output_dir_prefix }}
       variant_matrix_json: ${{ matrix.template.variant_matrix_json }}
+      global_json_file: ${{ matrix.template.global_json_file }}
       warnings_as_errors_msbuild_args: -p:CodeAnalysisTreatWarningsAsErrors=true -p:TreatWarningsAsErrors=true -p:MSBuildTreatWarningsAsErrors=true
       post_build_command: ${{ matrix.template.post_build_command }}
       pack_project: ${{ matrix.template.pack_project }}
@@ -128,6 +129,8 @@ jobs:
 
       - name: Setup test environment
         uses: ./.github/actions/setup-template-test
+        with:
+          global-json-file: ${{ matrix.global_json_file }}
 
       - name: Test Template (${{ matrix.variant }})
         run: |
@@ -175,4 +178,3 @@ jobs:
           if ("${{ contains(needs.*.result, 'failure') }}" -eq "true" -or "${{ contains(needs.*.result, 'cancelled') }}" -eq "true" -or "${{ contains(needs.*.result, 'skipped') }}" -eq "true") {
             throw "One or more required jobs failed, were cancelled, or were skipped"
           }
-
