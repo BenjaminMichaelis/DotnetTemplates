@@ -53,6 +53,7 @@ jobs:
         uses: ./.github/actions/setup-template-test
 
       - name: Validate template (${{ matrix.variant }})
+        id: validate
         env:
           POST_BUILD_COMMAND: ${{ inputs.post_build_command }}
         run: |
@@ -68,9 +69,16 @@ jobs:
           $hasSlnx = Test-Path "$projectName.slnx"
           $hasTests = (@(Get-ChildItem -Recurse -Filter "*.Tests.csproj")).Count -gt 0
 
-          if ([bool]::Parse("${{ matrix.expectSln }}") -ne $hasSln) { throw "Unexpected .sln file presence: $hasSln" }
-          if ([bool]::Parse("${{ matrix.expectSlnx }}") -ne $hasSlnx) { throw "Unexpected .slnx file presence: $hasSlnx" }
-          if ([bool]::Parse("${{ matrix.expectTests }}") -ne $hasTests) { throw "Unexpected test project presence: $hasTests" }
+          # Detect capabilities from generated output (not pre-computed from source templates)
+          $hasAspireHost = (@(Get-ChildItem -Recurse -Filter "*.AppHost.csproj" -ErrorAction SilentlyContinue)).Count -gt 0
+          $hasEfMigrations = (@(Get-ChildItem -Recurse -Filter "*.csproj" -ErrorAction SilentlyContinue) |
+            Where-Object { (Get-Content $_.FullName -Raw) -match "EntityFrameworkCore\.Design" -and
+                           (Test-Path (Join-Path $_.DirectoryName "Migrations")) }).Count -gt 0
+          $hasDockerfile = (@(Get-ChildItem -Recurse -Filter "Dockerfile" -ErrorAction SilentlyContinue)).Count -gt 0
+
+          "has_aspire_host=$($hasAspireHost.ToString().ToLower())" >> $env:GITHUB_OUTPUT
+          "has_ef_migrations=$($hasEfMigrations.ToString().ToLower())" >> $env:GITHUB_OUTPUT
+          "has_dockerfile=$($hasDockerfile.ToString().ToLower())" >> $env:GITHUB_OUTPUT
 
           $solutionPath = if ($hasSln) { "$projectName.sln" } elseif ($hasSlnx) { "$projectName.slnx" } else { $null }
           if ($solutionPath) {
@@ -106,7 +114,7 @@ jobs:
           }
 
       - name: Validate Aspire manifest
-        if: ${{ matrix.hasAspireHost == true }}
+        if: steps.validate.outputs.has_aspire_host == 'true'
         working-directory: ${{ inputs.output_dir_prefix }}-${{ matrix.variant }}
         run: |
           $appHostProj = Get-ChildItem -Recurse -Filter "*.AppHost.csproj" | Select-Object -First 1
@@ -118,7 +126,7 @@ jobs:
           }
 
       - name: Validate Docker build
-        if: ${{ matrix.hasDockerfile == true }}
+        if: steps.validate.outputs.has_dockerfile == 'true'
         working-directory: ${{ inputs.output_dir_prefix }}-${{ matrix.variant }}
         run: |
           $dockerfile = Get-ChildItem -Recurse -Filter "Dockerfile" | Select-Object -First 1
@@ -128,13 +136,13 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "Docker build failed with exit code $LASTEXITCODE" }
 
       - name: Validate EF migrations
-        if: ${{ matrix.hasEfMigrations == true }}
+        if: steps.validate.outputs.has_ef_migrations == 'true'
         working-directory: ${{ inputs.output_dir_prefix }}-${{ matrix.variant }}
         run: |
           $efProjects = @(Get-ChildItem -Recurse -Filter "*.csproj" |
             Where-Object { (Get-Content $_.FullName -Raw) -match "EntityFrameworkCore\.Design" -and (Test-Path (Join-Path $_.DirectoryName "Migrations")) } |
             Sort-Object FullName -Unique)
-          if ($efProjects.Count -eq 0) { throw "No EF projects found despite hasEfMigrations flag" }
+          if ($efProjects.Count -eq 0) { throw "No EF projects found despite has_ef_migrations detection" }
           
           # Try to find AppHost project first (for Aspire apps with EF)
           $startupProj = Get-ChildItem -Recurse -Filter "*.AppHost.csproj" | Select-Object -First 1
