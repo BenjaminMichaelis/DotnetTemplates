@@ -31,3 +31,5 @@ public abstract class SerializationTestsBase<TDto>
         await AssertAreEqual(dto, deserializedDto!);
     }
 }
+
+

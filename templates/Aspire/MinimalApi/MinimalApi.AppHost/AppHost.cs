@@ -14,6 +14,7 @@ builder.AddAspireDocs().WithParentRelationship(docsGroup);
 var authSigningKey = builder.AddParameter("auth-signing-key", secret: true);
 
 IResourceBuilder<IResourceWithConnectionString> db;
+IResourceBuilder<SqlServerServerResource>? sql = null;
 
 //#if (applicationInsights)
 // Application Insights is provisioned by Aspire in Azure and the connection string is
@@ -31,7 +32,7 @@ if (builder.ExecutionContext.IsPublishMode)
 }
 else
 {
-    var sql = builder.AddSqlServer();
+    sql = builder.AddSqlServer();
     db = sql.AddSqlDatabase();
 
     var disableDbGate = string.Equals(
@@ -62,18 +63,51 @@ else
     }
 }
 
-var backend = builder.AddProject<Projects.MinimalApi>("MinimalApi-backend")
-    .WithDependency(db, ConnectionStrings.DatabaseKey)
-    .WithEnvironment("Auth__SigningKey", authSigningKey)
-    .WithExternalHttpEndpoints()
+var backend = builder.AddProject<Projects.MinimalApi>(
+        "MinimalApi-backend",
+        options => options.ExcludeLaunchProfile = true)
+    .WaitFor(db)
     .PublishAsAzureContainerApp((infra, app) => app.Template.Scale.MaxReplicas = 1);
 
 var backendMigrations = backend
-    .AddEFMigrations("MinimalApi-backend-migrations", "MinimalApi.Data.ApplicationDbContext")
+    .AddEFMigrations(
+        "MinimalApi-backend-migrations",
+        "MinimalApi.Data.ApplicationDbContext")
     .WithMigrationsProject("../MinimalApi.Data/MinimalApi.Data.csproj")
     .RunDatabaseUpdateOnStart()
     .PublishAsMigrationScript()
     .PublishAsMigrationBundle();
+
+backend.WithEnvironment("Auth__SigningKey", authSigningKey);
+
+if (!builder.ExecutionContext.IsPublishMode)
+{
+    backend.WithEnvironment("ASPNETCORE_ENVIRONMENT", "Development");
+    backend.WithEnvironment("DOTNET_ENVIRONMENT", "Development");
+    backend.WithEnvironment(async context =>
+    {
+        context.EnvironmentVariables[$"ConnectionStrings__{ConnectionStrings.DatabaseKey}"] =
+            await db.Resource.GetConnectionStringAsync(context.CancellationToken)
+            ?? throw new InvalidOperationException($"Connection string '{ConnectionStrings.DatabaseKey}' could not be resolved.");
+    });
+}
+else
+{
+    backend.WithEnvironment($"ConnectionStrings__{ConnectionStrings.DatabaseKey}", db);
+}
+
+backend.WithHttpEndpoint(port: 5285, targetPort: 5285, name: "http", env: "ASPNETCORE_HTTP_PORTS", isProxied: false);
+backend.WithHttpHealthCheck("/alive");
+
+if (builder.ExecutionContext.IsPublishMode)
+{
+    backend.WithExternalHttpEndpoints();
+}
+
+if (sql is not null)
+{
+    backendMigrations.WaitFor(sql);
+}
 
 backend.WaitForCompletion(backendMigrations);
 

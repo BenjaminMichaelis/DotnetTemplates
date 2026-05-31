@@ -15,3 +15,5 @@ public class DataClass : IAsyncInitializer, IAsyncDisposable
         GC.SuppressFinalize(this);
     }
 }
+
+

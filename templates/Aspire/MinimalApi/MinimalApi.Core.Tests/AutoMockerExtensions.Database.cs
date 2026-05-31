@@ -127,3 +127,5 @@ file sealed class SqliteConnectionResolver<TContext> : IMockResolver, IDisposabl
         GC.SuppressFinalize(this);
     }
 }
+
+

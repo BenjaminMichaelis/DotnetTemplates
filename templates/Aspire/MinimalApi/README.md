@@ -75,7 +75,7 @@ Run all tests (unit tests only when generated without `--integrationTests`):
 When generated with `--integrationTests true`, `MinimalApi.Aspire.Tests` is part of the solution, so `dotnet test` runs both unit and integration tests. To run only unit tests without starting containers:
 
 ```cli
-> dotnet test MinimalApi.Core.Tests/MinimalApi.Core.Tests.csproj
+> dotnet test MinimalApi.Tests/MinimalApi.Tests.csproj
 ```
 
 To run only integration tests:
@@ -155,3 +155,4 @@ The `UseAzureMonitor()` call in `ServiceDefaults/Extensions.cs` is already prese
 ### Without the option (default)
 
 The `UseAzureMonitor()` stub in `ServiceDefaults` still activates if you manually set `APPLICATIONINSIGHTS_CONNECTION_STRING` at runtime. You just won't have Aspire auto-provisioning or the profiler.
+

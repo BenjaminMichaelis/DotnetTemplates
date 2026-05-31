@@ -26,3 +26,5 @@ public class RoomDtoTests : SerializationTestsBase<RoomDto>
         };
     }
 }
+
+

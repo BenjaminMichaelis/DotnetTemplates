@@ -39,6 +39,7 @@ function Get-TemplateParameter {
                 $result[$name] = @{
                     type = "bool"
                     values = @($false, $true)
+                    defaultValue = $false
                 }
             }
             "choice" {
@@ -53,9 +54,15 @@ function Get-TemplateParameter {
                 if (-not $choices) {
                     throw "Parameter '$name' is choice but no choices were found."
                 }
+                $defaultValue = if (-not [string]::IsNullOrWhiteSpace($symbol.defaultValue)) {
+                    [string]$symbol.defaultValue
+                } else {
+                    $choices[0]
+                }
                 $result[$name] = @{
                     type = "choice"
                     values = $choices
+                    defaultValue = $defaultValue
                 }
             }
         }
@@ -118,81 +125,156 @@ function New-NormalizedStandardCombinationKey {
 function New-StandardVariant {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '')]
     [CmdletBinding()]
-    param([hashtable]$Combo)
-
-    $hasNoSln = $Combo.ContainsKey("no-sln")
-    $hasSln = $Combo.ContainsKey("sln")
-    $hasTests = $Combo.ContainsKey("tests")
-
-    $noSln = $hasNoSln -and [bool]$Combo["no-sln"]
-    $sln = $hasSln -and [bool]$Combo["sln"] -and -not $noSln
-    $tests = if ($hasTests) { [string]$Combo["tests"] } else { "tunit" }
-    if ([string]::IsNullOrWhiteSpace($tests)) {
-        $tests = "tunit"
-    }
+    param(
+        [hashtable]$Combo,
+        [hashtable]$ParamDefs
+    )
 
     $templateArgs = @()
-    if ($noSln) { $templateArgs += "--no-sln" }
-    elseif ($sln) { $templateArgs += "--sln" }
-
-    if ($tests -ne "tunit") { $templateArgs += "--tests $tests" }
-
     $variantParts = @()
-    if ($sln) { $variantParts += "sln" }
-    elseif ($noSln) { $variantParts += "no-sln" }
+    $tests = ""
 
-    if ($tests -eq "None") { $variantParts += "no-tests" }
-    elseif ($tests -ne "tunit") { $variantParts += $tests }
-    elseif (-not $sln -and -not $noSln) { $variantParts += "tunit" }
+    foreach ($key in ($Combo.Keys | Sort-Object)) {
+        $def = $ParamDefs[$key]
+        $value = $Combo[$key]
+
+        if ($def.type -eq "bool") {
+            if ([bool]$value) {
+                $templateArgs += "--$key"
+                $variantParts += $key
+            }
+            # false is the default — no arg needed
+        } elseif ($def.type -eq "choice") {
+            $strVal = [string]$value
+            $defaultChoice = [string]$def.defaultValue
+            if ($strVal -ne $defaultChoice) {
+                $templateArgs += "--$key $strVal"
+                if ($key -eq "tests" -and $strVal -eq "None") {
+                    $variantParts += "no-tests"
+                } else {
+                    $variantParts += $strVal
+                }
+            }
+            if ($key -eq "tests") {
+                $tests = $strVal
+            }
+        }
+    }
 
     $variantName = ($variantParts -join "-")
     if ([string]::IsNullOrWhiteSpace($variantName)) {
         $variantName = "default"
     }
 
+    $reportTrxArgs = if ($tests -eq "None") {
+        ""
+    } elseif ($tests -eq "xunit") {
+        "--report-xunit-trx --report-xunit-trx-filename tests.trx"
+    } else {
+        "--report-trx --report-trx-filename tests.trx"
+    }
+
     return [ordered]@{
-        variant = $variantName
-        args = ($templateArgs -join " ")
-        expectSln = $sln
-        expectSlnx = (-not $noSln -and -not $sln)
-        expectTests = ($tests -ne "None")
-        reportTrxArgs = if ($tests -eq "None") { "" } elseif ($tests -eq "xunit") { "--report-xunit-trx --report-xunit-trx-filename tests.trx" } else { "--report-trx --report-trx-filename tests.trx" }
+        variant       = $variantName
+        args          = ($templateArgs -join " ")
+        reportTrxArgs = $reportTrxArgs
     }
 }
 
-function New-AspireVariant {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '')]
-    [CmdletBinding()]
-    param([hashtable]$ParamDefinitions)
+function Test-TruthyMsBuildValue {
+    param([object]$Value)
 
-    $allowed = @("applicationInsights", "integrationTests")
-    $unknown = @($ParamDefinitions.Keys | Where-Object { $_ -notin $allowed })
-    if ($unknown.Count -gt 0) {
-        throw "Unhandled Aspire parameters detected: $($unknown -join ', ')"
+    if ($null -eq $Value) {
+        return $false
     }
 
-    $domains = @{
-        applicationInsights = @($false, $true)
-        integrationTests = @($false, $true)
-    }
-    $combos = Get-CartesianProduct -Domains $domains
-    $variants = @()
-    foreach ($combo in $combos) {
-        $templateArgs = @()
-        if ([bool]$combo.applicationInsights) { $templateArgs += "--applicationInsights true" }
-        if ([bool]$combo.integrationTests) { $templateArgs += "--integrationTests true" }
+    return ([string]$Value).Trim().Equals("true", [System.StringComparison]::OrdinalIgnoreCase)
+}
 
-        $name = @()
-        if ([bool]$combo.applicationInsights) { $name += "applicationInsights" } else { $name += "default" }
-        if ([bool]$combo.integrationTests) { $name += "with-integration-tests" }
-        $variantName = $name -join "-"
+function Test-FalsyMsBuildValue {
+    param([object]$Value)
 
-        $variants += @([ordered]@{
-                variant = $variantName
-                args = ($templateArgs -join " ")
-            })
+    if ($null -eq $Value) {
+        return $false
     }
-    return @($variants | Sort-Object variant)
+
+    return ([string]$Value).Trim().Equals("false", [System.StringComparison]::OrdinalIgnoreCase)
+}
+
+function Get-MsBuildPropertyValues {
+    param(
+        [xml]$ProjectXml,
+        [string]$PropertyName
+    )
+
+    $values = @()
+    foreach ($propertyGroup in @($ProjectXml.Project.PropertyGroup)) {
+        if ($null -eq $propertyGroup) {
+            continue
+        }
+
+        foreach ($property in @($propertyGroup.SelectNodes($PropertyName))) {
+            if ($null -ne $property) {
+                $values += @([string]$property.InnerText)
+            }
+        }
+    }
+
+    return $values
+}
+
+function Test-TemplatePrimaryProjectPackable {
+    param(
+        [string]$TemplateDir,
+        [string]$SourceName
+    )
+
+    if ([string]::IsNullOrWhiteSpace($SourceName)) {
+        $SourceName = "Template"
+    }
+
+    $primaryProject = Join-Path (Join-Path $TemplateDir $SourceName) "$SourceName.csproj"
+    if (-not (Test-Path -Path $primaryProject -PathType Leaf)) {
+        return $false
+    }
+
+    [xml]$projectXml = Get-Content -Path $primaryProject -Raw
+    $sdk = [string]$projectXml.Project.GetAttribute("Sdk")
+
+    $isPackableValues = @(Get-MsBuildPropertyValues -ProjectXml $projectXml -PropertyName "IsPackable")
+    if ($isPackableValues | Where-Object { Test-FalsyMsBuildValue -Value $_ }) {
+        return $false
+    }
+
+    $packAsToolValues = @(Get-MsBuildPropertyValues -ProjectXml $projectXml -PropertyName "PackAsTool")
+    if ($packAsToolValues | Where-Object { Test-TruthyMsBuildValue -Value $_ }) {
+        $runtimeIdentifierValues = @(
+            Get-MsBuildPropertyValues -ProjectXml $projectXml -PropertyName "RuntimeIdentifier"
+            Get-MsBuildPropertyValues -ProjectXml $projectXml -PropertyName "RuntimeIdentifiers"
+            Get-MsBuildPropertyValues -ProjectXml $projectXml -PropertyName "ToolPackageRuntimeIdentifiers"
+        )
+
+        if ($runtimeIdentifierValues | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }) {
+            return $false
+        }
+
+        return $true
+    }
+
+    if ($isPackableValues | Where-Object { Test-TruthyMsBuildValue -Value $_ }) {
+        return $true
+    }
+
+    if ($sdk -match '(^|;)Aspire\.AppHost\.Sdk($|/|;)' -or $sdk -match '(^|;)Microsoft\.NET\.Sdk\.Web($|/|;)') {
+        return $false
+    }
+
+    $outputTypeValues = @(Get-MsBuildPropertyValues -ProjectXml $projectXml -PropertyName "OutputType")
+    if ($outputTypeValues | Where-Object { $_.Trim() -in @("Exe", "WinExe") }) {
+        return $false
+    }
+
+    return ($sdk -match '(^|;)Microsoft\.NET\.Sdk($|/|;)')
 }
 
 $schemaPath = Join-Path ([System.IO.Path]::GetTempPath()) "dotnet-template-schema.json"
@@ -204,7 +286,6 @@ if (-not $templateFiles) {
 }
 
 $standardTemplates = @()
-$aspireVariantMatrix = $null
 
 foreach ($file in $templateFiles) {
     $jsonText = Get-Content -Path $file.FullName -Raw
@@ -220,19 +301,9 @@ foreach ($file in $templateFiles) {
 
     $shortName = [string]$template.shortName
     $paramDefs = Get-TemplateParameter -TemplateJson $template
+    $templateDir = Split-Path -Parent $file.FullName | Split-Path -Parent
 
-    if ($shortName -eq "bmichaelis.aspire.minimalapi") {
-        $aspireVariants = New-AspireVariant -ParamDefinitions $paramDefs
-        $aspireVariantMatrix = @{ include = $aspireVariants }
-        continue
-    }
-
-    $allowedStandard = @("no-sln", "sln", "tests")
-    $unknownStandard = @($paramDefs.Keys | Where-Object { $_ -notin $allowedStandard })
-    if ($unknownStandard.Count -gt 0) {
-        throw "Unhandled standard template parameters for '$shortName': $($unknownStandard -join ', ')"
-    }
-
+    # Allow arbitrary bool parameters (no longer restrict to standard set)
     $domains = @{}
     foreach ($entry in $paramDefs.GetEnumerator()) {
         $domains[$entry.Key] = $entry.Value.values
@@ -256,7 +327,7 @@ foreach ($file in $templateFiles) {
 
     $variants = @()
     foreach ($combo in $deduped.Values) {
-        $variants += @(New-StandardVariant -Combo $combo)
+        $variants += @(New-StandardVariant -Combo $combo -ParamDefs $paramDefs)
     }
     $variants = @($variants | Sort-Object variant)
     if (-not $variants) {
@@ -277,7 +348,7 @@ foreach ($file in $templateFiles) {
         $postBuildCommand = "benchmark-run"
     }
 
-    $packProject = $shortName -ne "bmichaelis.tool"
+    $packProject = Test-TemplatePrimaryProjectPackable -TemplateDir $templateDir -SourceName $sourceName
     $jobName = $shortName.Replace("bmichaelis.", "")
 
     $standardTemplates += @([ordered]@{
@@ -292,19 +363,12 @@ foreach ($file in $templateFiles) {
         })
 }
 
-if ($null -eq $aspireVariantMatrix) {
-    throw "Aspire template variants were not generated."
-}
-
 $standardTemplates = @($standardTemplates | Sort-Object job_name)
 $standardJson = Get-CompactJson -Value $standardTemplates
-$aspireJson = Get-CompactJson -Value $aspireVariantMatrix
 
 if (-not $env:GITHUB_OUTPUT) {
     Write-Output "standard_templates=$standardJson"
-    Write-Output "aspire_variants=$aspireJson"
     return
 }
 
 "standard_templates=$standardJson" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
-"aspire_variants=$aspireJson" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
