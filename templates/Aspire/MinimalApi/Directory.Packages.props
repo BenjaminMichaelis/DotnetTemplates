@@ -5,12 +5,12 @@
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="Aspire.Hosting.Azure" Version="13.3.5" />
-    <PackageVersion Include="Aspire.Hosting.Azure.ApplicationInsights" Version="13.3.5" />
-    <PackageVersion Include="Aspire.Hosting.Azure.AppContainers" Version="13.3.5" />
-    <PackageVersion Include="Aspire.Hosting.Azure.Sql" Version="13.3.5" />
+    <PackageVersion Include="Aspire.Hosting.Azure" Version="13.4.0" />
+    <PackageVersion Include="Aspire.Hosting.Azure.ApplicationInsights" Version="13.4.0" />
+    <PackageVersion Include="Aspire.Hosting.Azure.AppContainers" Version="13.4.0" />
+    <PackageVersion Include="Aspire.Hosting.Azure.Sql" Version="13.4.0" />
     <PackageVersion Include="Aspire.Hosting.EntityFrameworkCore" Version="13.3.3-preview.1.26264.13" />
-    <PackageVersion Include="Aspire.Hosting.SqlServer" Version="13.3.5" />
+    <PackageVersion Include="Aspire.Hosting.SqlServer" Version="13.4.0" />
     <PackageVersion Include="Azure.Monitor.OpenTelemetry.AspNetCore" Version="1.5.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.8" />
     <PackageVersion Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="10.0.8" />
