@@ -20,7 +20,7 @@
   -->
   <ItemGroup>
     <!--#if (tests != "None") -->
-    <PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.7.0">
+    <PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.8.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageVersion>
