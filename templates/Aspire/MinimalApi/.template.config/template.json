@@ -19,10 +19,10 @@
   "sourceName": "MinimalApi",
   "primaryOutputs": [
     {
-      "path": "MinimalApi.slnx"
+      "path": "__PROJECT_NAME__.slnx"
     },
     {
-      "path": "MinimalApi.AppHost/MinimalApi.AppHost.csproj"
+      "path": "__PROJECT_NAME__.AppHost/__PROJECT_NAME__.AppHost.csproj"
     }
   ],
   "postActions": [
@@ -38,18 +38,24 @@
       "continueOnError": true,
       "args": {
         "files": [
-          "MinimalApi/MinimalApi.csproj",
-          "MinimalApi.AppHost/MinimalApi.AppHost.csproj",
-          "MinimalApi.Core/MinimalApi.Core.csproj",
-          "MinimalApi.Core.Tests/MinimalApi.Core.Tests.csproj",
-          "MinimalApi.Data/MinimalApi.Data.csproj",
-          "MinimalApi.ServiceDefaults/MinimalApi.ServiceDefaults.csproj",
-          "MinimalApi.Aspire.Tests/MinimalApi.Aspire.Tests.csproj:integrationTests"
+          "__PROJECT_NAME__/__PROJECT_NAME__.csproj",
+          "__PROJECT_NAME__.AppHost/__PROJECT_NAME__.AppHost.csproj",
+          "__PROJECT_NAME__.Core/__PROJECT_NAME__.Core.csproj",
+          "__PROJECT_NAME__.Core.Tests/__PROJECT_NAME__.Core.Tests.csproj",
+          "__PROJECT_NAME__.Data/__PROJECT_NAME__.Data.csproj",
+          "__PROJECT_NAME__.ServiceDefaults/__PROJECT_NAME__.ServiceDefaults.csproj",
+          "__PROJECT_NAME__.Aspire.Tests/__PROJECT_NAME__.Aspire.Tests.csproj:integrationTests"
         ]
       }
     }
   ],
   "symbols": {
+    "projectName": {
+      "type": "derived",
+      "valueSource": "name",
+      "valueTransform": "identity",
+      "replaces": "__PROJECT_NAME__"
+    },
     "applicationInsights": {
       "type": "parameter",
       "datatype": "bool",
