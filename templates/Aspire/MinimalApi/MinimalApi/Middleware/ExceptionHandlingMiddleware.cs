@@ -1,12 +1,13 @@
-using System.Net;
-using System.Text.Json;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MinimalApi.Middleware;
 
 /// <summary>
-/// Middleware to handle exceptions and return appropriate HTTP status codes
+/// Middleware to map well-known exception types to specific HTTP status codes.
+/// Writes RFC 9457 ProblemDetails responses via IProblemDetailsService so the
+/// error shape is consistent with UseExceptionHandler() for all other errors.
 /// </summary>
-public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
+public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger, IProblemDetailsService problemDetailsService)
 {
     public async Task InvokeAsync(HttpContext context)
     {
@@ -17,27 +18,27 @@ public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Exception
         catch (UnauthorizedAccessException ex)
         {
             logger.LogWarning(ex, "Unauthorized access attempt: {Message}", ex.Message);
-            await HandleExceptionAsync(context, ex, HttpStatusCode.Forbidden);
+            await WriteProblemDetailsAsync(context, ex, StatusCodes.Status403Forbidden);
         }
         catch (InvalidOperationException ex)
         {
             logger.LogWarning(ex, "Invalid operation: {Message}", ex.Message);
-            await HandleExceptionAsync(context, ex, HttpStatusCode.BadRequest);
+            await WriteProblemDetailsAsync(context, ex, StatusCodes.Status400BadRequest);
         }
     }
 
-    private static async Task HandleExceptionAsync(HttpContext context, Exception exception, HttpStatusCode statusCode)
+    private async Task WriteProblemDetailsAsync(HttpContext context, Exception exception, int statusCode)
     {
-        context.Response.ContentType = "application/json";
-        context.Response.StatusCode = (int)statusCode;
-
-        var response = new
+        context.Response.StatusCode = statusCode;
+        await problemDetailsService.WriteAsync(new ProblemDetailsContext
         {
-            statusCode = (int)statusCode,
-            message = exception.Message
-        };
-
-        var json = JsonSerializer.Serialize(response);
-        await context.Response.WriteAsync(json);
+            HttpContext = context,
+            Exception = exception,
+            ProblemDetails = new ProblemDetails
+            {
+                Status = statusCode,
+                Detail = exception.Message,
+            },
+        });
     }
 }
