@@ -74,9 +74,11 @@ var backendMigrations = backend
         "MinimalApi-backend-migrations",
         "MinimalApi.Data.ApplicationDbContext")
     .WithMigrationsProject("../MinimalApi.Data/MinimalApi.Data.csproj")
+    .WaitFor(db)
     .RunDatabaseUpdateOnStart()
     .PublishAsMigrationScript()
-    .PublishAsMigrationBundle();
+    .PublishAsMigrationBundle(publishContainer: true)
+    .PublishAsAzureContainerAppJob();
 
 backend.WithEnvironment("Auth__SigningKey", authSigningKey);
 
