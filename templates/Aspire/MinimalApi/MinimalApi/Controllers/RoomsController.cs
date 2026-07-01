@@ -20,7 +20,7 @@ public class RoomsController(
     public async Task<ActionResult<IEnumerable<RoomDto>>> GetAllRooms()
     {
         var rooms = await roomService.GetAllRoomsAsync();
-        return Ok(rooms.Select(r => (RoomDto?)r));
+        return Ok(rooms.Select(r => (RoomDto)r!));
     }
 
     [HttpGet("my", Name = "GetMyRooms")]
@@ -36,7 +36,7 @@ public class RoomsController(
         }
 
         var rooms = await roomService.GetRoomsByUserIdAsync(userId);
-        return Ok(rooms.Select(r => (RoomDto?)r));
+        return Ok(rooms.Select(r => (RoomDto)r!));
     }
 
     [HttpGet("{id:guid}", Name = "GetRoom")]
@@ -50,7 +50,7 @@ public class RoomsController(
             return NotFound();
         }
 
-        return Ok((RoomDto?)room);
+        return Ok((RoomDto)room!);
     }
 
     [HttpGet("name/{friendlyName}", Name = "GetRoomByName")]
@@ -64,7 +64,7 @@ public class RoomsController(
             return NotFound();
         }
 
-        return Ok((RoomDto?)room);
+        return Ok((RoomDto)room!);
     }
 
     [HttpPost(Name = "CreateRoom")]
@@ -80,7 +80,7 @@ public class RoomsController(
         }
 
         var room = await roomService.CreateRoomAsync(request.FriendlyName, userId, cancellationToken);
-        return CreatedAtAction(nameof(GetRoom), new { id = room.Id }, (RoomDto?)room);
+        return CreatedAtAction(nameof(GetRoom), new { id = room.Id }, (RoomDto)room!);
     }
 
     [HttpDelete("{id:guid}", Name = "DeleteRoom")]
@@ -117,7 +117,7 @@ public class RoomsController(
 
     [HttpPost("{roomId:guid}/questions", Name = "CreateQuestion")]
     [ProducesResponseType<QuestionDto>(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
+    [ProducesResponseType<string>(StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<QuestionDto>> CreateQuestion(Guid roomId, [FromBody] CreateQuestionRequest request, CancellationToken cancellationToken)
     {
         // Get client ID from header or generate one
