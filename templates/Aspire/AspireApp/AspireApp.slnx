@@ -21,6 +21,9 @@
     <File Path=".github/workflows/deploy-infrastructure.yml" />
   </Folder>
   <Project Path="AspireApp.AppHost/AspireApp.AppHost.csproj" />
+  <!--#if (frontend != "none")-->
+  <Project Path="AspireApp.Web/AspireApp.Web.csproj" />
+  <!--#endif-->
   <!--#if (integrationTests)-->
   <Project Path="AspireApp.Aspire.Tests/AspireApp.Aspire.Tests.csproj" />
   <!--#endif-->

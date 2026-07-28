@@ -118,4 +118,24 @@ if (appInsights is not null)
 }
 //#endif
 
+//#if (frontend != "none")
+#pragma warning disable ASPIREBROWSERLOGS001
+var frontendApp = builder.AddJavaScriptApp("AspireApp-frontend", "../AspireApp.Web", "dev")
+    .WithNpm(install: true)
+    .WithHttpEndpoint(env: "PORT")
+    .WithBrowserLogs()
+    .WithExternalHttpEndpoints()
+    .WithDependency(backend)
+    .WithEnvironment("APP_BACKEND_HTTP", backend.GetEndpoint("http"))
+    .WithEnvironment("APP_BACKEND_HTTPS", backend.GetEndpoint("https"));
+#pragma warning restore ASPIREBROWSERLOGS001
+
+//#if (applicationInsights)
+if (appInsights is not null)
+{
+    frontendApp.WithReference(appInsights);
+}
+//#endif
+//#endif
+
 builder.Build().Run();

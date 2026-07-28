@@ -7,9 +7,9 @@
     "Web API",
     "Web"
   ],
-  "identity": "BenjaminMichaelis.Aspire.AspireApp",
+  "identity": "BenjaminMichaelis.Aspire.App",
   "name": "Benjamin Michaelis Aspire App",
-  "description": "Creates a full-stack .NET Aspire solution with an ASP.NET Core Web API backend, EF Core, ASP.NET Core Identity, optional React frontend, and Azure deployment assets.",
+  "description": "Creates a full-stack .NET Aspire solution with an ASP.NET Core Web API backend, optional Vue/React frontend, EF Core, ASP.NET Core Identity, and Azure deployment assets.",
   "shortName": "bmichaelis.aspire.app",
   "icon": "favicon.ico",
   "tags": {
@@ -51,6 +51,16 @@
     }
   ],
   "symbols": {
+    "frontend": {
+      "type": "parameter",
+      "datatype": "choice",
+      "defaultValue": "react",
+      "description": "The frontend framework to include. Use 'none' for an API-only solution.",
+      "choices": [
+        { "choice": "react", "description": "Add a React + TypeScript + Vite + PWA frontend" },
+        { "choice": "none", "description": "No frontend — API-only solution" }
+      ]
+    },
     "applicationInsights": {
       "type": "parameter",
       "datatype": "bool",
@@ -71,6 +81,12 @@
           "condition": "(!integrationTests)",
           "exclude": [
             "AspireApp.Aspire.Tests/**"
+          ]
+        },
+        {
+          "condition": "(frontend == \"none\")",
+          "exclude": [
+            "AspireApp.Web/**"
           ]
         }
       ]
