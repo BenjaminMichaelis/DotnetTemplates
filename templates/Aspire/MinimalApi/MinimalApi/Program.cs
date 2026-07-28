@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 
 using MinimalApi.Core;
 using MinimalApi.Data;
+using MinimalApi.Endpoints;
 using MinimalApi.Middleware;
 
 using Scalar.AspNetCore;
@@ -29,7 +30,6 @@ if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
 //#endif
 
 // Add services to the container.
-builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 // Add CORS for cross-origin clients
@@ -144,7 +144,8 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
+app.MapRoomEndpoints();
+app.MapAuthEndpoints();
 
 app.Run();
 
