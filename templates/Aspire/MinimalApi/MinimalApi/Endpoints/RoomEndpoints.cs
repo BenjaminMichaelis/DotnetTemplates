@@ -87,6 +87,7 @@ internal static class RoomEndpoints
             if (string.IsNullOrEmpty(userId))
                 return Results.Unauthorized();
 
+            // Room scoping and authorization are enforced by the service layer for question mutations.
             await questionService.ApproveQuestionAsync(questionId, userId, cancellationToken);
             return Results.NoContent();
         }).RequireAuthorization();
@@ -97,6 +98,7 @@ internal static class RoomEndpoints
             if (string.IsNullOrEmpty(userId))
                 return Results.Unauthorized();
 
+            // Room scoping and authorization are enforced by the service layer for question mutations.
             await questionService.MarkAsAnsweredAsync(questionId, userId, cancellationToken);
             return Results.NoContent();
         }).RequireAuthorization();
@@ -107,6 +109,7 @@ internal static class RoomEndpoints
             if (string.IsNullOrEmpty(userId))
                 return Results.Unauthorized();
 
+            // Room scoping and authorization are enforced by the service layer for question mutations.
             await questionService.DeleteQuestionAsync(questionId, userId, cancellationToken);
             return Results.NoContent();
         }).RequireAuthorization();

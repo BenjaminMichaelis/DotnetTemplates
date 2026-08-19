@@ -71,10 +71,13 @@ export function useRoomHub(
       const cleanup = async () => {
         if (hubInstance) {
           try {
-            // Only try to leave if connection is still active
             const state = hubInstance.getState()
             if (state === HubConnectionState.Connected && roomId) {
-              await hubInstance.leaveAsOwner(roomId)
+              if (asOwner) {
+                await hubInstance.leaveAsOwner(roomId)
+              } else {
+                await hubInstance.leaveAsParticipant(roomId)
+              }
             }
             await hubInstance.stop()
           } catch (error) {

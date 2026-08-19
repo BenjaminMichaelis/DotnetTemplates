@@ -42,6 +42,11 @@ internal static class AuthEndpoints
 
         group.MapPost("/register", async (RegisterRequest request, SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager) =>
         {
+            if (request.Password != request.ConfirmPassword)
+            {
+                return Results.BadRequest(new { errors = new[] { "Passwords do not match." } });
+            }
+
             var user = new ApplicationUser { UserName = request.Email, Email = request.Email };
             var result = await userManager.CreateAsync(user, request.Password);
 
@@ -74,18 +79,20 @@ internal static class AuthEndpoints
             return Results.NoContent();
         }).RequireAuthorization();
 
-        group.MapGet("/user", (ClaimsPrincipal user, UserManager<ApplicationUser> userManager) =>
+        group.MapGet("/user", async (ClaimsPrincipal user, UserManager<ApplicationUser> userManager) =>
         {
             if (!user.Identity?.IsAuthenticated ?? true)
             {
                 return Results.Ok(new UserInfo { IsAuthenticated = false });
             }
 
+            var appUser = await userManager.GetUserAsync(user);
+
             return Results.Ok(new UserInfo
             {
                 UserId = userManager.GetUserId(user) ?? "",
                 UserName = user.Identity?.Name ?? "",
-                Email = user.Identity?.Name ?? "",
+                Email = appUser?.Email ?? user.Identity?.Name ?? "",
                 IsAuthenticated = true
             });
         });

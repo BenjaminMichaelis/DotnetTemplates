@@ -1,31 +1,43 @@
-# Aspire Minimal API Template
+# AspireApp Template
 
-This template creates a .NET Aspire solution with an ASP.NET Core Web API backend, EF Core, ASP.NET Core Identity, and Azure deployment assets.
+This template creates a full-stack .NET Aspire solution with an ASP.NET Core Web API backend, an optional React frontend, EF Core, ASP.NET Core Identity, and Azure deployment assets.
 
 ## Template
 
 Create a new app in your current directory by running:
 
 ```cli
-> dotnet new bmichaelis.aspire.AspireApp
+> dotnet new bmichaelis.aspire.app
+```
+
+With the default React frontend:
+
+```cli
+> dotnet new bmichaelis.aspire.app --frontend react
+```
+
+Without a frontend (API-only solution):
+
+```cli
+> dotnet new bmichaelis.aspire.app --frontend none
 ```
 
 With Application Insights monitoring enabled:
 
 ```cli
-> dotnet new bmichaelis.aspire.AspireApp --applicationInsights true
+> dotnet new bmichaelis.aspire.app --applicationInsights true
 ```
 
 With Aspire integration tests:
 
 ```cli
-> dotnet new bmichaelis.aspire.AspireApp --integrationTests true
+> dotnet new bmichaelis.aspire.app --integrationTests true
 ```
 
 Both options together:
 
 ```cli
-> dotnet new bmichaelis.aspire.AspireApp --applicationInsights true --integrationTests true
+> dotnet new bmichaelis.aspire.app --applicationInsights true --integrationTests true
 ```
 
 ### Parameters
@@ -35,6 +47,7 @@ Both options together:
 | Parameter | Description | Default |
 |-----------|-------------|---------|
 | `--name` | Name of the project | Current directory name |
+| `--frontend` | Frontend to generate: `react` for the default React + TypeScript app, or `none` for an API-only solution | `react` |
 | `--applicationInsights` | Add Azure Application Insights monitoring | `false` |
 | `--integrationTests` | Add Aspire integration tests using TUnit | `false` |
 
@@ -155,4 +168,3 @@ The `UseAzureMonitor()` call in `ServiceDefaults/Extensions.cs` is already prese
 ### Without the option (default)
 
 The `UseAzureMonitor()` stub in `ServiceDefaults` still activates if you manually set `APPLICATIONINSIGHTS_CONNECTION_STRING` at runtime. You just won't have Aspire auto-provisioning or the profiler.
-

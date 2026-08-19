@@ -1,7 +1,7 @@
 locals {
   tags = merge(var.tags,
     {
-      "Environment" = "Prod"
+      "Environment" = var.environment
   })
 }
 
@@ -22,4 +22,3 @@ module "container_registry" {
   pull_identity_ids = values(var.app_identities)
   push_identity_ids = []
 }
-
