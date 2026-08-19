@@ -18,7 +18,7 @@ on:
       warnings_as_errors_msbuild_args:
         required: false
         type: string
-        default: -p:CodeAnalysisTreatWarningsAsErrors=true -p:TreatWarningsAsErrors=true -p:MSBuildTreatWarningsAsErrors=true -p:NuGetAudit=false
+        default: -p:CodeAnalysisTreatWarningsAsErrors=true -p:TreatWarningsAsErrors=true -p:MSBuildTreatWarningsAsErrors=true
       post_build_command:
         required: false
         type: string
@@ -173,4 +173,3 @@ jobs:
           name: ${{ inputs.failed_playlist_artifact_prefix }}-${{ matrix.variant }}
           path: test-results/failed-tests.playlist
           if-no-files-found: ignore
-
