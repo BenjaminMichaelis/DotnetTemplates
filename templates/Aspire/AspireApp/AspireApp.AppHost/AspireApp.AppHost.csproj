@@ -12,7 +12,6 @@
     <PackageReference Include="Aspire.Hosting.EntityFrameworkCore" />
     <PackageReference Include="Aspire.Hosting.SqlServer" />
     <!--#if (frontend != "none")-->
-    <PackageReference Include="Aspire.Hosting.Browsers" />
     <PackageReference Include="Aspire.Hosting.JavaScript" />
     <!--#endif-->
     <!--#if (applicationInsights)-->
