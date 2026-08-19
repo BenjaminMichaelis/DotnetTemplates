@@ -1,9 +1,9 @@
+using AspireApp.Data;
+
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
-
-using AspireApp.Data;
 
 using Moq.AutoMock.Resolvers;
 

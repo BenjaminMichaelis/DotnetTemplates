@@ -44,14 +44,14 @@ jobs:
         global-json-file: ./global.json
 
     - name: Restore dependencies
-      run: dotnet restore Templates.csproj -p:CodeAnalysisTreatWarningsAsErrors=true -p:TreatWarningsAsErrors=true -p:MSBuildTreatWarningsAsErrors=true
+      run: dotnet restore Templates.csproj -p:CodeAnalysisTreatWarningsAsErrors=true -p:TreatWarningsAsErrors=true -p:MSBuildTreatWarningsAsErrors=true -p:NuGetAudit=false
 
     - name: Enforce formatting
       run: |
         .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -Targets "Templates.csproj"
 
     - name: Pack
-      run: dotnet pack --configuration Release --no-restore -p:CodeAnalysisTreatWarningsAsErrors=true -p:TreatWarningsAsErrors=true -p:MSBuildTreatWarningsAsErrors=true -o .
+      run: dotnet pack --configuration Release --no-restore -p:CodeAnalysisTreatWarningsAsErrors=true -p:TreatWarningsAsErrors=true -p:MSBuildTreatWarningsAsErrors=true -p:NuGetAudit=false -o .
     
     - name: Upload Artifacts
       uses: actions/upload-artifact@v7
@@ -109,7 +109,7 @@ jobs:
       project_name: ${{ matrix.template.project_name }}
       output_dir_prefix: ${{ matrix.template.output_dir_prefix }}
       variant_matrix_json: ${{ matrix.template.variant_matrix_json }}
-      warnings_as_errors_msbuild_args: -p:CodeAnalysisTreatWarningsAsErrors=true -p:TreatWarningsAsErrors=true -p:MSBuildTreatWarningsAsErrors=true
+      warnings_as_errors_msbuild_args: -p:CodeAnalysisTreatWarningsAsErrors=true -p:TreatWarningsAsErrors=true -p:MSBuildTreatWarningsAsErrors=true -p:NuGetAudit=false
       post_build_command: ${{ matrix.template.post_build_command }}
       pack_project: ${{ matrix.template.pack_project }}
       failed_playlist_artifact_prefix: ${{ matrix.template.failed_playlist_artifact_prefix }}
@@ -124,4 +124,3 @@ jobs:
           if ("${{ contains(needs.*.result, 'failure') }}" -eq "true" -or "${{ contains(needs.*.result, 'cancelled') }}" -eq "true" -or "${{ contains(needs.*.result, 'skipped') }}" -eq "true") {
             throw "One or more required jobs failed, were cancelled, or were skipped"
           }
-

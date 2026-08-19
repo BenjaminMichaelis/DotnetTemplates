@@ -1,9 +1,9 @@
 using Aspire.Hosting.EntityFrameworkCore;
 
-using Microsoft.Extensions.DependencyInjection;
-
 using AspireApp.AppHost;
 using AspireApp.Core;
+
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = DistributedApplication.CreateBuilder(args);
 

@@ -1,11 +1,11 @@
+using AspireApp.Core.QA;
+using AspireApp.Data;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
-using AspireApp.Core.QA;
-using AspireApp.Data;
 
 namespace AspireApp.Core;
 

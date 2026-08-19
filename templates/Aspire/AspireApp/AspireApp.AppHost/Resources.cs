@@ -2,12 +2,12 @@ using System.Diagnostics;
 
 using Aspire.Hosting.Azure;
 
+using AspireApp.AppHost;
+using AspireApp.Core;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
-
-using AspireApp.AppHost;
-using AspireApp.Core;
 
 namespace AspireApp.AppHost;
 
