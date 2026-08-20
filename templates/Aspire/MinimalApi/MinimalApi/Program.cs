@@ -30,6 +30,7 @@ if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
 //#endif
 
 // Add services to the container.
+builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
 
 // Add CORS for cross-origin clients
@@ -120,20 +121,20 @@ var app = builder.Build();
 
 app.MapDefaultEndpoints();
 
+// Configure the HTTP request pipeline.
+app.UseExceptionHandler();
+
 // Enable CORS
 app.UseCors("AllowedOrigins");
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.MapScalarApiReference();
     app.UseMigrationsEndPoint();
-    app.UseDeveloperExceptionPage();
 }
 else
 {
-    app.UseExceptionHandler("/Error");
     app.UseHsts();
     app.UseHttpsRedirection();
 }
@@ -143,6 +144,8 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapGet("/", () => "API is running.");
 
 app.MapRoomEndpoints();
 app.MapAuthEndpoints();
