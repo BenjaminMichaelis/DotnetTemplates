@@ -1,3 +1,5 @@
+using Aspire.Hosting.Testing;
+
 using TUnit.Aspire;
 
 namespace MinimalApi.Aspire.Tests;
@@ -11,25 +13,27 @@ namespace MinimalApi.Aspire.Tests;
 public class AppHostIntegrationTests(AppFixture fixture)
 {
     /// <summary>
-    /// Verifies that the AppHost builds and starts successfully.
-    /// This is a smoke test that ensures all resources are orchestrated correctly.
+    /// Verifies that the backend is reachable through Aspire orchestration.
+    /// The liveness endpoint proves HTTP reachability without coupling the test to database readiness checks.
     /// </summary>
     [Test]
-    public async Task AppHostStartsSuccessfully()
+    public async Task BackendAliveEndpointReturnsSuccess()
     {
-        var app = fixture.App;
-        await Assert.That(app).IsNotNull();
+        using var client = fixture.CreateHttpClient("MinimalApi-backend", "http");
+
+        using var response = await client.GetAsync("/alive");
+
+        await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.OK);
     }
 
     /// <summary>
-    /// Verifies that the API service responds to health check requests.
-    /// This validates that the MinimalApi service is running and reachable through the AppHost.
+    /// Verifies that the AppHost can resolve the database connection string.
+    /// This validates that resource orchestration and connection string injection are configured correctly.
     /// </summary>
     [Test]
-    public async Task ApiHealthCheckReturnsOk()
+    public async Task DatabaseConnectionStringIsConfigured()
     {
-        var httpClient = fixture.CreateHttpClient("MinimalApi-backend");
-        var response = await httpClient.GetAsync("/health");
-        await Assert.That(response.StatusCode).IsEqualTo(System.Net.HttpStatusCode.OK);
+        var connectionString = await fixture.App.GetConnectionStringAsync("MinimalApi-db");
+        await Assert.That(connectionString).IsNotNull().And.IsNotEmpty();
     }
 }

@@ -35,6 +35,9 @@ updates:
     schedule:
       interval: "weekly"
     groups:
+      aspire:
+        patterns:
+          - "Aspire.*"
       entity-framework-stack:
         patterns:
           - "Microsoft.EntityFrameworkCore.*"

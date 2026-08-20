@@ -338,3 +338,5 @@ public class RoomServiceTests : ServiceTestsBase
             .WithMessage("Only the room owner can delete the room");
     }
 }
+
+

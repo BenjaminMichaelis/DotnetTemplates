@@ -30,3 +30,4 @@
   <Project Path="MinimalApi.ServiceDefaults/MinimalApi.ServiceDefaults.csproj" />
   <Project Path="MinimalApi/MinimalApi.csproj" />
 </Solution>
+
