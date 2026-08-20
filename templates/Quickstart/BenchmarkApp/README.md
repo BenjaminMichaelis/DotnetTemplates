@@ -17,7 +17,7 @@ Create a new app in your current directory by running.
 
 ## .NET SDK version
 
-This template includes a `global.json` file. To update the SDK version used by generated projects and CI validation, update `templates/Quickstart/BenchmarkApp/global.json`.
+This template includes a `global.json` file. To update the SDK version used by generated projects and CI validation, update `global.json`.
 
 ### Parameters
 
