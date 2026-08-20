@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 
 using MinimalApi.Core;
 using MinimalApi.Data;
+using MinimalApi.Endpoints;
 using MinimalApi.Middleware;
 
 using Scalar.AspNetCore;
@@ -29,7 +30,6 @@ if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
 //#endif
 
 // Add services to the container.
-builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
 
@@ -147,7 +147,8 @@ app.UseAuthorization();
 
 app.MapGet("/", () => "API is running.");
 
-app.MapControllers();
+app.MapRoomEndpoints();
+app.MapAuthEndpoints();
 
 app.Run();
 

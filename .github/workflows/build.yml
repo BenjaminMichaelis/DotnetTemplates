@@ -27,7 +27,7 @@ jobs:
       contents: write
 
     steps:
-      - uses: fastify/github-action-merge-dependabot@v3.12.0
+      - uses: fastify/github-action-merge-dependabot@v3.15.0
         with:
             use-github-auto-merge: true
 
@@ -124,4 +124,3 @@ jobs:
           if ("${{ contains(needs.*.result, 'failure') }}" -eq "true" -or "${{ contains(needs.*.result, 'cancelled') }}" -eq "true" -or "${{ contains(needs.*.result, 'skipped') }}" -eq "true") {
             throw "One or more required jobs failed, were cancelled, or were skipped"
           }
-
