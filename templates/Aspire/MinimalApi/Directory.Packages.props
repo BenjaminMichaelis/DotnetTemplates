@@ -35,10 +35,8 @@
     <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.15.1" />
     <PackageVersion Include="Polly.Core" Version="8.6.6" />
     <PackageVersion Include="Scalar.AspNetCore" Version="2.14.14" />
-    <PackageVersion Include="SQLitePCLRaw.lib.e_sqlite3" Version="3.50.3" />
     <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="8.19.1" />
     <PackageVersion Include="System.Linq.Dynamic.Core" Version="1.7.2" />
-    <PackageVersion Include="MessagePack" Version="2.5.302" />
   </ItemGroup>
   <ItemGroup>
     <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-2m69-gcr7-jv3q" />
