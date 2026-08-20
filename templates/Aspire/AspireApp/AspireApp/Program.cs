@@ -1,13 +1,12 @@
 using System.Text;
 
+using AspireApp.Core;
+using AspireApp.Data;
+using AspireApp.Middleware;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-
-using MinimalApi.Core;
-using MinimalApi.Data;
-using MinimalApi.Endpoints;
-using MinimalApi.Middleware;
 
 using Scalar.AspNetCore;
 
@@ -30,6 +29,7 @@ if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
 //#endif
 
 // Add services to the container.
+builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 // Add CORS for cross-origin clients
@@ -106,8 +106,8 @@ authBuilder.AddJwtBearer(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = "MinimalApi",
-        ValidAudience = "MinimalApi",
+        ValidIssuer = "AspireApp",
+        ValidAudience = "AspireApp",
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey))
     };
 });
@@ -144,8 +144,7 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapRoomEndpoints();
-app.MapAuthEndpoints();
+app.MapControllers();
 
 app.Run();
 

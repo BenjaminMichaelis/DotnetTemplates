@@ -124,4 +124,3 @@ jobs:
           if ("${{ contains(needs.*.result, 'failure') }}" -eq "true" -or "${{ contains(needs.*.result, 'cancelled') }}" -eq "true" -or "${{ contains(needs.*.result, 'skipped') }}" -eq "true") {
             throw "One or more required jobs failed, were cancelled, or were skipped"
           }
-

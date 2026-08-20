@@ -173,5 +173,3 @@ jobs:
           name: ${{ inputs.failed_playlist_artifact_prefix }}-${{ matrix.variant }}
           path: test-results/failed-tests.playlist
           if-no-files-found: ignore
-
-
