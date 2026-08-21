@@ -10,6 +10,10 @@ inputs:
     description: File glob pattern used to locate the package
     required: false
     default: BenjaminMichaelis.Dotnet.Templates.*.nupkg
+  global-json-file:
+    description: Path to the global.json used for SDK installation
+    required: false
+    default: ./global.json
 
 runs:
   using: composite
@@ -23,7 +27,7 @@ runs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v5
       with:
-        global-json-file: ./global.json
+        global-json-file: ${{ inputs.global-json-file }}
 
     - name: Restore .NET Tools
       shell: pwsh
