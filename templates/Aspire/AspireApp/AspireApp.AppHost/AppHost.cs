@@ -1,9 +1,9 @@
 using Aspire.Hosting.EntityFrameworkCore;
 
+using Microsoft.Extensions.DependencyInjection;
+
 using AspireApp.AppHost;
 using AspireApp.Core;
-
-using Microsoft.Extensions.DependencyInjection;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
@@ -75,8 +75,9 @@ var backendMigrations = backend
         "AspireApp.Data.ApplicationDbContext")
     .WithMigrationsProject("../AspireApp.Data/AspireApp.Data.csproj")
     .RunDatabaseUpdateOnStart()
+    .WithReference(db)
     .PublishAsMigrationScript()
-    .PublishAsMigrationBundle();
+    .PublishAsMigrationBundle(publishContainer: true);
 
 backend.WithEnvironment("Auth__SigningKey", authSigningKey);
 

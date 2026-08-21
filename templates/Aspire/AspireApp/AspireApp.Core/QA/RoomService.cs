@@ -1,6 +1,6 @@
-using AspireApp.Data;
-
 using Microsoft.EntityFrameworkCore;
+
+using AspireApp.Data;
 
 namespace AspireApp.Core.QA;
 

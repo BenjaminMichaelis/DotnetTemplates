@@ -1,14 +1,14 @@
 using System.Text;
 
-using AspireApp.Core;
-using AspireApp.Data;
-using AspireApp.Middleware;
-
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 
 using Scalar.AspNetCore;
+
+using AspireApp.Core;
+using AspireApp.Data;
+using AspireApp.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 

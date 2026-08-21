@@ -1,8 +1,8 @@
-using AspireApp.Data;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+
+using AspireApp.Data;
 
 namespace AspireApp.Controllers;
 

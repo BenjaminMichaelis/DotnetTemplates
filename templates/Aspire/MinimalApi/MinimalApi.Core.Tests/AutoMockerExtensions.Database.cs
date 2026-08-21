@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 
-using MinimalApi.Data;
-
 using Moq.AutoMock.Resolvers;
+
+using MinimalApi.Data;
 
 namespace MinimalApi.Core.Tests;
 

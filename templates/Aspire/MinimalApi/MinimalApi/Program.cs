@@ -4,12 +4,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 
+using Scalar.AspNetCore;
+
 using MinimalApi.Core;
 using MinimalApi.Data;
 using MinimalApi.Endpoints;
 using MinimalApi.Middleware;
-
-using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
