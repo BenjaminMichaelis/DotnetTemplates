@@ -101,6 +101,9 @@ if (!builder.ExecutionContext.IsPublishMode)
             await db.Resource.GetConnectionStringAsync(context.CancellationToken)
             ?? throw new InvalidOperationException($"Connection string '{ConnectionStrings.DatabaseKey}' could not be resolved.");
     });
+    // The backend startup project (Program.cs) validates Auth:SigningKey at startup, so it must
+    // be available when EF runs database update against the backend startup project.
+    backendMigrations.WithEnvironment("Auth__SigningKey", authSigningKey);
 }
 else
 {
