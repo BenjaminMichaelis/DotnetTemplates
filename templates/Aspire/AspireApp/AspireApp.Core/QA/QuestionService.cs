@@ -1,8 +1,8 @@
 using System.Collections.Concurrent;
 
-using Microsoft.EntityFrameworkCore;
-
 using AspireApp.Data;
+
+using Microsoft.EntityFrameworkCore;
 
 namespace AspireApp.Core.QA;
 

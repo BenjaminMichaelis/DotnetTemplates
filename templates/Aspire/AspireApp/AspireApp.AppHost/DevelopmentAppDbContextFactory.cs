@@ -1,9 +1,9 @@
+using AspireApp.Core;
+using AspireApp.Data;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
-
-using AspireApp.Core;
-using AspireApp.Data;
 
 namespace AspireApp.AppHost;
 
