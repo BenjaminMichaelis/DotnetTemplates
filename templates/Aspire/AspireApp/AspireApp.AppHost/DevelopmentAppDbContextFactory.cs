@@ -1,9 +1,9 @@
 using AspireApp.Core;
 using AspireApp.Data;
 
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Configuration;
 
 namespace AspireApp.AppHost;
 
@@ -11,17 +11,17 @@ public class DesignTimeAppDbContextFactory : IDesignTimeDbContextFactory<Applica
 {
     public ApplicationDbContext CreateDbContext(string[] args)
     {
-        HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
-        var factory = new DefaultServiceProviderFactory(new ServiceProviderOptions()
-        {
-            ValidateOnBuild = false,
-            ValidateScopes = false
-        });
-        builder.ConfigureContainer(factory);
-        builder.AddDatabase();
+        var configuration = new ConfigurationBuilder()
+            .AddEnvironmentVariables()
+            .AddCommandLine(args)
+            .Build();
 
-        var host = builder.Build();
+        var connectionString = configuration.GetConnectionString(ConnectionStrings.DatabaseKey)
+            ?? $"Server=(localdb)\\mssqllocaldb;Database={nameof(AspireApp)}DesignTime;Trusted_Connection=True;TrustServerCertificate=True";
 
-        return host.Services.GetRequiredService<ApplicationDbContext>();
+        var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+        optionsBuilder.UseAzureSql(connectionString);
+
+        return new ApplicationDbContext(optionsBuilder.Options);
     }
 }

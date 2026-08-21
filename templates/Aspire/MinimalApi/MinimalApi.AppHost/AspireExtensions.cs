@@ -14,7 +14,7 @@ internal static class AspireExtensions
         public ILogger GetResourceLogger<T>(IResourceBuilder<T> resourceBuilder)
         where T : IResource
         {
-            return GetResourceLogger(context.ServiceProvider, resourceBuilder.Resource);
+            return GetResourceLogger(context.Services, resourceBuilder.Resource);
         }
     }
 
@@ -88,7 +88,7 @@ internal static class AspireExtensions
     {
         public Task<bool> ExecuteProcessAsync(ExecuteCommandContext context, ProcessStartInfo processInfo)
         {
-            return resourceBuilder.Resource.ExecuteProcessAsync(context.ServiceProvider, processInfo, context.CancellationToken);
+            return resourceBuilder.Resource.ExecuteProcessAsync(context.Services, processInfo, context.CancellationToken);
         }
 
     }
