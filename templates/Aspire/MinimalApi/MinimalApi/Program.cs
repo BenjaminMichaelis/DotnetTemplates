@@ -145,7 +145,7 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGet("/", () => "API is running.");
+app.MapGet("/", () => TypedResults.Ok("API is running.")).WithName("GetRoot");
 
 app.MapRoomEndpoints();
 app.MapAuthEndpoints();
