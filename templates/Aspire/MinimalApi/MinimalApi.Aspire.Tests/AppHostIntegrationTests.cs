@@ -1,4 +1,5 @@
 using Aspire.Hosting.Testing;
+using System.Net.Http.Json;
 using System.Text.Json.Nodes;
 
 using TUnit.Aspire;

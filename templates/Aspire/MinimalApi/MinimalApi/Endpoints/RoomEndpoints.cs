@@ -40,7 +40,7 @@ internal static class RoomEndpoints
     private static async Task<Ok<RoomDto[]>> GetAllRoomsAsync(IRoomService roomService)
     {
         var result = await roomService.GetAllRoomsAsync();
-        return TypedResults.Ok(result.Select(static room => (RoomDto)room).ToArray());
+        return TypedResults.Ok(result.Select(ToRoomDto).ToArray());
     }
 
     private static async Task<Results<Ok<RoomDto[]>, UnauthorizedHttpResult>> GetMyRoomsAsync(
@@ -55,7 +55,7 @@ internal static class RoomEndpoints
         }
 
         var result = await roomService.GetRoomsByUserIdAsync(userId);
-        return TypedResults.Ok(result.Select(static room => (RoomDto)room).ToArray());
+        return TypedResults.Ok(result.Select(ToRoomDto).ToArray());
     }
 
     private static async Task<Results<Ok<RoomDto>, NotFound>> GetRoomByIdAsync(Guid id, IRoomService roomService)
@@ -66,7 +66,7 @@ internal static class RoomEndpoints
             return TypedResults.NotFound();
         }
 
-        return TypedResults.Ok((RoomDto)room);
+        return TypedResults.Ok(ToRoomDto(room));
     }
 
     private static async Task<Results<Ok<RoomDto>, NotFound>> GetRoomByFriendlyNameAsync(
@@ -79,7 +79,7 @@ internal static class RoomEndpoints
             return TypedResults.NotFound();
         }
 
-        return TypedResults.Ok((RoomDto)room);
+        return TypedResults.Ok(ToRoomDto(room));
     }
 
     private static async Task<Results<Created<RoomDto>, UnauthorizedHttpResult>> CreateRoomAsync(
@@ -96,7 +96,7 @@ internal static class RoomEndpoints
         }
 
         var room = await roomService.CreateRoomAsync(request.FriendlyName, userId, cancellationToken);
-        return TypedResults.Created($"/api/rooms/{room.Id}", (RoomDto)room);
+        return TypedResults.Created($"/api/rooms/{room.Id}", ToRoomDto(room));
     }
 
     private static async Task<Results<NoContent, UnauthorizedHttpResult>> DeleteRoomAsync(
@@ -119,13 +119,13 @@ internal static class RoomEndpoints
     private static async Task<Ok<QuestionDto[]>> GetQuestionsAsync(Guid roomId, IQuestionService questionService)
     {
         var questions = await questionService.GetQuestionsByRoomIdAsync(roomId);
-        return TypedResults.Ok(questions.Select(static question => (QuestionDto)question).ToArray());
+        return TypedResults.Ok(questions.Select(ToQuestionDto).ToArray());
     }
 
     private static async Task<Ok<QuestionDto[]>> GetApprovedQuestionsAsync(Guid roomId, IQuestionService questionService)
     {
         var questions = await questionService.GetApprovedQuestionsByRoomIdAsync(roomId);
-        return TypedResults.Ok(questions.Select(static question => (QuestionDto)question).ToArray());
+        return TypedResults.Ok(questions.Select(ToQuestionDto).ToArray());
     }
 
     private static async Task<Results<Created<QuestionDto>, ProblemHttpResult>> CreateQuestionAsync(
@@ -145,7 +145,7 @@ internal static class RoomEndpoints
         }
 
         var question = await questionService.SubmitQuestionAsync(roomId, request.QuestionText, request.AuthorName, cancellationToken);
-        return TypedResults.Created($"/api/rooms/{roomId}/questions", (QuestionDto)question);
+        return TypedResults.Created($"/api/rooms/{roomId}/questions", ToQuestionDto(question));
     }
 
     private static async Task<Results<NoContent, UnauthorizedHttpResult>> ApproveQuestionAsync(
@@ -239,6 +239,12 @@ internal static class RoomEndpoints
         await roomService.SetCurrentQuestionAsync(roomId, null, userId, cancellationToken);
         return TypedResults.NoContent();
     }
+
+    private static RoomDto ToRoomDto(Room room) =>
+        (RoomDto?)room ?? throw new InvalidOperationException("Room conversion returned null.");
+
+    private static QuestionDto ToQuestionDto(Question question) =>
+        (QuestionDto?)question ?? throw new InvalidOperationException("Question conversion returned null.");
 }
 
 public record CreateRoomRequest(string FriendlyName);
