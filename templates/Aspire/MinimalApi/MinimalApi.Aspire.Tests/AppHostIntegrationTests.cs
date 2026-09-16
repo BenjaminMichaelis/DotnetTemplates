@@ -64,7 +64,8 @@ public class AppHostIntegrationTests(AppFixture fixture)
         await Assert.That(loginSchema).IsEqualTo("#/components/schemas/UserInfo");
 
         var registerOperation = GetOperation(paths, "/api/auth/register", "post");
-        var registerSchema = registerOperation["responses"]!["400"]!["content"]!["application/problem+json"]!["schema"]!["$ref"]?.GetValue<string>();
+        var registerValidationResponse = GetResponseWithContentType(registerOperation, "application/problem+json");
+        var registerSchema = registerValidationResponse["content"]!["application/problem+json"]!["schema"]!["$ref"]?.GetValue<string>();
         await Assert.That(registerSchema).IsEqualTo("#/components/schemas/HttpValidationProblemDetails");
 
         var roomsOperation = GetOperation(paths, "/api/rooms/", "get");
@@ -75,4 +76,18 @@ public class AppHostIntegrationTests(AppFixture fixture)
     private static JsonObject GetOperation(JsonObject paths, string path, string method) =>
         paths[path]?[method]?.AsObject()
         ?? throw new InvalidOperationException($"OpenAPI operation '{method.ToUpperInvariant()} {path}' was not found.");
+
+    private static JsonObject GetResponseWithContentType(JsonObject operation, string contentType)
+    {
+        foreach (var response in operation["responses"]!.AsObject())
+        {
+            var responseObject = response.Value?.AsObject();
+            if (responseObject?["content"]?[contentType] is not null)
+            {
+                return responseObject;
+            }
+        }
+
+        throw new InvalidOperationException($"OpenAPI response with content type '{contentType}' was not found.");
+    }
 }
