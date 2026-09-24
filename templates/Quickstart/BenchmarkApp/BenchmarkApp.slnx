@@ -9,8 +9,8 @@
     <File Path="README.md" />
   </Folder>
 <!--#if (tests != "None") -->
-  <Project Path="BenchmarkApp.Tests/BenchmarkApp.Tests.csproj" />
+  <Project Path="__PROJECT_NAME__.Tests/__PROJECT_NAME__.Tests.csproj" />
 <!--#endif -->
-  <Project Path="BenchmarkApp.Benchmark/BenchmarkApp.Benchmark.csproj" />
-  <Project Path="BenchmarkApp/BenchmarkApp.csproj" />
+  <Project Path="__PROJECT_NAME__.Benchmark/__PROJECT_NAME__.Benchmark.csproj" />
+  <Project Path="__PROJECT_NAME__/__PROJECT_NAME__.csproj" />
 </Solution>

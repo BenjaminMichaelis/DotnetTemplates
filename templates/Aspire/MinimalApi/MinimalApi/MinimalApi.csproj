@@ -5,9 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MinimalApi.Core\MinimalApi.Core.csproj" />
-    <ProjectReference Include="..\MinimalApi.Data\MinimalApi.Data.csproj" />
-    <ProjectReference Include="..\MinimalApi.ServiceDefaults\MinimalApi.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\__PROJECT_NAME__.Core\__PROJECT_NAME__.Core.csproj" />
+    <ProjectReference Include="..\__PROJECT_NAME__.Data\__PROJECT_NAME__.Data.csproj" />
+    <ProjectReference Include="..\__PROJECT_NAME__.ServiceDefaults\__PROJECT_NAME__.ServiceDefaults.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">

@@ -54,8 +54,8 @@ jobs:
         run: |
           dotnet tool run dotnet-ef migrations has-pending-model-changes `
             --configuration Release `
-            --project MinimalApi.Data/MinimalApi.Data.csproj `
-            --startup-project MinimalApi.AppHost/MinimalApi.AppHost.csproj `
+            --project __PROJECT_NAME__.Data/__PROJECT_NAME__.Data.csproj `
+            --startup-project __PROJECT_NAME__.AppHost/__PROJECT_NAME__.AppHost.csproj `
             --no-build
 
       # Microsoft Testing Platform can stop the run once 10 tests fail in CI:
@@ -118,8 +118,8 @@ jobs:
             --self-contained `
             --no-build `
             --configuration Release `
-            --project MinimalApi.Data/MinimalApi.Data.csproj `
-            --startup-project .\MinimalApi.AppHost\MinimalApi.AppHost.csproj `
+            --project __PROJECT_NAME__.Data/__PROJECT_NAME__.Data.csproj `
+            --startup-project .\__PROJECT_NAME__.AppHost\__PROJECT_NAME__.AppHost.csproj `
             --output efbundle
 
       - name: Upload DB Migration
@@ -262,7 +262,7 @@ jobs:
         id: buildkit-cache
         with:
           path: .buildkit-cache
-          key: minimalapi-buildkit-${{ hashFiles('MinimalApi/Dockerfile', 'Directory.Packages.props', 'Directory.Build.props', 'Directory.Build.targets', 'NuGet.config', 'MinimalApi/**/*.csproj') }}
+          key: minimalapi-buildkit-${{ hashFiles('__PROJECT_NAME__/Dockerfile', 'Directory.Packages.props', 'Directory.Build.props', 'Directory.Build.targets', 'NuGet.config', '__PROJECT_NAME__/**/*.csproj') }}
           restore-keys: |
             minimalapi-buildkit-
 
@@ -270,7 +270,7 @@ jobs:
         uses: reproducible-containers/buildkit-cache-dance@v3
         with:
           builder: ${{ steps.setup-buildx.outputs.name }}
-          dockerfile: MinimalApi/Dockerfile
+          dockerfile: __PROJECT_NAME__/Dockerfile
           cache-dir: .buildkit-cache
           skip-extraction: ${{ steps.buildkit-cache.outputs.cache-hit == 'true' }}
 
@@ -278,7 +278,7 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: .
-          file: ./MinimalApi/Dockerfile
+          file: ./__PROJECT_NAME__/Dockerfile
           push: true
           platforms: linux/amd64
           tags: ${{ needs.get-infrastructure-outputs.outputs.acr_login_server }}/minimalapi:${{ github.sha }}
