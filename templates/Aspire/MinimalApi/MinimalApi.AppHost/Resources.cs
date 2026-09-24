@@ -37,7 +37,6 @@ public static class Resources
 
                 // This pairs with the usage of .UseAzureSql() which has a compatibility level of 170.
                 .WithImageTag("2025-latest")
-                .PublishAsConnectionString()
                 //Give the SQL server container a fixed port number. This can be useful if people want to use external tools 
                 // with re-usable port numbers to connect to the database. The expected range is between 1024-49151.
                 //.WithHostPort(00000)
@@ -64,7 +63,7 @@ public static class Resources
             rv.WithCommand("InstallAspireCLI", "Install CLI", async ctx =>
             {
 #pragma warning disable ASPIREINTERACTION001
-                var interactionService = ctx.ServiceProvider.GetRequiredService<IInteractionService>();
+                var interactionService = ctx.Services.GetRequiredService<IInteractionService>();
                 var confirmationResult = await interactionService.PromptConfirmationAsync(
                     "Install Aspire CLI",
                     "This will download and install the Aspire CLI from https://aspire.dev/get-started/install-cli/\n\nDo you want to continue?",
@@ -177,7 +176,7 @@ public static class Resources
         {
             builder.WithCommand("RestoreTools", "Restore Tools", async ctx =>
             {
-                bool processResult = await RestoreDotnetToolsAsync(builder.Resource, ctx.ServiceProvider);
+                bool processResult = await RestoreDotnetToolsAsync(builder.Resource, ctx.Services);
                 return processResult ? CommandResults.Success() : CommandResults.Failure("Failed to restore tools");
             }, new CommandOptions()
             {
@@ -233,7 +232,7 @@ public static class Resources
                     return CommandResults.Failure("No connection string to the database");
                 }
 #pragma warning disable ASPIREINTERACTION001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-                var interactionService = ctx.ServiceProvider.GetRequiredService<IInteractionService>();
+                var interactionService = ctx.Services.GetRequiredService<IInteractionService>();
                 var migrationNameResult = await interactionService.PromptInputAsync("Migration Name", "Enter the name for the migration", "Name", "", cancellationToken: ctx.CancellationToken);
                 if (migrationNameResult.Canceled || string.IsNullOrWhiteSpace(migrationNameResult.Data.Value))
                 {
@@ -270,7 +269,7 @@ public static class Resources
             database.WithCommand("RemoveMigration", "Remove Migration", async ctx =>
             {
 #pragma warning disable ASPIREINTERACTION001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-                var interactionService = ctx.ServiceProvider.GetRequiredService<IInteractionService>();
+                var interactionService = ctx.Services.GetRequiredService<IInteractionService>();
                 var confirmationResult = await interactionService.PromptConfirmationAsync("Remove Migration", "This will remove the most recent compiled migration. Continue?",
                     options: new()
                     {
