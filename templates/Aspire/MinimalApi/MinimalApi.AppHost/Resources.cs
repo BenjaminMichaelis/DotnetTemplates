@@ -247,9 +247,9 @@ public static class Resources
                         "ef",
                         "migrations",
                         "--startup-project",
-                        "./MinimalApi.AppHost",
+                        "./__PROJECT_NAME__.AppHost",
                         "--project",
-                        "./MinimalApi.Data",
+                        "./__PROJECT_NAME__.Data",
                         "--no-build",
                         "add",
                         migrationNameResult.Data.Value
@@ -296,9 +296,9 @@ public static class Resources
                         "ef",
                         "migrations",
                         "--startup-project",
-                        "./MinimalApi.AppHost",
+                        "./__PROJECT_NAME__.AppHost",
                         "--project",
-                        "./MinimalApi.Data",
+                        "./__PROJECT_NAME__.Data",
                         "--no-build",
                         "remove"
                     },

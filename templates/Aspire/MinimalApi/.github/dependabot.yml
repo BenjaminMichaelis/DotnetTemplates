@@ -18,7 +18,7 @@ updates:
           - "dotnet-ef"
 
   - package-ecosystem: "docker"
-    directory: "/MinimalApi"
+    directory: "/__PROJECT_NAME__"
     schedule:
       interval: "weekly"
     patterns: ["*"]
@@ -44,4 +44,3 @@ updates:
       github-actions:
         patterns:
           - "*"
-

@@ -8,8 +8,8 @@
     <File Path="NuGet.config" />
     <File Path="README.md" />
   </Folder>
-  <Project Path="DotnetTool/DotnetTool.csproj" />
+  <Project Path="__PROJECT_NAME__/__PROJECT_NAME__.csproj" />
   <!--#if (tests != "None") -->
-  <Project Path="DotnetTool.Tests/DotnetTool.Tests.csproj" />
+  <Project Path="__PROJECT_NAME__.Tests/__PROJECT_NAME__.Tests.csproj" />
   <!--#endif -->
 </Solution>
