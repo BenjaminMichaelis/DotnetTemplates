@@ -15,12 +15,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 #if (tests != "None")
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkApp.Tests", "BenchmarkApp.Tests\BenchmarkApp.Tests.csproj", "{29ED9E74-DD82-4D2F-99DC-B0865BBF680C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkApp.Tests", "__PROJECT_NAME__.Tests\__PROJECT_NAME__.Tests.csproj", "{29ED9E74-DD82-4D2F-99DC-B0865BBF680C}"
 EndProject
 #endif
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkApp.Benchmark", "BenchmarkApp.Benchmark\BenchmarkApp.Benchmark.csproj", "{1283065B-D336-4E8A-8507-5731C9550CDD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkApp.Benchmark", "__PROJECT_NAME__.Benchmark\__PROJECT_NAME__.Benchmark.csproj", "{1283065B-D336-4E8A-8507-5731C9550CDD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkApp", "BenchmarkApp\BenchmarkApp.csproj", "{05CD66E2-F93B-478A-AACB-6BD7BCCF9A38}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BenchmarkApp", "__PROJECT_NAME__\__PROJECT_NAME__.csproj", "{05CD66E2-F93B-478A-AACB-6BD7BCCF9A38}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

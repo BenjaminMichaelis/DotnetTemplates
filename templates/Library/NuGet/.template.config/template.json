@@ -16,6 +16,12 @@
   "preferNameDirectory":true,
   "sourceName": "NuGetLib",
   "symbols":{
+    "projectName": {
+      "type": "derived",
+      "valueSource": "name",
+      "valueTransform": "identity",
+      "replaces": "__PROJECT_NAME__"
+    },
     "createdDate": {
       "type": "generated",
       "generator": "now",
