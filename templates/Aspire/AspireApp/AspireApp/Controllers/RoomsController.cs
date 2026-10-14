@@ -71,6 +71,7 @@ public class RoomsController(
     [Authorize]
     [ProducesResponseType<RoomDto>(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<RoomDto>> CreateRoom([FromBody] CreateRoomRequest request, CancellationToken cancellationToken)
     {
         var userId = userManager.GetUserId(User);
@@ -87,6 +88,8 @@ public class RoomsController(
     [Authorize]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> DeleteRoom(Guid id, CancellationToken cancellationToken)
     {
         var userId = userManager.GetUserId(User);
@@ -117,6 +120,7 @@ public class RoomsController(
 
     [HttpPost("{roomId:guid}/questions", Name = "CreateQuestion")]
     [ProducesResponseType<QuestionDto>(StatusCodes.Status201Created)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<string>(StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<QuestionDto>> CreateQuestion(Guid roomId, [FromBody] CreateQuestionRequest request, CancellationToken cancellationToken)
     {
@@ -142,6 +146,8 @@ public class RoomsController(
     [Authorize]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> ApproveQuestion(Guid roomId, Guid questionId, CancellationToken cancellationToken)
     {
         var userId = userManager.GetUserId(User);
@@ -158,6 +164,8 @@ public class RoomsController(
     [Authorize]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> MarkQuestionAnswered(Guid roomId, Guid questionId, CancellationToken cancellationToken)
     {
         var userId = userManager.GetUserId(User);
@@ -174,6 +182,8 @@ public class RoomsController(
     [Authorize]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> DeleteQuestion(Guid roomId, Guid questionId, CancellationToken cancellationToken)
     {
         var userId = userManager.GetUserId(User);
@@ -190,6 +200,8 @@ public class RoomsController(
     [Authorize]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> SetCurrentQuestion(Guid roomId, Guid? questionId, CancellationToken cancellationToken)
     {
         var userId = userManager.GetUserId(User);
@@ -206,6 +218,8 @@ public class RoomsController(
     [Authorize]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> ClearCurrentQuestion(Guid roomId, CancellationToken cancellationToken)
     {
         var userId = userManager.GetUserId(User);
