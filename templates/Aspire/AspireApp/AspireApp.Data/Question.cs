@@ -19,9 +19,9 @@ public class Question
     [MaxLength(100)]
     public string? AuthorName { get; set; }
 
-    public bool IsAnswered { get; set; } = false;
+    public bool IsAnswered { get; set; }
 
-    public bool IsApproved { get; set; } = false;
+    public bool IsApproved { get; set; }
 
     public DateTimeOffset CreatedDate { get; set; } = DateTimeOffset.UtcNow;
 

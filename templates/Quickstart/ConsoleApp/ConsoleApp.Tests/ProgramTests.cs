@@ -12,12 +12,8 @@ public class ProgramTests
     public async Task Method_WithPositiveValue_AddsOne()
     {
         //Arrange
-        AutoMocker mocker = new();
-
-        Program class1 = mocker.CreateInstance<Program>();
-
         //Act
-        int result = class1.Method(41);
+        int result = Program.Method(41);
 
         //Assert
         await AssertEqual(42, result);
@@ -31,9 +27,8 @@ public class ProgramTests
     public async Task Method_WithNegativeValue_AddsOne()
     {
         //Arrange
-        Program class1 = new();
         //Act
-        int result = class1.Method(-2);
+        int result = Program.Method(-2);
         //Assert
         await AssertEqual(-1, result);
     }
@@ -41,10 +36,10 @@ public class ProgramTests
     private static async Task AssertEqual(int expected, int actual)
     {
 #if USE_XUNIT
-        Assert.Equal(expected, actual);
+        Xunit.Assert.Equal(expected, actual);
         await Task.CompletedTask;
 #else
-        await Assert.That(actual).IsEqualTo(expected);
+        await TUnit.Assertions.Assert.That(actual).IsEqualTo(expected);
 #endif
     }
 
