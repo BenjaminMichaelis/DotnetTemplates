@@ -153,7 +153,7 @@ app.MapAuthEndpoints();
 app.Run();
 
 // Simple no-op email sender
-internal class NoOpEmailSender<TUser> : IEmailSender<TUser> where TUser : class
+internal sealed class NoOpEmailSender<TUser> : IEmailSender<TUser> where TUser : class
 {
     public Task SendConfirmationLinkAsync(TUser user, string email, string confirmationLink) => Task.CompletedTask;
     public Task SendPasswordResetLinkAsync(TUser user, string email, string resetLink) => Task.CompletedTask;

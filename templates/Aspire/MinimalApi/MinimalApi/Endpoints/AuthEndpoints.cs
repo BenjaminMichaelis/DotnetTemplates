@@ -8,6 +8,8 @@ namespace MinimalApi.Endpoints;
 
 internal static class AuthEndpoints
 {
+    private static readonly string[] PasswordMismatchErrors = ["Passwords do not match."];
+
     internal static IEndpointRouteBuilder MapAuthEndpoints(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/auth").WithTags("Auth");
@@ -44,7 +46,7 @@ internal static class AuthEndpoints
         {
             if (request.Password != request.ConfirmPassword)
             {
-                return Results.BadRequest(new { errors = new[] { "Passwords do not match." } });
+                return Results.BadRequest(new { errors = PasswordMismatchErrors });
             }
 
             var user = new ApplicationUser { UserName = request.Email, Email = request.Email };

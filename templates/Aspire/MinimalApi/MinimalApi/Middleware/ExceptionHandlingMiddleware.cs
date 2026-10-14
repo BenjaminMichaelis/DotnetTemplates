@@ -1,3 +1,5 @@
+using System.Net;
+
 using Microsoft.AspNetCore.Mvc;
 
 namespace MinimalApi.Middleware;
@@ -7,7 +9,10 @@ namespace MinimalApi.Middleware;
 /// Writes RFC 9457 ProblemDetails responses via IProblemDetailsService so the
 /// error shape is consistent with UseExceptionHandler() for all other errors.
 /// </summary>
-public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger, IProblemDetailsService problemDetailsService)
+public partial class ExceptionHandlingMiddleware(
+    RequestDelegate next,
+    ILogger<ExceptionHandlingMiddleware> logger,
+    IProblemDetailsService problemDetailsService)
 {
     public async Task InvokeAsync(HttpContext context)
     {
@@ -17,13 +22,13 @@ public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Exception
         }
         catch (UnauthorizedAccessException ex)
         {
-            logger.LogWarning(ex, "Unauthorized access attempt: {Message}", ex.Message);
-            await WriteProblemDetailsAsync(context, ex, StatusCodes.Status403Forbidden);
+            LogUnauthorizedAccess(logger, ex, ex.Message);
+            await WriteProblemDetailsAsync(context, ex, (int)HttpStatusCode.Forbidden);
         }
         catch (InvalidOperationException ex)
         {
-            logger.LogWarning(ex, "Invalid operation: {Message}", ex.Message);
-            await WriteProblemDetailsAsync(context, ex, StatusCodes.Status400BadRequest);
+            LogInvalidOperation(logger, ex, ex.Message);
+            await WriteProblemDetailsAsync(context, ex, (int)HttpStatusCode.BadRequest);
         }
     }
 
@@ -41,4 +46,10 @@ public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Exception
             },
         });
     }
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Unauthorized access attempt: {Message}")]
+    private static partial void LogUnauthorizedAccess(ILogger logger, Exception exception, string message);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Invalid operation: {Message}")]
+    private static partial void LogInvalidOperation(ILogger logger, Exception exception, string message);
 }

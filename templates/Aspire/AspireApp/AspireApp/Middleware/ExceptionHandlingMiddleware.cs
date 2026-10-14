@@ -7,7 +7,7 @@ namespace AspireApp.Middleware;
 /// Writes RFC 9457 ProblemDetails responses via IProblemDetailsService so the
 /// error shape is consistent with UseExceptionHandler() for all other errors.
 /// </summary>
-public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger, IProblemDetailsService problemDetailsService)
+public partial class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger, IProblemDetailsService problemDetailsService)
 {
     public async Task InvokeAsync(HttpContext context)
     {
@@ -17,12 +17,12 @@ public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Exception
         }
         catch (UnauthorizedAccessException ex)
         {
-            logger.LogWarning(ex, "Unauthorized access attempt: {Message}", ex.Message);
+            LogUnauthorizedAccess(logger, ex, ex.Message);
             await WriteProblemDetailsAsync(context, ex, StatusCodes.Status403Forbidden);
         }
         catch (InvalidOperationException ex)
         {
-            logger.LogWarning(ex, "Invalid operation: {Message}", ex.Message);
+            LogInvalidOperation(logger, ex, ex.Message);
             await WriteProblemDetailsAsync(context, ex, StatusCodes.Status400BadRequest);
         }
     }
@@ -41,4 +41,10 @@ public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Exception
             },
         });
     }
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Unauthorized access attempt: {Message}")]
+    private static partial void LogUnauthorizedAccess(ILogger logger, Exception exception, string message);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Invalid operation: {Message}")]
+    private static partial void LogInvalidOperation(ILogger logger, Exception exception, string message);
 }
