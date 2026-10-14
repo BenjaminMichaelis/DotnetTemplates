@@ -14,13 +14,15 @@ public class AuthController(
 {
     [HttpPost("login", Name = "Login")]
     [ProducesResponseType<UserInfo>(StatusCodes.Status200OK)]
-    [ProducesResponseType<AuthErrorResponse>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<UserInfo>> Login([FromBody] LoginRequest request)
     {
         var user = await userManager.FindByEmailAsync(request.Email);
         if (user is null)
         {
-            return Unauthorized(new AuthErrorResponse("Invalid email or password"));
+            return Problem(
+                detail: "Invalid email or password",
+                statusCode: StatusCodes.Status401Unauthorized);
         }
 
         var result = await signInManager.PasswordSignInAsync(
@@ -40,12 +42,14 @@ public class AuthController(
             });
         }
 
-        return Unauthorized(new AuthErrorResponse("Invalid email or password"));
+        return Problem(
+            detail: "Invalid email or password",
+            statusCode: StatusCodes.Status401Unauthorized);
     }
 
     [HttpPost("register", Name = "Register")]
     [ProducesResponseType<UserInfo>(StatusCodes.Status200OK)]
-    [ProducesResponseType<RegisterErrorResponse>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<UserInfo>> Register([FromBody] RegisterRequest request)
     {
         var user = new ApplicationUser { UserName = request.Email, Email = request.Email };
@@ -71,7 +75,12 @@ public class AuthController(
             }
         }
 
-        return BadRequest(new RegisterErrorResponse(result.Errors.Select(e => e.Description)));
+        foreach (var error in result.Errors)
+        {
+            ModelState.AddModelError(string.Empty, error.Description);
+        }
+
+        return ValidationProblem();
     }
 
     [HttpPost("logout", Name = "Logout")]
@@ -105,8 +114,6 @@ public class AuthController(
 
 public record LoginRequest(string Email, string Password, bool? RememberMe);
 public record RegisterRequest(string Email, string Password, string ConfirmPassword);
-public record AuthErrorResponse(string Message);
-public record RegisterErrorResponse(IEnumerable<string> Errors);
 public record UserInfo
 {
     public string UserId { get; init; } = "";
