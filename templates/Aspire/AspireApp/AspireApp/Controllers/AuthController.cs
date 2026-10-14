@@ -1,10 +1,10 @@
+using AspireApp.Data;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-using MinimalApi.Data;
-
-namespace MinimalApi.Controllers;
+namespace AspireApp.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -12,13 +12,17 @@ public class AuthController(
     SignInManager<ApplicationUser> signInManager,
     UserManager<ApplicationUser> userManager) : ControllerBase
 {
-    [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    [HttpPost("login", Name = "Login")]
+    [ProducesResponseType<UserInfo>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<UserInfo>> Login([FromBody] LoginRequest request)
     {
         var user = await userManager.FindByEmailAsync(request.Email);
         if (user is null)
         {
-            return Unauthorized(new { message = "Invalid email or password" });
+            return Problem(
+                detail: "Invalid email or password",
+                statusCode: StatusCodes.Status401Unauthorized);
         }
 
         var result = await signInManager.PasswordSignInAsync(
@@ -38,11 +42,15 @@ public class AuthController(
             });
         }
 
-        return Unauthorized(new { message = "Invalid email or password" });
+        return Problem(
+            detail: "Invalid email or password",
+            statusCode: StatusCodes.Status401Unauthorized);
     }
 
-    [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+    [HttpPost("register", Name = "Register")]
+    [ProducesResponseType<UserInfo>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<UserInfo>> Register([FromBody] RegisterRequest request)
     {
         var user = new ApplicationUser { UserName = request.Email, Email = request.Email };
         var result = await userManager.CreateAsync(user, request.Password);
@@ -67,19 +75,27 @@ public class AuthController(
             }
         }
 
-        return BadRequest(new { errors = result.Errors.Select(e => e.Description) });
+        foreach (var error in result.Errors)
+        {
+            ModelState.AddModelError(string.Empty, error.Description);
+        }
+
+        return ValidationProblem();
     }
 
-    [HttpPost("logout")]
+    [HttpPost("logout", Name = "Logout")]
     [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Logout()
     {
         await signInManager.SignOutAsync();
         return NoContent();
     }
 
-    [HttpGet("user")]
-    public IActionResult GetCurrentUser()
+    [HttpGet("user", Name = "GetCurrentUser")]
+    [ProducesResponseType<UserInfo>(StatusCodes.Status200OK)]
+    public ActionResult<UserInfo> GetCurrentUser()
     {
         if (!User.Identity?.IsAuthenticated ?? true)
         {
