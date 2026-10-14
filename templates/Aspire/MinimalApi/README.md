@@ -36,7 +36,7 @@ Both options together:
 |-----------|-------------|---------|
 | `--name` | Name of the project | Current directory name |
 | `--applicationInsights` | Add Azure Application Insights monitoring | `false` |
-| `--integrationTests` | Add Aspire integration tests using TUnit | `false` |
+| `--integrationTests` | Add ASP.NET Core API integration tests and Aspire AppHost tests using TUnit | `false` |
 
 ## What is included
 
@@ -45,8 +45,9 @@ Both options together:
 - **EF Core** – SQL Server data layer with AppHost-native `AddEFMigrations` orchestration
 - **Aspire AppHost** – Local orchestration with SQL Server container and DB viewer (dbGate)
 - **ServiceDefaults** – Shared OpenTelemetry, health checks, service discovery
-- **Core + Tests** – Business logic projects with TUnit tests
-- **Aspire integration tests** *(optional, `--integrationTests true`)* – TUnit-based tests that validate AppHost startup and distributed app behavior
+- **Core + Core tests** – Business logic projects with TUnit unit tests (`MinimalApi.Core.Tests` references `MinimalApi.Core`)
+- **API integration tests** *(optional, `--integrationTests true`)* – In-process ASP.NET Core HTTP tests in `MinimalApi.Api.Tests`
+- **AppHost tests** *(optional, `--integrationTests true`)* – Aspire orchestration tests in `MinimalApi.AppHost.Tests`, validating startup and distributed app behavior
 - **Terraform/Infra** – Azure Container Apps, Azure SQL, Application Insights, ACR
 - **GitHub Actions CI/CD** – Build, test, migrate DB, push container image
 
@@ -66,25 +67,31 @@ In development, the API exposes:
 
 ### Running tests
 
-Run all tests (unit tests only when generated without `--integrationTests`):
+Run all tests. Without `--integrationTests true`, only the Core unit test project is included:
 
 ```cli
 > dotnet test
 ```
 
-When generated with `--integrationTests true`, `MinimalApi.Aspire.Tests` is part of the solution, so `dotnet test` runs both unit and integration tests. To run only unit tests without starting containers:
+When generated with `--integrationTests true`, the solution includes the API and AppHost integration test projects. To run only Core unit tests:
 
 ```cli
-> dotnet test MinimalApi.Tests/MinimalApi.Tests.csproj
+> dotnet test MinimalApi.Core.Tests/MinimalApi.Core.Tests.csproj
 ```
 
-To run only integration tests:
+To run only the ASP.NET Core API tests (in-process; no Docker containers):
 
 ```cli
-> dotnet test MinimalApi.Aspire.Tests/MinimalApi.Aspire.Tests.csproj
+> dotnet test MinimalApi.Api.Tests/MinimalApi.Api.Tests.csproj
 ```
 
-**Requirements for Aspire integration tests**:
+To run only the Aspire AppHost tests:
+
+```cli
+> dotnet test MinimalApi.AppHost.Tests/MinimalApi.AppHost.Tests.csproj
+```
+
+**Requirements for Aspire AppHost tests**:
 - Docker must be running (Aspire uses containers for infrastructure)
 - Sufficient disk space for SQL Server and other service containers
 - First run may take 1–2 minutes to download and start containers
@@ -155,4 +162,3 @@ The `UseAzureMonitor()` call in `ServiceDefaults/Extensions.cs` is already prese
 ### Without the option (default)
 
 The `UseAzureMonitor()` stub in `ServiceDefaults` still activates if you manually set `APPLICATIONINSIGHTS_CONNECTION_STRING` at runtime. You just won't have Aspire auto-provisioning or the profiler.
-

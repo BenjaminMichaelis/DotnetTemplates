@@ -155,3 +155,5 @@ internal class NoOpEmailSender<TUser> : IEmailSender<TUser> where TUser : class
     public Task SendPasswordResetLinkAsync(TUser user, string email, string resetLink) => Task.CompletedTask;
     public Task SendPasswordResetCodeAsync(TUser user, string email, string resetCode) => Task.CompletedTask;
 }
+
+public partial class Program { }
