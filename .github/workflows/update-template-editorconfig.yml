@@ -103,14 +103,14 @@ jobs:
           }
 
           $prBody = @"
-          This PR automatically updates template `.editorconfig` files to match the root repository configuration.
+          This PR automatically updates template ``.editorconfig`` files to match the root repository configuration.
           
           ## Changes Made
-          - Updated `.editorconfig` files in the following templates: **${{ steps.update-script.outputs.changed_templates }}**
+          - Updated ``.editorconfig`` files in the following templates: **${{ steps.update-script.outputs.changed_templates }}**
           - Templates using override metadata: **$templatesWithOverrides**
           
           ## Automation Details
-          This PR was automatically created by the `update-template-editorconfig` workflow when changes were detected in the root `.editorconfig` file or template override metadata.
+          This PR was automatically created by the ``update-template-editorconfig`` workflow when changes were detected in the root ``.editorconfig`` file or template override metadata.
           
           Please review the changes to ensure:
           1. Templates without customizations received the updated configuration
@@ -140,14 +140,14 @@ jobs:
           }
 
           $prBody = @"
-          This PR automatically updates template `.editorconfig` files to match the root repository configuration.
+          This PR automatically updates template ``.editorconfig`` files to match the root repository configuration.
           
           ## Changes Made
-          - Updated `.editorconfig` files in the following templates: **${{ steps.update-script.outputs.changed_templates }}**
+          - Updated ``.editorconfig`` files in the following templates: **${{ steps.update-script.outputs.changed_templates }}**
           - Templates using override metadata: **$templatesWithOverrides**
           
           ## Automation Details
-          This PR was automatically updated by the `update-template-editorconfig` workflow when changes were detected in the root `.editorconfig` file or template override metadata.
+          This PR was automatically updated by the ``update-template-editorconfig`` workflow when changes were detected in the root ``.editorconfig`` file or template override metadata.
           
           Please review the changes to ensure:
           1. Templates without customizations received the updated configuration
