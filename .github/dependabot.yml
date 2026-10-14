@@ -17,6 +17,8 @@ updates:
       - "/templates/Quickstart/ConsoleApp/.github/workflows"
       - "/templates/Aspire/MinimalApi/.github/workflows"
       - "/templates/Aspire/AspireApp/.github/workflows"
+      - "/.github/actions/setup-template-test"
+      - "/.github/actions/trx-playlist"
     schedule:
       interval: "weekly" 
     groups:
@@ -53,7 +55,6 @@ updates:
       - "/templates/Library/DotnetTool"
       - "/templates/Quickstart/BenchmarkApp"
       - "/templates/Quickstart/ConsoleApp"
-      - "/templates/Aspire/AspireApp"
     schedule:
       interval: "weekly"
 

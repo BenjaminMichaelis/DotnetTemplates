@@ -141,6 +141,13 @@ Get-ChildItem -Path (Join-Path $repoRoot "templates") -Recurse -File |
   Where-Object { $_.DirectoryName -match '[\\/]\.github[\\/]workflows$' -and $_.Extension -in @(".yml", ".yaml") } |
   ForEach-Object { Add-ExpectedDirectory $workflowDirectories $_.DirectoryName }
 
+Get-ChildItem -Path $repoRoot -Recurse -File |
+  Where-Object {
+    $_.Name -in @("action.yml", "action.yaml") -and
+    $_.FullName -notmatch '[\\/](bin|obj|\.git)[\\/]'
+  } |
+  ForEach-Object { Add-ExpectedDirectory $workflowDirectories $_.DirectoryName }
+
 Assert-DependabotCoverage "nuget" $nugetDirectories
 Assert-DependabotCoverage "dotnet-sdk" $sdkDirectories
 Assert-DependabotCoverage "docker" $dockerDirectories
