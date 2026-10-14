@@ -9,15 +9,15 @@ public class ToolTests
 #else
     [Test]
 #endif
-    public async Task Greet_WithName_ReturnsGreeting()
+    public async Task GreetWithNameReturnsGreeting()
     {
         string result = Tool.Greet("World");
 
 #if USE_XUNIT
-        Assert.Equal("Hello, World!", result);
+        Xunit.Assert.Equal("Hello, World!", result);
         await Task.CompletedTask;
 #else
-        await Assert.That(result).IsEqualTo("Hello, World!");
+        await TUnit.Assertions.Assert.That(result).IsEqualTo("Hello, World!");
 #endif
     }
 }

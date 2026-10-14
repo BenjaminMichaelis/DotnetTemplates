@@ -10,7 +10,11 @@ public class Md5VsSha256
     private readonly byte[] _data;
 
     private readonly SHA256 _sha256 = SHA256.Create();
+
+    // MD5 is intentionally included only as a comparison benchmark, not for security.
+#pragma warning disable CA5351
     private readonly MD5 _md5 = MD5.Create();
+#pragma warning restore CA5351
 
     public Md5VsSha256()
     {
