@@ -16,6 +16,7 @@ updates:
       - "/templates/Quickstart/BenchmarkApp/.github/workflows"
       - "/templates/Quickstart/ConsoleApp/.github/workflows"
       - "/templates/Aspire/MinimalApi/.github/workflows"
+      - "/templates/Aspire/AspireApp/.github/workflows"
     schedule:
       interval: "weekly" 
     groups:
@@ -24,14 +25,16 @@ updates:
             - "*-artifact"
 
 
-# Library.NuGet, Library.DotnetTool, Quickstart.BenchmarkApp, Quickstart.ConsoleApp, Aspire.MinimalApi Templates
+# Library.NuGet, Library.DotnetTool, Quickstart, Aspire.MinimalApi, and AspireApp Templates
   - package-ecosystem: "nuget"
     directories:
+      - "/"
       - "/templates/Library/NuGet"
       - "/templates/Library/DotnetTool"
       - "/templates/Quickstart/BenchmarkApp"
       - "/templates/Quickstart/ConsoleApp"
       - "/templates/Aspire/MinimalApi"
+      - "/templates/Aspire/AspireApp"
     schedule:
       interval: "weekly"
     groups:
@@ -45,16 +48,25 @@ updates:
 
   - package-ecosystem: "dotnet-sdk"
     directories:
+      - "/"
       - "/templates/Library/NuGet"
       - "/templates/Library/DotnetTool"
       - "/templates/Quickstart/BenchmarkApp"
       - "/templates/Quickstart/ConsoleApp"
+      - "/templates/Aspire/AspireApp"
     schedule:
       interval: "weekly"
 
 # Docker and dotnet SDK grouped into one PR
   - package-ecosystem: "docker"
     directory: "/templates/Aspire/MinimalApi/MinimalApi"
+    schedule:
+      interval: "weekly"
+    patterns: ["*"]
+    multi-ecosystem-group: "dotnet-version"
+
+  - package-ecosystem: "docker"
+    directory: "/templates/Aspire/AspireApp/AspireApp"
     schedule:
       interval: "weekly"
     patterns: ["*"]
@@ -67,8 +79,19 @@ updates:
     patterns: ["*"]
     multi-ecosystem-group: "dotnet-version"
 
+  - package-ecosystem: "dotnet-sdk"
+    directory: "/templates/Aspire/AspireApp"
+    schedule:
+      interval: "weekly"
+    patterns: ["*"]
+    multi-ecosystem-group: "dotnet-version"
+
   - package-ecosystem: "terraform"
     directory: "/templates/Aspire/MinimalApi/Infra"
     schedule:
       interval: "weekly"
 
+  - package-ecosystem: "terraform"
+    directory: "/templates/Aspire/AspireApp/Infra"
+    schedule:
+      interval: "weekly"
