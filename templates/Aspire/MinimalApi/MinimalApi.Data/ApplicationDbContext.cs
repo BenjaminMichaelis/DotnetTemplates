@@ -11,12 +11,12 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Room> Rooms => Set<Room>();
     public DbSet<Question> Questions => Set<Question>();
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder builder)
     {
-        base.OnModelCreating(modelBuilder);
+        base.OnModelCreating(builder);
 
         // Configure Room entity
-        modelBuilder.Entity<Room>(entity =>
+        builder.Entity<Room>(entity =>
         {
             entity.HasIndex(e => e.FriendlyName)
                 .IsUnique();
@@ -33,7 +33,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         });
 
         // Configure Question entity
-        modelBuilder.Entity<Question>(entity =>
+        builder.Entity<Question>(entity =>
         {
             entity.HasOne(e => e.Room)
                 .WithMany(r => r.Questions)
@@ -52,21 +52,21 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             // use the DateTimeOffsetToBinaryConverter
             // Based on: https://github.com/aspnet/EntityFrameworkCore/issues/10784#issuecomment-415769754
             // This only supports millisecond precision, but should be sufficient for most use cases.
-            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            foreach (var entityType in builder.Model.GetEntityTypes())
             {
                 var properties = entityType.ClrType
                     .GetProperties()
                     .Where(p => p.PropertyType == typeof(DateTimeOffset) || p.PropertyType == typeof(DateTimeOffset?));
                 foreach (var property in properties)
                 {
-                    var builder = modelBuilder
+                    var propertyBuilder = builder
                         .Entity(entityType.Name)
                         .Property(property.Name)
                         .HasConversion<DateTimeOffsetToBinaryConverter>();
                 }
             }
 
-            modelBuilder.Entity<IdentityPasskeyData>().HasNoKey();
+            builder.Entity<IdentityPasskeyData>().HasNoKey();
         }
     }
 }

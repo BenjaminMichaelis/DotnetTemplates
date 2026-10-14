@@ -1,10 +1,10 @@
+using AspireApp.Data;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-using MinimalApi.Data;
-
-namespace MinimalApi.Controllers;
+namespace AspireApp.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
