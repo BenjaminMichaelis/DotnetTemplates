@@ -1,12 +1,17 @@
 using System.Net;
-using System.Text.Json;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MinimalApi.Middleware;
 
 /// <summary>
-/// Middleware to handle exceptions and return appropriate HTTP status codes
+/// Middleware to map well-known exception types to specific HTTP status codes.
+/// Writes RFC 9457 ProblemDetails responses via IProblemDetailsService so the
+/// error shape is consistent with UseExceptionHandler() for all other errors.
 /// </summary>
-public partial class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
+public partial class ExceptionHandlingMiddleware(
+    RequestDelegate next,
+    ILogger<ExceptionHandlingMiddleware> logger,
+    IProblemDetailsService problemDetailsService)
 {
     public async Task InvokeAsync(HttpContext context)
     {
@@ -17,12 +22,12 @@ public partial class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<E
         catch (UnauthorizedAccessException ex)
         {
             LogUnauthorizedAccess(logger, ex, ex.Message);
-            await HandleExceptionAsync(context, ex, HttpStatusCode.Forbidden);
+            await WriteProblemDetailsAsync(context, ex, (int)HttpStatusCode.Forbidden);
         }
         catch (InvalidOperationException ex)
         {
             LogInvalidOperation(logger, ex, ex.Message);
-            await HandleExceptionAsync(context, ex, HttpStatusCode.BadRequest);
+            await WriteProblemDetailsAsync(context, ex, (int)HttpStatusCode.BadRequest);
         }
     }
 
@@ -32,18 +37,18 @@ public partial class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<E
     [LoggerMessage(Level = LogLevel.Warning, Message = "Invalid operation: {Message}")]
     private static partial void LogInvalidOperation(ILogger logger, Exception exception, string message);
 
-    private static async Task HandleExceptionAsync(HttpContext context, Exception exception, HttpStatusCode statusCode)
+    private async Task WriteProblemDetailsAsync(HttpContext context, Exception exception, int statusCode)
     {
-        context.Response.ContentType = "application/json";
-        context.Response.StatusCode = (int)statusCode;
-
-        var response = new
+        context.Response.StatusCode = statusCode;
+        await problemDetailsService.WriteAsync(new ProblemDetailsContext
         {
-            statusCode = (int)statusCode,
-            message = exception.Message
-        };
-
-        var json = JsonSerializer.Serialize(response);
-        await context.Response.WriteAsync(json);
+            HttpContext = context,
+            Exception = exception,
+            ProblemDetails = new ProblemDetails
+            {
+                Status = statusCode,
+                Detail = exception.Message,
+            },
+        });
     }
 }
