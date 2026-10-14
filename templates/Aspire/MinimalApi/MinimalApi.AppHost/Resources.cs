@@ -11,11 +11,14 @@ using MinimalApi.Core;
 
 namespace MinimalApi.AppHost;
 
-public static class Resources
+#pragma warning disable CA1708 // C# extension blocks generate members with the same name.
+public static partial class Resources
 {
     public const string ContainerSuffixKey = "MinimalApi:ContainerSuffix";
     public const string SqlServer = "MinimalApi-sql";
 
+    [LoggerMessage(Level = LogLevel.Information, Message = "Updated logical group '{Name}' state to {State}")]
+    private static partial void LogUpdatedLogicalGroupState(ILogger logger, string name, string state);
 
     extension(IDistributedApplicationBuilder builder)
     {
@@ -430,10 +433,10 @@ public static class Resources
 
                 if (logger?.IsEnabled(LogLevel.Information) == true)
                 {
-                    logger.LogInformation("Updated logical group '{Name}' state to {State}",
-                        resource.Name, parentState);
+                    LogUpdatedLogicalGroupState(logger, resource.Name, parentState);
                 }
             }
         }
     }
 }
+#pragma warning restore CA1708

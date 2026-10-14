@@ -7,8 +7,23 @@ using Microsoft.Extensions.Logging;
 
 namespace MinimalApi.AppHost;
 
-internal static class AspireExtensions
+internal static partial class AspireExtensions
 {
+    [LoggerMessage(Level = LogLevel.Information, Message = "Running: {ProcessInfo}")]
+    private static partial void LogRunningProcess(ILogger logger, string processInfo);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "{Output}")]
+    private static partial void LogProcessOutput(ILogger logger, string? output);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "{Output}")]
+    private static partial void LogProcessErrorOutput(ILogger logger, string? output);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "{ProcessName} process exited with code {ExitCode}")]
+    private static partial void LogProcessExitCode(ILogger logger, string? processName, int exitCode);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "Failed to run '{ProcessName}' process")]
+    private static partial void LogProcessFailure(ILogger logger, Exception exception, string processName);
+
     extension(ExecuteCommandContext context)
     {
         public ILogger GetResourceLogger<T>(IResourceBuilder<T> resourceBuilder)
@@ -38,7 +53,9 @@ internal static class AspireExtensions
             var logger = serviceProvider.GetResourceLogger(resource);
             if (logger.IsEnabled(LogLevel.Information))
             {
-                logger.LogInformation("Running: {ProcessInfo}", processInfo.ToDisplayString());
+#pragma warning disable CA1873 // Formatting is intentionally deferred behind the enabled check.
+                LogRunningProcess(logger, processInfo.ToDisplayString());
+#pragma warning restore CA1873
             }
             try
             {
@@ -48,7 +65,7 @@ internal static class AspireExtensions
                     {
                         if (!string.IsNullOrWhiteSpace(e.Data) && logger.IsEnabled(LogLevel.Information))
                         {
-                            logger.LogInformation("{Output}", e.Data);
+                            LogProcessOutput(logger, e.Data);
                         }
                     };
 
@@ -56,7 +73,7 @@ internal static class AspireExtensions
                     {
                         if (!string.IsNullOrWhiteSpace(e.Data) && logger.IsEnabled(LogLevel.Error))
                         {
-                            logger.LogError("{Output}", e.Data);
+                            LogProcessErrorOutput(logger, e.Data);
                         }
                     };
 
@@ -66,7 +83,7 @@ internal static class AspireExtensions
                     await process.WaitForExitAsync(cancellationToken);
                     if (process.ExitCode != 0 && logger.IsEnabled(LogLevel.Error))
                     {
-                        logger.LogError("{ProcessName} process exited with code {ExitCode}", Path.GetFileName(processInfo.FileName), process.ExitCode);
+                        LogProcessExitCode(logger, Path.GetFileName(processInfo.FileName), process.ExitCode);
                         return false;
                     }
                     return true;
@@ -78,7 +95,7 @@ internal static class AspireExtensions
             }
             catch (Exception e)
             {
-                logger.LogError(e, "Failed to run '{ProcessName}' process", processInfo.FileName);
+                LogProcessFailure(logger, e, processInfo.FileName);
                 return false;
             }
         }

@@ -6,7 +6,7 @@ namespace MinimalApi.Middleware;
 /// <summary>
 /// Middleware to handle exceptions and return appropriate HTTP status codes
 /// </summary>
-public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
+public partial class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
 {
     public async Task InvokeAsync(HttpContext context)
     {
@@ -16,15 +16,21 @@ public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Exception
         }
         catch (UnauthorizedAccessException ex)
         {
-            logger.LogWarning(ex, "Unauthorized access attempt: {Message}", ex.Message);
+            LogUnauthorizedAccess(logger, ex, ex.Message);
             await HandleExceptionAsync(context, ex, HttpStatusCode.Forbidden);
         }
         catch (InvalidOperationException ex)
         {
-            logger.LogWarning(ex, "Invalid operation: {Message}", ex.Message);
+            LogInvalidOperation(logger, ex, ex.Message);
             await HandleExceptionAsync(context, ex, HttpStatusCode.BadRequest);
         }
     }
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Unauthorized access attempt: {Message}")]
+    private static partial void LogUnauthorizedAccess(ILogger logger, Exception exception, string message);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Invalid operation: {Message}")]
+    private static partial void LogInvalidOperation(ILogger logger, Exception exception, string message);
 
     private static async Task HandleExceptionAsync(HttpContext context, Exception exception, HttpStatusCode statusCode)
     {
