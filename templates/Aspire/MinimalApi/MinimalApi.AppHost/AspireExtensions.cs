@@ -9,8 +9,8 @@ namespace MinimalApi.AppHost;
 
 internal static partial class AspireExtensions
 {
-    [LoggerMessage(Level = LogLevel.Information, Message = "Running: {ProcessInfo}")]
-    private static partial void LogRunningProcess(ILogger logger, string processInfo);
+    private static readonly Action<ILogger, string, Exception?> RunningProcessLog =
+        LoggerMessage.Define<string>(LogLevel.Information, new EventId(0), "Running: {ProcessInfo}");
 
     [LoggerMessage(Level = LogLevel.Information, Message = "{Output}")]
     private static partial void LogProcessOutput(ILogger logger, string? output);
@@ -53,9 +53,7 @@ internal static partial class AspireExtensions
             var logger = serviceProvider.GetResourceLogger(resource);
             if (logger.IsEnabled(LogLevel.Information))
             {
-#pragma warning disable CA1873 // Formatting is intentionally deferred behind the enabled check.
-                LogRunningProcess(logger, processInfo.ToDisplayString());
-#pragma warning restore CA1873
+                RunningProcessLog(logger, processInfo.ToDisplayString(), null);
             }
             try
             {
