@@ -17,9 +17,6 @@ public static partial class Resources
     public const string ContainerSuffixKey = "MinimalApi:ContainerSuffix";
     public const string SqlServer = "MinimalApi-sql";
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Updated logical group '{Name}' state to {State}")]
-    private static partial void LogUpdatedLogicalGroupState(ILogger logger, string name, string state);
-
     extension(IDistributedApplicationBuilder builder)
     {
         public IResourceBuilder<AzureSqlServerResource> AddAzureSqlServer()
@@ -431,12 +428,15 @@ public static partial class Resources
                         Properties = [new("ChildCount", resource.Children.Count)]
                     });
 
-                if (logger?.IsEnabled(LogLevel.Information) == true)
+                if (logger is not null)
                 {
                     LogUpdatedLogicalGroupState(logger, resource.Name, parentState);
                 }
             }
         }
     }
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Updated logical group '{Name}' state to {State}")]
+    private static partial void LogUpdatedLogicalGroupState(ILogger logger, string name, string state);
 }
 #pragma warning restore CA1708

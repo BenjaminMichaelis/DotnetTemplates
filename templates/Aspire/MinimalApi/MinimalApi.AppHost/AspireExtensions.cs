@@ -9,21 +9,6 @@ namespace MinimalApi.AppHost;
 
 internal static partial class AspireExtensions
 {
-    private static readonly Action<ILogger, string, Exception?> RunningProcessLog =
-        LoggerMessage.Define<string>(LogLevel.Information, new EventId(0), "Running: {ProcessInfo}");
-
-    [LoggerMessage(Level = LogLevel.Information, Message = "{Output}")]
-    private static partial void LogProcessOutput(ILogger logger, string? output);
-
-    [LoggerMessage(Level = LogLevel.Error, Message = "{Output}")]
-    private static partial void LogProcessErrorOutput(ILogger logger, string? output);
-
-    [LoggerMessage(Level = LogLevel.Error, Message = "{ProcessName} process exited with code {ExitCode}")]
-    private static partial void LogProcessExitCode(ILogger logger, string? processName, int exitCode);
-
-    [LoggerMessage(Level = LogLevel.Error, Message = "Failed to run '{ProcessName}' process")]
-    private static partial void LogProcessFailure(ILogger logger, Exception exception, string processName);
-
     extension(ExecuteCommandContext context)
     {
         public ILogger GetResourceLogger<T>(IResourceBuilder<T> resourceBuilder)
@@ -61,7 +46,7 @@ internal static partial class AspireExtensions
                 {
                     process.OutputDataReceived += (sender, e) =>
                     {
-                        if (!string.IsNullOrWhiteSpace(e.Data) && logger.IsEnabled(LogLevel.Information))
+                        if (!string.IsNullOrWhiteSpace(e.Data))
                         {
                             LogProcessOutput(logger, e.Data);
                         }
@@ -69,7 +54,7 @@ internal static partial class AspireExtensions
 
                     process.ErrorDataReceived += (sender, e) =>
                     {
-                        if (!string.IsNullOrWhiteSpace(e.Data) && logger.IsEnabled(LogLevel.Error))
+                        if (!string.IsNullOrWhiteSpace(e.Data))
                         {
                             LogProcessErrorOutput(logger, e.Data);
                         }
@@ -79,7 +64,7 @@ internal static partial class AspireExtensions
                     process.BeginErrorReadLine();
 
                     await process.WaitForExitAsync(cancellationToken);
-                    if (process.ExitCode != 0 && logger.IsEnabled(LogLevel.Error))
+                    if (process.ExitCode != 0)
                     {
                         LogProcessExitCode(logger, Path.GetFileName(processInfo.FileName), process.ExitCode);
                         return false;
@@ -154,4 +139,19 @@ internal static partial class AspireExtensions
             return rv.ToString();
         }
     }
+
+    private static readonly Action<ILogger, string, Exception?> RunningProcessLog =
+        LoggerMessage.Define<string>(LogLevel.Information, new EventId(0), "Running: {ProcessInfo}");
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "{Output}")]
+    private static partial void LogProcessOutput(ILogger logger, string? output);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "{Output}")]
+    private static partial void LogProcessErrorOutput(ILogger logger, string? output);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "{ProcessName} process exited with code {ExitCode}")]
+    private static partial void LogProcessExitCode(ILogger logger, string? processName, int exitCode);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "Failed to run '{ProcessName}' process")]
+    private static partial void LogProcessFailure(ILogger logger, Exception exception, string processName);
 }
