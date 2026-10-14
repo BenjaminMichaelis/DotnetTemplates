@@ -497,6 +497,17 @@ dotnet_diagnostic.VSTHRD200.severity = none
 # CA1707: Identifiers should not contain underscores
 dotnet_diagnostic.CA1707.severity = none
 
+###############
+# Spell Check #
+###############
+# https://learn.microsoft.com/visualstudio/ide/text-spell-checker
+spelling_exclusion_path = .\exclusions.dic
+spelling_checkable_types = strings,identifiers,comments
+# Update this to match your preferred language, you will need to ensure you have the language pack installed for the language
+spelling_languages = en-us
+# This is only the level that spelling errors occur in the Error List, it is not actually a compile-time warning/error
+spelling_error_severity = information
+
 [**/Migrations/**/*.cs]
 # EF migrations are generated artifacts; keep format/style tooling from rewriting them.
 generated_code = true
@@ -521,17 +532,6 @@ dotnet_diagnostic.CA1711.severity = none
 
 # CA1861: Avoid constant arrays as arguments
 dotnet_diagnostic.CA1861.severity = none
-
-###############
-# Spell Check #
-###############
-# https://learn.microsoft.com/visualstudio/ide/text-spell-checker
-spelling_exclusion_path = .\exclusions.dic
-spelling_checkable_types = strings,identifiers,comments
-# Update this to match your preferred language, you will need to ensure you have the language pack installed for the language
-spelling_languages = en-us
-# This is only the level that spelling errors occur in the Error List, it is not actually a compile-time warning/error
-spelling_error_severity = information
 
 # Template-specific overrides
 # NuGet template-specific style relaxations.
