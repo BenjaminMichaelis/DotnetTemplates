@@ -31,7 +31,7 @@ tab_width = 4
 
 # New line preferences
 end_of_line = lf
-insert_final_newline = true
+insert_final_newline = false
 
 #### .NET Coding Conventions ####
 [*.{cs,vb}]
@@ -488,16 +488,6 @@ dotnet_diagnostic.INTL0303.severity = warning
 # VSTHRD200: Use Async suffix for async methods
 dotnet_diagnostic.VSTHRD200.severity = warning
 
-##################################
-#### xUnit Analyzers Defaults ####
-##################################
-
-# xUnit1042: The member referenced by the MemberData attribute returns untyped data rows
-dotnet_diagnostic.xUnit1042.severity = warning
-
-# xUnit2024: Do not use boolean asserts for simple equality tests
-dotnet_diagnostic.xUnit2024.severity = warning
-
 [*Tests.cs]
 # These settings are appropriate for test projects.
 
@@ -507,8 +497,30 @@ dotnet_diagnostic.VSTHRD200.severity = none
 # CA1707: Identifiers should not contain underscores
 dotnet_diagnostic.CA1707.severity = none
 
-# CA1822: Test methods cannot be static (TUnit requirement)
-dotnet_diagnostic.CA1822.severity = none
+[**/Migrations/**/*.cs]
+# EF migrations are generated artifacts; keep format/style tooling from rewriting them.
+generated_code = true
+
+# Keep EF migration files in their generated block-scoped style.
+csharp_style_namespace_declarations = block_scoped:silent
+dotnet_diagnostic.IDE0161.severity = none
+
+# CS1591: Missing XML comment for publicly visible type or member
+dotnet_diagnostic.CS1591.severity = none
+
+# Default severity for all analyzer diagnostics
+dotnet_analyzer_diagnostic.severity = none
+dotnet_diagnostic.severity = none
+
+# Default severity for analyzer diagnostics with category 'Style'
+dotnet_analyzer_diagnostic.category-Style.severity = none
+dotnet_diagnostic.IDE0063.severity = silent
+dotnet_diagnostic.IDE0005.severity = none
+dotnet_diagnostic.CS8019.severity = none
+dotnet_diagnostic.CA1711.severity = none
+
+# CA1861: Avoid constant arrays as arguments
+dotnet_diagnostic.CA1861.severity = none
 
 ###############
 # Spell Check #
