@@ -1,4 +1,5 @@
 using System.Net;
+
 using Microsoft.AspNetCore.Mvc;
 
 namespace MinimalApi.Middleware;
@@ -31,12 +32,6 @@ public partial class ExceptionHandlingMiddleware(
         }
     }
 
-    [LoggerMessage(Level = LogLevel.Warning, Message = "Unauthorized access attempt: {Message}")]
-    private static partial void LogUnauthorizedAccess(ILogger logger, Exception exception, string message);
-
-    [LoggerMessage(Level = LogLevel.Warning, Message = "Invalid operation: {Message}")]
-    private static partial void LogInvalidOperation(ILogger logger, Exception exception, string message);
-
     private async Task WriteProblemDetailsAsync(HttpContext context, Exception exception, int statusCode)
     {
         context.Response.StatusCode = statusCode;
@@ -51,4 +46,10 @@ public partial class ExceptionHandlingMiddleware(
             },
         });
     }
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Unauthorized access attempt: {Message}")]
+    private static partial void LogUnauthorizedAccess(ILogger logger, Exception exception, string message);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Invalid operation: {Message}")]
+    private static partial void LogInvalidOperation(ILogger logger, Exception exception, string message);
 }
