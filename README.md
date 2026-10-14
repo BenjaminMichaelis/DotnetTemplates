@@ -8,6 +8,16 @@ Feedback and contributions are welcome via issues and pull requests.
 
 Use [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) or newer.
 
+## Updating .NET SDK version
+
+When bumping the SDK version used by templates:
+
+1. Update `/global.json` for repository-level build/pack workflows.
+2. Update each template `global.json` under `/templates/**/global.json`.
+3. Keep SDK versions aligned unless a template intentionally requires a different SDK/roll-forward policy.
+
+Template-validation workflows install .NET from each template's `global.json`, so CI exercises the same SDK expectations that generated projects use.
+
 ## Install
 
 Install the template pack:
@@ -35,6 +45,7 @@ Use the short name after `bmichaelis.`:
 | Short name | Template docs |
 | --- | --- |
 | `nuget` | [templates/Library/NuGet](./templates/Library/NuGet/README.md) |
+| `tool` | [templates/Library/DotnetTool](./templates/Library/DotnetTool/README.md) |
 | `quickstart.consoleapp` | [templates/Quickstart/ConsoleApp](./templates/Quickstart/ConsoleApp/README.md) |
 | `quickstart.benchmarkconsole` | [templates/Quickstart/BenchmarkApp](./templates/Quickstart/BenchmarkApp/README.md) |
 | `aspire.minimalapi` | [templates/Aspire/MinimalApi](./templates/Aspire/MinimalApi/README.md) |
@@ -84,6 +95,7 @@ Remove the local install:
 
 - `Templates.csproj`: template pack project that packs `templates/**`
 - `templates/Library/NuGet`: `bmichaelis.nuget`
+- `templates/Library/DotnetTool`: `bmichaelis.tool`
 - `templates/Quickstart/ConsoleApp`: `bmichaelis.quickstart.consoleapp`
 - `templates/Quickstart/BenchmarkApp`: `bmichaelis.quickstart.benchmarkconsole`
 - `templates/Aspire/MinimalApi`: `bmichaelis.aspire.minimalapi`
@@ -94,7 +106,7 @@ Remove the local install:
 2. Add or update `.template.config/template.json`
 3. Copy the root `.editorconfig` to the template (or run `.\CopyEditorConfigToTemplates.ps1`)
 4. Ensure template CI includes strict `dotnet format` checks (whitespace, style, analyzers)
-5. Update CI matrix entries (for example, `build.yml`)
+5. Update CI reusable workflow inputs/matrix JSON (in `build.yml` and `.github/workflows/template-validation.yml`)
 6. Update this README with the new template
 
 ## EditorConfig management
@@ -105,6 +117,12 @@ CI enforces formatting via strict checks:
 - `dotnet format whitespace <target> --verify-no-changes --no-restore`
 - `dotnet format style <target> --verify-no-changes --no-restore --severity info`
 - `dotnet format analyzers <target> --verify-no-changes --no-restore --severity info`
+
+CI architecture is intentionally DRY and schema-driven:
+- `build.yml` orchestrates package build, dynamic matrix generation, and top-level test gates
+- `.github/scripts/Get-TemplateCiMatrix.ps1` discovers template options from `template.json`, validates against the template schema, and emits workflow matrices
+- `.github/workflows/template-validation.yml` is the reusable workflow for standard template validation variants
+- `.github/actions/setup-template-test` and `.github/actions/trx-playlist` provide reusable native GitHub Actions setup and test-result handling
 
 **For template-specific customizations:**
 - Keep template-specific rules in `templates/<Template>/.template.config/editorconfig.override`

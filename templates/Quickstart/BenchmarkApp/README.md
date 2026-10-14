@@ -15,12 +15,15 @@ Create a new app in your current directory by running.
  dotnet new bmichaelis.quickstart.benchmarkconsole
 ```
 
+## .NET SDK version
+
+This template includes a `global.json` file. To update the SDK version used by generated projects and CI validation, update `global.json`.
+
 ### Parameters
 
 - `--sln`: Include a legacy `.sln` file instead of the default `.slnx` file.
 - `--no-sln`: Don't include a solution file.
-- `--no-tests`: Don't include the test project.
-- `--tests`: Choose the test framework (`tunit` default, `xunit` for xUnit v3 + MTP v2).
+- `--tests`: Choose the test framework (`tunit` default, `xunit` for xUnit v3 + MTP v2, `None` to exclude test project).
 
 [Default template options](https://learn.microsoft.com/dotnet/core/tools/dotnet-new#options)
 

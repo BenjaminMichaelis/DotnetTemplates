@@ -8,7 +8,7 @@
     <File Path="NuGet.config" />
     <File Path="README.md" />
   </Folder>
-<!--#if (!no-tests) -->
+<!--#if (tests != "None") -->
   <Project Path="BenchmarkApp.Tests/BenchmarkApp.Tests.csproj" />
 <!--#endif -->
   <Project Path="BenchmarkApp.Benchmark/BenchmarkApp.Benchmark.csproj" />

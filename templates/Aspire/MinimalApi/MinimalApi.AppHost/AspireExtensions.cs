@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace MinimalApi.AppHost;
 
-internal static class AspireExtensions
+internal static partial class AspireExtensions
 {
     extension(ExecuteCommandContext context)
     {
@@ -36,7 +36,10 @@ internal static class AspireExtensions
             processInfo.RedirectStandardError = true;
 
             var logger = serviceProvider.GetResourceLogger(resource);
-            logger.LogInformation("Running: {ProcessInfo}", processInfo.ToDisplayString());
+            if (logger.IsEnabled(LogLevel.Information))
+            {
+                RunningProcessLog(logger, processInfo.ToDisplayString(), null);
+            }
             try
             {
                 if (Process.Start(processInfo) is { } process)
@@ -45,7 +48,7 @@ internal static class AspireExtensions
                     {
                         if (!string.IsNullOrWhiteSpace(e.Data))
                         {
-                            logger.LogInformation(e.Data);
+                            LogProcessOutput(logger, e.Data);
                         }
                     };
 
@@ -53,7 +56,7 @@ internal static class AspireExtensions
                     {
                         if (!string.IsNullOrWhiteSpace(e.Data))
                         {
-                            logger.LogError(e.Data);
+                            LogProcessErrorOutput(logger, e.Data);
                         }
                     };
 
@@ -61,9 +64,9 @@ internal static class AspireExtensions
                     process.BeginErrorReadLine();
 
                     await process.WaitForExitAsync(cancellationToken);
-                    if (process.ExitCode != 0 && logger.IsEnabled(LogLevel.Error))
+                    if (process.ExitCode != 0)
                     {
-                        logger.LogError("{ProcessName} process exited with code {ExitCode}", Path.GetFileName(processInfo.FileName), process.ExitCode);
+                        LogProcessExitCode(logger, Path.GetFileName(processInfo.FileName), process.ExitCode);
                         return false;
                     }
                     return true;
@@ -75,7 +78,7 @@ internal static class AspireExtensions
             }
             catch (Exception e)
             {
-                logger.LogError(e, "Failed to run '{ProcessName}' process", processInfo.FileName);
+                LogProcessFailure(logger, e, processInfo.FileName);
                 return false;
             }
         }
@@ -136,4 +139,19 @@ internal static class AspireExtensions
             return rv.ToString();
         }
     }
+
+    private static readonly Action<ILogger, string, Exception?> RunningProcessLog =
+        LoggerMessage.Define<string>(LogLevel.Information, new EventId(0), "Running: {ProcessInfo}");
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "{Output}")]
+    private static partial void LogProcessOutput(ILogger logger, string? output);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "{Output}")]
+    private static partial void LogProcessErrorOutput(ILogger logger, string? output);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "{ProcessName} process exited with code {ExitCode}")]
+    private static partial void LogProcessExitCode(ILogger logger, string? processName, int exitCode);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "Failed to run '{ProcessName}' process")]
+    private static partial void LogProcessFailure(ILogger logger, Exception exception, string processName);
 }

@@ -1,11 +1,15 @@
-using MinimalApi.Core;
-using MinimalApi.Data;
-using MinimalApi.Middleware;
+using System.Text;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
+
+using MinimalApi.Core;
+using MinimalApi.Data;
+using MinimalApi.Endpoints;
+using MinimalApi.Middleware;
+
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,9 +30,8 @@ if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
 //#endif
 
 // Add services to the container.
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddProblemDetails();
+builder.Services.AddOpenApi();
 
 // Add CORS for cross-origin clients
 builder.Services.AddCors(options =>
@@ -46,7 +49,7 @@ builder.Services.AddCors(options =>
         else
         {
             // In production, restrict to specific origins from configuration
-            var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() 
+            var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()
                 ?? ["https://yourdomain.com"];
             policy.WithOrigins(allowedOrigins)
                   .AllowAnyHeader()
@@ -111,27 +114,27 @@ authBuilder.AddJwtBearer(options =>
 });
 
 // No-op email sender for now (can be replaced with real implementation)
-builder.Services.AddScoped<IEmailSender<ApplicationUser>>(sp => 
+builder.Services.AddScoped<IEmailSender<ApplicationUser>>(sp =>
     new NoOpEmailSender<ApplicationUser>());
 
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
 
+// Configure the HTTP request pipeline.
+app.UseExceptionHandler();
+
 // Enable CORS
 app.UseCors("AllowedOrigins");
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.MapOpenApi();
+    app.MapScalarApiReference();
     app.UseMigrationsEndPoint();
-    app.UseDeveloperExceptionPage();
 }
 else
 {
-    app.UseExceptionHandler("/Error");
     app.UseHsts();
     app.UseHttpsRedirection();
 }
@@ -142,12 +145,15 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
+app.MapGet("/", () => "API is running.");
+
+app.MapRoomEndpoints();
+app.MapAuthEndpoints();
 
 app.Run();
 
 // Simple no-op email sender
-internal class NoOpEmailSender<TUser> : IEmailSender<TUser> where TUser : class
+internal sealed class NoOpEmailSender<TUser> : IEmailSender<TUser> where TUser : class
 {
     public Task SendConfirmationLinkAsync(TUser user, string email, string confirmationLink) => Task.CompletedTask;
     public Task SendPasswordResetLinkAsync(TUser user, string email, string resetLink) => Task.CompletedTask;

@@ -11,11 +11,11 @@ using MinimalApi.Core;
 
 namespace MinimalApi.AppHost;
 
-public static class Resources
+#pragma warning disable CA1708 // C# extension blocks generate members with the same name.
+public static partial class Resources
 {
     public const string ContainerSuffixKey = "MinimalApi:ContainerSuffix";
     public const string SqlServer = "MinimalApi-sql";
-
 
     extension(IDistributedApplicationBuilder builder)
     {
@@ -28,7 +28,7 @@ public static class Resources
         {
             string? containerSuffix = builder.Configuration[ContainerSuffixKey];
             string? containerName = string.IsNullOrWhiteSpace(containerSuffix) ? "MinimalApi-sql" : $"MinimalApi-{containerSuffix}-sql";
-            
+
             return builder
                 .AddSqlServer(SqlServer)
                 .WithLifetime(ContainerLifetime.Persistent)
@@ -141,13 +141,6 @@ public static class Resources
             }
         }
 
-        public IResourceBuilder<ExternalServiceResource> AddMUIDocs()
-        {
-            return builder.AddExternalService("MUI-docs", "https://mui.com/material-ui/getting-started/")
-                .ExcludeFromManifest()
-                .ExcludeFromMcp();
-        }
-
         public IResourceBuilder<LogicalGroupResource> AddLogicalGroup(string name)
         {
             var resource = new LogicalGroupResource(name);
@@ -230,13 +223,6 @@ public static class Resources
         {
             var database = sql.AddDatabase("MinimalApi-db");
 
-            database.OnResourceReady(async (resource, e, cancellationToken) =>
-            {
-                if (!await ApplyDatabaseMigrationsAsync(resource, e.Services, cancellationToken))
-                {
-                    throw new Exception("Failed to apply database migrations to the database");
-                }
-            });
             database.WithDotnetToolRestoreCommand();
 
             database.WithCommand("CreateMigration", "Create Migration", async ctx =>
@@ -330,13 +316,6 @@ public static class Resources
                 IconName = "TableDismiss",
             });
 
-            database.WithCommand("ApplyMigrations", "Apply Database Migrations",
-                async ctx => await ApplyDatabaseMigrationsAsync(database.Resource, ctx.ServiceProvider, ctx.CancellationToken)
-                    ? CommandResults.Success() : CommandResults.Failure("Failed to apply migrations"), new CommandOptions()
-                    {
-                        IconName = "DatabaseLightning"
-                    });
-
             return database;
         }
     }
@@ -354,66 +333,6 @@ public static class Resources
         };
 
         return await resource.ExecuteProcessAsync(services, psi);
-    }
-
-    private static async Task<bool> ApplyDatabaseMigrationsAsync(SqlServerDatabaseResource database, IServiceProvider services, CancellationToken cancellationToken)
-    {
-        string? connectionString = await database.ConnectionStringExpression.GetValueAsync(cancellationToken);
-        if (string.IsNullOrWhiteSpace(connectionString)) throw new InvalidOperationException("Connection string for database not available");
-
-        ILogger logger = services.GetResourceLogger(database);
-
-        logger.LogInformation("Applying any pending migrations to the database");
-
-        bool processResult = await ApplyMigrationsAsync();
-
-        if (!processResult && await RestoreDotnetToolsAsync(database, services))
-        {
-            processResult = await ApplyMigrationsAsync();
-        }
-
-        if (processResult)
-        {
-            logger.LogInformation("Applied migrations to the database");
-            return true;
-        }
-        else
-        {
-            logger.LogError("Failed to apply migrations to the database");
-            return false;
-        }
-
-        Task<bool> ApplyMigrationsAsync()
-        {
-            // Determine the build configuration to use
-            // Check common environment variable or default to Debug for local development
-            string configuration = Environment.GetEnvironmentVariable("DOTNET_BUILD_CONFIGURATION") 
-                ?? Environment.GetEnvironmentVariable("Configuration") 
-                ?? "Debug";
-            
-            ProcessStartInfo psi = new()
-            {
-                FileName = "dotnet",
-                ArgumentList = {
-                    "ef",
-                    "database",
-                    "update",
-                    "--no-build",
-                    "--configuration",
-                    configuration,
-                    "--startup-project",
-                    "./MinimalApi.AppHost",
-                    "--project",
-                    "./MinimalApi.Data",
-                },
-                WorkingDirectory = GetSolutionDirectory()?.FullName,
-                EnvironmentVariables =
-                {
-                    { $"ConnectionStrings__{ConnectionStrings.DatabaseKey}", connectionString }
-                }
-            };
-            return database.ExecuteProcessAsync(services, psi, cancellationToken);
-        }
     }
 
     private static void RefreshPathVariable()
@@ -440,7 +359,7 @@ public static class Resources
             dir = dir.Parent)
         {
             if (dir.EnumerateFiles("*.sln?").Any())
-            { 
+            {
                 return dir;
             }
         }
@@ -509,12 +428,15 @@ public static class Resources
                         Properties = [new("ChildCount", resource.Children.Count)]
                     });
 
-                if (logger?.IsEnabled(LogLevel.Information) == true)
+                if (logger is not null)
                 {
-                    logger.LogInformation("Updated logical group '{Name}' state to {State}",
-                        resource.Name, parentState);
+                    LogUpdatedLogicalGroupState(logger, resource.Name, parentState);
                 }
             }
         }
     }
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Updated logical group '{Name}' state to {State}")]
+    private static partial void LogUpdatedLogicalGroupState(ILogger logger, string name, string state);
 }
+#pragma warning restore CA1708

@@ -1,0 +1,37 @@
+name: Generate failed-test playlist
+description: Converts TRX test results into a merged failed-tests playlist when TRX files exist.
+
+inputs:
+  trx-root:
+    description: Root directory to search for TRX files
+    required: false
+    default: .
+  output-path:
+    description: Output path for the generated playlist
+    required: false
+    default: test-results/failed-tests.playlist
+
+runs:
+  using: composite
+  steps:
+    - name: Generate merged failure playlist from TRX
+      shell: pwsh
+      run: |
+        $trxFiles = Get-ChildItem -Path "${{ inputs.trx-root }}" -Recurse -File -Filter "*.trx" |
+          Where-Object { $_.FullName -like "*trx-data*" } |
+          Select-Object -ExpandProperty FullName
+
+        if (-not $trxFiles) {
+          Write-Host "No TRX files found. Skipping playlist generation."
+          exit 0
+        }
+
+        $outputDir = Split-Path -Parent "${{ inputs.output-path }}"
+        if (-not [string]::IsNullOrWhiteSpace($outputDir)) {
+          New-Item -ItemType Directory -Path $outputDir -Force | Out-Null
+        }
+
+        $args = @("tool", "run", "trx-to-vsplaylist", "convert")
+        $args += $trxFiles
+        $args += @("--outcome", "Failed", "--output", "${{ inputs.output-path }}", "--skip-empty")
+        dotnet @args

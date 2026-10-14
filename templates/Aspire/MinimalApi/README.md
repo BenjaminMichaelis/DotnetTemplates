@@ -16,6 +16,22 @@ With Application Insights monitoring enabled:
 > dotnet new bmichaelis.aspire.minimalapi --applicationInsights true
 ```
 
+With Aspire integration tests:
+
+```cli
+> dotnet new bmichaelis.aspire.minimalapi --integrationTests true
+```
+
+Both options together:
+
+```cli
+> dotnet new bmichaelis.aspire.minimalapi --applicationInsights true --integrationTests true
+```
+
+## .NET SDK version
+
+This template includes a `global.json` file. To update the SDK version used by generated projects and CI validation, update `global.json`.
+
 ### Parameters
 
 [Default template options](https://learn.microsoft.com/dotnet/core/tools/dotnet-new#options)
@@ -24,15 +40,17 @@ With Application Insights monitoring enabled:
 |-----------|-------------|---------|
 | `--name` | Name of the project | Current directory name |
 | `--applicationInsights` | Add Azure Application Insights monitoring | `false` |
+| `--integrationTests` | Add Aspire integration tests using TUnit | `false` |
 
 ## What is included
 
-- **API project** – ASP.NET Core Web API with controllers, CORS, Swagger/OpenAPI
+- **API project** – ASP.NET Core Web API with controllers, CORS, OpenAPI, and Scalar API docs (development)
 - **ASP.NET Core Identity** – Cookie + JWT authentication for API endpoints
-- **EF Core** – SQL Server data layer with migrations via AppHost
+- **EF Core** – SQL Server data layer with AppHost-native `AddEFMigrations` orchestration
 - **Aspire AppHost** – Local orchestration with SQL Server container and DB viewer (dbGate)
 - **ServiceDefaults** – Shared OpenTelemetry, health checks, service discovery
 - **Core + Tests** – Business logic projects with TUnit tests
+- **Aspire integration tests** *(optional, `--integrationTests true`)* – TUnit-based tests that validate AppHost startup and distributed app behavior
 - **Terraform/Infra** – Azure Container Apps, Azure SQL, Application Insights, ACR
 - **GitHub Actions CI/CD** – Build, test, migrate DB, push container image
 
@@ -41,6 +59,39 @@ With Application Insights monitoring enabled:
 ```cli
 > aspire run
 ```
+
+When you run locally, AppHost executes pending EF Core migrations through the `MinimalApi-backend-migrations` resource and starts the backend only after migrations finish.
+
+When you run `aspire publish`, AppHost emits migration artifacts under `efmigrations/` (SQL script + migration bundle).
+
+In development, the API exposes:
+- OpenAPI document: `/openapi/v1.json`
+- Scalar UI: `/scalar`
+
+### Running tests
+
+Run all tests (unit tests only when generated without `--integrationTests`):
+
+```cli
+> dotnet test
+```
+
+When generated with `--integrationTests true`, `MinimalApi.Aspire.Tests` is part of the solution, so `dotnet test` runs both unit and integration tests. To run only unit tests without starting containers:
+
+```cli
+> dotnet test MinimalApi.Tests/MinimalApi.Tests.csproj
+```
+
+To run only integration tests:
+
+```cli
+> dotnet test MinimalApi.Aspire.Tests/MinimalApi.Aspire.Tests.csproj
+```
+
+**Requirements for Aspire integration tests**:
+- Docker must be running (Aspire uses containers for infrastructure)
+- Sufficient disk space for SQL Server and other service containers
+- First run may take 1–2 minutes to download and start containers
 
 The AppHost passes the backend auth signing key through a secret parameter (`Auth__SigningKey`).
 Set it once for local development:
@@ -76,6 +127,8 @@ docker run -p 8080:8080 \
 ### Aspire vs. standalone Docker
 When running with `aspire run`, the AppHost uses `AddProject<Projects.MinimalApi>` and Aspire handles container publishing automatically (no Dockerfile required). The `Dockerfile` is for non-Aspire workflows only.
 
+The included GitHub Actions workflow uses Docker Buildx with GitHub Actions cache (`cache-from`/`cache-to`) and BuildKit cache-mount persistence for faster repeat builds in CI.
+
 ## Azure deployment
 
 Infrastructure is managed with Terraform under `Infra/`. See `Infra/README.md` for setup instructions.
@@ -106,3 +159,4 @@ The `UseAzureMonitor()` call in `ServiceDefaults/Extensions.cs` is already prese
 ### Without the option (default)
 
 The `UseAzureMonitor()` stub in `ServiceDefaults` still activates if you manually set `APPLICATIONINSIGHTS_CONNECTION_STRING` at runtime. You just won't have Aspire auto-provisioning or the profiler.
+

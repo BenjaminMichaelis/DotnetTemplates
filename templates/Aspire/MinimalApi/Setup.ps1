@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Interactive setup script that configures Azure AD App Registrations, 
     Terraform backend storage, and GitHub Actions OIDC authentication.
@@ -27,6 +27,7 @@
     .\Setup.ps1 -NonInteractive -ProjectName "MyApp" -GitHubOwner "myorg" -GitHubRepo "myrepo"
 #>
 
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingWriteHost', '', Justification = 'Interactive setup script: Write-Host with -ForegroundColor is intentional for user experience')]
 [CmdletBinding()]
 param(
     [Parameter(Mandatory = $false)]
@@ -60,7 +61,7 @@ param(
     [string]$TerraformContainerName = "terraform",
 
     [Parameter(Mandatory = $false)]
-    [switch]$CreateInfraApp = $true,
+    [bool]$CreateInfraApp = $true,
 
     [Parameter(Mandatory = $false)]
     [switch]$NonInteractive
@@ -72,36 +73,36 @@ $ErrorActionPreference = "Stop"
 # Helper Functions
 # ============================================================
 
-function Prompt-WithDefault {
+function Read-InputWithDefault {
     param(
         [string]$Message,
         [string]$Default
     )
 
     if ($Default) {
-        $input = Read-Host "$Message [$Default]"
-        if ([string]::IsNullOrWhiteSpace($input)) { return $Default }
-        return $input
+        $userInput = Read-Host "$Message [$Default]"
+        if ([string]::IsNullOrWhiteSpace($userInput)) { return $Default }
+        return $userInput
     }
     else {
         do {
-            $input = Read-Host "$Message"
-        } while ([string]::IsNullOrWhiteSpace($input))
-        return $input
+            $userInput = Read-Host "$Message"
+        } while ([string]::IsNullOrWhiteSpace($userInput))
+        return $userInput
     }
 }
 
-function Prompt-YesNo {
+function Read-YesNoConfirmation {
     param(
         [string]$Message,
         [bool]$Default = $true
     )
 
     $suffix = if ($Default) { "[Y/n]" } else { "[y/N]" }
-    $input = Read-Host "$Message $suffix"
+    $userInput = Read-Host "$Message $suffix"
 
-    if ([string]::IsNullOrWhiteSpace($input)) { return $Default }
-    return $input -match '^[Yy]'
+    if ([string]::IsNullOrWhiteSpace($userInput)) { return $Default }
+    return $userInput -match '^[Yy]'
 }
 
 function Get-GitHubRemoteInfo {
@@ -118,11 +119,13 @@ function Get-GitHubRemoteInfo {
             }
         }
     }
-    catch { }
+    catch {
+        Write-Verbose "Git remote info not available: $_"
+    }
     return $null
 }
 
-function Create-AppRegistrationWithRoles {
+function Build-AzureAppRegistration {
     param(
         [string]$Name,
         [string]$SubscriptionId,
@@ -284,7 +287,7 @@ function Create-AppRegistrationWithRoles {
     }
 }
 
-function Create-TerraformBackendStorage {
+function Build-TerraformBackendStorage {
     param(
         [string]$ResourceGroupName,
         [string]$StorageAccountName,
@@ -309,7 +312,7 @@ function Create-TerraformBackendStorage {
     # Create Storage Account
     Write-Host "  Checking storage account '$StorageAccountName'..." -ForegroundColor Yellow
     $ErrorActionPreference = "SilentlyContinue"
-    $storageAccountCheck = az storage account show --name $StorageAccountName --resource-group $ResourceGroupName 2>$null
+    az storage account show --name $StorageAccountName --resource-group $ResourceGroupName 2>$null | Out-Null
     $ErrorActionPreference = "Stop"
 
     if ($LASTEXITCODE -eq 0) {
@@ -413,7 +416,7 @@ function Create-TerraformBackendStorage {
     }
 }
 
-function Generate-ServicePrincipalsTerraform {
+function Build-ServicePrincipalTerraformFile {
     param(
         [string]$OutputPath,
         [string]$AppDisplayName,
@@ -501,7 +504,7 @@ if (-not $azAccount) {
 Write-Host "  Azure: Logged in as $($azAccount.user.name)" -ForegroundColor Green
 
 # Check GitHub CLI login
-$ghAuth = gh auth status 2>&1
+gh auth status 2>&1 | Out-Null
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Not logged into GitHub CLI. Please log in..." -ForegroundColor Yellow
     gh auth login
@@ -531,21 +534,21 @@ if ($NonInteractive) {
     if (-not $GitHubOwner -or -not $GitHubRepo) { throw "GitHubOwner and GitHubRepo are required in non-interactive mode" }
 }
 else {
-    $ProjectName = Prompt-WithDefault -Message "Project name" -Default $defaultProject
-    $GitHubOwner = Prompt-WithDefault -Message "GitHub owner (org or user)" -Default $defaultOwner
-    $GitHubRepo = Prompt-WithDefault -Message "GitHub repository name" -Default $defaultRepo
+    $ProjectName = Read-InputWithDefault -Message "Project name" -Default $defaultProject
+    $GitHubOwner = Read-InputWithDefault -Message "GitHub owner (org or user)" -Default $defaultOwner
+    $GitHubRepo = Read-InputWithDefault -Message "GitHub repository name" -Default $defaultRepo
 
     if (-not $SubscriptionId) {
-        $useCurrentSub = Prompt-YesNo -Message "Use current Azure subscription '$($azAccount.name)' ($($azAccount.id))?" -Default $true
+        $useCurrentSub = Read-YesNoConfirmation -Message "Use current Azure subscription '$($azAccount.name)' ($($azAccount.id))?" -Default $true
         if (-not $useCurrentSub) {
-            $SubscriptionId = Prompt-WithDefault -Message "Azure Subscription ID" -Default ""
+            $SubscriptionId = Read-InputWithDefault -Message "Azure Subscription ID" -Default ""
         }
     }
 
-    $Environment = Prompt-WithDefault -Message "GitHub environment name" -Default $Environment
-    $Branch = Prompt-WithDefault -Message "Default branch" -Default $Branch
-    $Location = Prompt-WithDefault -Message "Azure region" -Default $Location
-    $CreateInfraApp = Prompt-YesNo -Message "Create separate Infra app registration (with Graph permissions for AAD role management)?" -Default $true
+    $Environment = Read-InputWithDefault -Message "GitHub environment name" -Default $Environment
+    $Branch = Read-InputWithDefault -Message "Default branch" -Default $Branch
+    $Location = Read-InputWithDefault -Message "Azure region" -Default $Location
+    $CreateInfraApp = Read-YesNoConfirmation -Message "Create separate Infra app registration (with Graph permissions for AAD role management)?" -Default $true
 }
 
 # Set subscription
@@ -569,8 +572,8 @@ if (-not $TerraformStorageAccountName) {
 }
 
 if (-not $NonInteractive) {
-    $TerraformResourceGroupName = Prompt-WithDefault -Message "Terraform resource group name" -Default $TerraformResourceGroupName
-    $TerraformStorageAccountName = Prompt-WithDefault -Message "Terraform storage account name (must be globally unique)" -Default $TerraformStorageAccountName
+    $TerraformResourceGroupName = Read-InputWithDefault -Message "Terraform resource group name" -Default $TerraformResourceGroupName
+    $TerraformStorageAccountName = Read-InputWithDefault -Message "Terraform storage account name (must be globally unique)" -Default $TerraformStorageAccountName
 }
 
 # Display configuration summary
@@ -595,7 +598,7 @@ Write-Host "  TF Storage Account:    $TerraformStorageAccountName" -ForegroundCo
 Write-Host ""
 
 if (-not $NonInteractive) {
-    $proceed = Prompt-YesNo -Message "Proceed with this configuration?" -Default $true
+    $proceed = Read-YesNoConfirmation -Message "Proceed with this configuration?" -Default $true
     if (-not $proceed) {
         Write-Host "Setup cancelled." -ForegroundColor Yellow
         exit 0
@@ -611,7 +614,7 @@ Write-Host "------------------------------------------------------" -ForegroundC
 Write-Host "  Step 1/5: Creating App Registrations" -ForegroundColor Cyan
 Write-Host "------------------------------------------------------" -ForegroundColor Cyan
 
-$mainApp = Create-AppRegistrationWithRoles `
+$mainApp = Build-AzureAppRegistration `
     -Name $AppName `
     -SubscriptionId $SubscriptionId `
     -GitHubOwner $GitHubOwner `
@@ -626,7 +629,7 @@ if ($CreateInfraApp) {
     Write-Host "  Creating Infrastructure App Registration..." -ForegroundColor Cyan
 
     $infraAppName = "${AppName}Infra"
-    $infraApp = Create-AppRegistrationWithRoles `
+    $infraApp = Build-AzureAppRegistration `
         -Name $infraAppName `
         -SubscriptionId $SubscriptionId `
         -GitHubOwner $GitHubOwner `
@@ -646,7 +649,7 @@ Write-Host "------------------------------------------------------" -ForegroundC
 Write-Host "  Step 2/5: Creating Terraform Backend Storage" -ForegroundColor Cyan
 Write-Host "------------------------------------------------------" -ForegroundColor Cyan
 
-Create-TerraformBackendStorage `
+Build-TerraformBackendStorage `
     -ResourceGroupName $TerraformResourceGroupName `
     -StorageAccountName $TerraformStorageAccountName `
     -ContainerName $TerraformContainerName `
@@ -668,7 +671,7 @@ $infraDir = Join-Path $PSScriptRoot "Infra"
 $spTfPath = Join-Path $infraDir "prod" "service_principals.tf"
 $infraDisplayName = if ($infraApp) { $infraApp.DisplayName } else { "${AppName}Infra" }
 
-Generate-ServicePrincipalsTerraform `
+Build-ServicePrincipalTerraformFile `
     -OutputPath $spTfPath `
     -AppDisplayName $mainApp.DisplayName `
     -InfraDisplayName $infraDisplayName

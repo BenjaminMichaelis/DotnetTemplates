@@ -1,9 +1,9 @@
-using MinimalApi.Core;
-using MinimalApi.Data;
-
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+
+using MinimalApi.Core;
+using MinimalApi.Data;
 
 namespace MinimalApi.AppHost;
 

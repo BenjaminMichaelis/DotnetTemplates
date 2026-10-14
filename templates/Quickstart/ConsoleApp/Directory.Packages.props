@@ -19,20 +19,20 @@
   This would typically list all NuGet packages used within this solution.
   -->
   <ItemGroup>
-    <!--#if (!no-tests) -->
-    <PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.6.2">
+    <!--#if (tests != "None") -->
+    <PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.7.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageVersion>
     <!--#endif -->
-    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.300" />
-    <!--#if (!no-tests) -->
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.303" />
+    <!--#if (tests != "None") -->
     <PackageVersion Include="Moq" Version="4.20.72" />
-    <PackageVersion Include="Moq.AutoMock" Version="4.0.2" />
+    <PackageVersion Include="Moq.AutoMock" Version="4.0.3" />
     <!--#if (USE_XUNIT) -->
-    <PackageVersion Include="xunit.v3.mtp-v2" Version="3.2.2" />
+    <PackageVersion Include="xunit.v3.mtp-v2" Version="4.0.1" />
     <!--#else -->
-    <PackageVersion Include="TUnit" Version="1.44.39" />
+    <PackageVersion Include="TUnit" Version="1.48.6" />
     <!--#endif -->
     <!--#endif -->
   </ItemGroup>

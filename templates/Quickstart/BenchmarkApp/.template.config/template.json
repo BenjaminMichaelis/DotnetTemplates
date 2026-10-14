@@ -44,17 +44,11 @@
       "defaultValue": "false",
       "description": "Use legacy .sln format instead of the default .slnx format."
     },
-    "no-tests": {
-      "type": "parameter",
-      "dataType":"bool",
-      "defaultValue": "false",
-      "description": "Do not include a test project."
-    },
     "tests": {
       "type": "parameter",
       "dataType":"choice",
       "defaultValue":"tunit",
-      "description":"Test framework to include. Ignored when --no-tests is specified.",
+      "description":"Test framework to include.",
       "choices":[
         {
           "choice":"tunit",
@@ -63,6 +57,10 @@
         {
           "choice":"xunit",
           "description":"Use xUnit v3 tests with MTP v2"
+        },
+        {
+          "choice":"None",
+          "description":"Do not include a test project"
         }
       ]
     },
@@ -94,7 +92,7 @@
           ]
         },
         {
-          "condition": "(no-tests)",
+          "condition": "(tests == \"None\")",
           "exclude": [
             "BenchmarkApp.Tests/*"
           ]

@@ -1,15 +1,15 @@
-using MinimalApi.Data;
-
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
-using Microsoft.Data.Sqlite;
+
+using MinimalApi.Data;
 
 using Moq.AutoMock.Resolvers;
 
 namespace MinimalApi.Core.Tests;
 
-public static partial class AutoMockerExtensions
+public static class AutoMockerExtensions
 {
     extension(AutoMocker mocker)
     {
@@ -127,3 +127,5 @@ file sealed class SqliteConnectionResolver<TContext> : IMockResolver, IDisposabl
         GC.SuppressFinalize(this);
     }
 }
+
+

@@ -7,18 +7,17 @@ using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 
-namespace _BenchmarkProjectName_
+namespace BenchmarkApp;
+
+public class BenchmarkConfig : ManualConfig
 {
-    public class BenchmarkConfig : ManualConfig
+    public BenchmarkConfig()
     {
-        public BenchmarkConfig()
-        {
-            // Configure your benchmarks, see for more details: https://benchmarkdotnet.org/articles/configs/configs.html.
-            //Add(Job.Dry);
-            //Add(ConsoleLogger.Default);
-            //Add(TargetMethodColumn.Method, StatisticColumn.Max);
-            //Add(RPlotExporter.Default, CsvExporter.Default);
-            //Add(EnvironmentAnalyser.Default);
-        }
+        // Configure your benchmarks, see for more details: https://benchmarkdotnet.org/articles/configs/configs.html.
+        //Add(Job.Dry);
+        //Add(ConsoleLogger.Default);
+        //Add(TargetMethodColumn.Method, StatisticColumn.Max);
+        //Add(RPlotExporter.Default, CsvExporter.Default);
+        //Add(EnvironmentAnalyser.Default);
     }
 }

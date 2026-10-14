@@ -1,0 +1,180 @@
+name: Template Validation
+
+on:
+  workflow_call:
+    inputs:
+      template_short_name:
+        required: true
+        type: string
+      project_name:
+        required: true
+        type: string
+      output_dir_prefix:
+        required: true
+        type: string
+      variant_matrix_json:
+        required: true
+        type: string
+      global_json_file:
+        required: true
+        type: string
+      warnings_as_errors_msbuild_args:
+        required: false
+        type: string
+        default: -p:CodeAnalysisTreatWarningsAsErrors=true -p:TreatWarningsAsErrors=true -p:MSBuildTreatWarningsAsErrors=true
+      post_build_command:
+        required: false
+        type: string
+        default: ""
+      pack_project:
+        required: false
+        type: boolean
+        default: false
+      failed_playlist_artifact_prefix:
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  test-template:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(inputs.variant_matrix_json) }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup test environment
+        uses: ./.github/actions/setup-template-test
+        with:
+          global-json-file: ${{ inputs.global_json_file }}
+
+      - name: Validate template (${{ matrix.variant }})
+        id: validate
+        env:
+          POST_BUILD_COMMAND: ${{ inputs.post_build_command }}
+        run: |
+          $repoRoot = $env:GITHUB_WORKSPACE
+          $outDir = "${{ inputs.output_dir_prefix }}-${{ matrix.variant }}"
+          New-Item -ItemType Directory -Path $outDir -Force | Out-Null
+          Push-Location $outDir
+
+          $projectName = "${{ inputs.project_name }}"
+          dotnet new bmichaelis.${{ inputs.template_short_name }} ${{ matrix.args }} --name $projectName --output .
+
+          $hasSln = Test-Path "$projectName.sln"
+          $hasSlnx = Test-Path "$projectName.slnx"
+          $hasTests = (@(Get-ChildItem -Recurse -Filter "*.Tests.csproj")).Count -gt 0
+
+          # Detect capabilities from generated output (not pre-computed from source templates)
+          $hasAspireHost = (@(Get-ChildItem -Recurse -Filter "*.AppHost.csproj" -ErrorAction SilentlyContinue)).Count -gt 0
+          $hasEfMigrations = (@(Get-ChildItem -Recurse -Filter "*.csproj" -ErrorAction SilentlyContinue) |
+            Where-Object { (Get-Content $_.FullName -Raw) -match "EntityFrameworkCore\.Design" -and
+                           (Test-Path (Join-Path $_.DirectoryName "Migrations")) }).Count -gt 0
+          $hasDockerfile = (@(Get-ChildItem -Recurse -Filter "Dockerfile" -ErrorAction SilentlyContinue)).Count -gt 0
+
+          "has_aspire_host=$($hasAspireHost.ToString().ToLower())" >> $env:GITHUB_OUTPUT
+          "has_ef_migrations=$($hasEfMigrations.ToString().ToLower())" >> $env:GITHUB_OUTPUT
+          "has_dockerfile=$($hasDockerfile.ToString().ToLower())" >> $env:GITHUB_OUTPUT
+
+          $solutionPath = if ($hasSln) { "$projectName.sln" } elseif ($hasSlnx) { "$projectName.slnx" } else { $null }
+          if ($solutionPath) {
+            & "$repoRoot/.github/scripts/Invoke-DotNetFormatStrict.ps1" -Targets $solutionPath -RestoreTargets
+            dotnet build $solutionPath ${{ inputs.warnings_as_errors_msbuild_args }}
+          } else {
+            & "$repoRoot/.github/scripts/Invoke-DotNetFormatStrict.ps1" -DiscoverFromCurrentDirectory -RestoreTargets
+          }
+
+          if ($hasTests) {
+            if ($solutionPath) {
+              dotnet test $solutionPath ${{ inputs.warnings_as_errors_msbuild_args }} --no-build --results-directory trx-data ${{ matrix.reportTrxArgs }}
+            } else {
+              $testProj = Get-ChildItem -Recurse -Filter "*.Tests.csproj" | Select-Object -First 1
+              dotnet test $testProj.FullName ${{ inputs.warnings_as_errors_msbuild_args }} --results-directory trx-data ${{ matrix.reportTrxArgs }}
+            }
+          } else {
+            dotnet build "$projectName/$projectName.csproj" ${{ inputs.warnings_as_errors_msbuild_args }}
+          }
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+          $postBuildAction = ([string]$env:POST_BUILD_COMMAND).Trim()
+          if ($postBuildAction -eq "") {
+            # No post-build action requested.
+          } elseif ($postBuildAction -eq "benchmark-run") {
+            dotnet run --project "$projectName/$projectName.csproj" -c Release
+          } else {
+            throw "Unknown post_build_command action '$postBuildAction'"
+          }
+
+          if ("${{ inputs.pack_project }}" -eq "true") {
+            dotnet pack "$projectName/$projectName.csproj" --configuration Release ${{ inputs.warnings_as_errors_msbuild_args }} -o ./NuGet
+          }
+
+      - name: Validate Aspire manifest
+        if: steps.validate.outputs.has_aspire_host == 'true'
+        working-directory: ${{ inputs.output_dir_prefix }}-${{ matrix.variant }}
+        run: |
+          $appHostProj = Get-ChildItem -Recurse -Filter "*.AppHost.csproj" | Select-Object -First 1
+          if (-not $appHostProj) { throw "AppHost project not found" }
+          $manifestPath = Join-Path (Get-Location).Path "aspire-manifest.json"
+          dotnet run --project $appHostProj.FullName -- --publisher manifest --output-path $manifestPath
+          if (-not (Test-Path $manifestPath)) {
+            throw "Aspire manifest smoke check failed: $manifestPath was not created."
+          }
+
+      - name: Validate Docker build
+        if: steps.validate.outputs.has_dockerfile == 'true'
+        working-directory: ${{ inputs.output_dir_prefix }}-${{ matrix.variant }}
+        run: |
+          $dockerfile = Get-ChildItem -Recurse -Filter "Dockerfile" | Select-Object -First 1
+          if (-not $dockerfile) { throw "Dockerfile not found" }
+          $buildContext = (Get-Location).Path
+          docker build -f $dockerfile.FullName -t smoke:${{ matrix.variant }} $buildContext
+          if ($LASTEXITCODE -ne 0) { throw "Docker build failed with exit code $LASTEXITCODE" }
+
+      - name: Validate EF migrations
+        if: steps.validate.outputs.has_ef_migrations == 'true'
+        working-directory: ${{ inputs.output_dir_prefix }}-${{ matrix.variant }}
+        run: |
+          $efProjects = @(Get-ChildItem -Recurse -Filter "*.csproj" |
+            Where-Object { (Get-Content $_.FullName -Raw) -match "EntityFrameworkCore\.Design" -and (Test-Path (Join-Path $_.DirectoryName "Migrations")) } |
+            Sort-Object FullName -Unique)
+          if ($efProjects.Count -eq 0) { throw "No EF projects found despite has_ef_migrations detection" }
+          
+          # Try to find AppHost project first (for Aspire apps with EF)
+          $startupProj = Get-ChildItem -Recurse -Filter "*.AppHost.csproj" | Select-Object -First 1
+          
+          # If no AppHost, use the first EF project as startup
+          if (-not $startupProj) {
+            $startupProj = $efProjects[0]
+          }
+          
+          if (-not $startupProj) { throw "No startup project found for EF validation" }
+          
+          dotnet tool restore
+          foreach ($proj in $efProjects) {
+            Write-Host "Checking EF migrations for $($proj.Name) with startup $($startupProj.Name)"
+            dotnet tool run dotnet-ef migrations has-pending-model-changes --project $proj.FullName --startup-project $startupProj.FullName --no-build
+            if ($LASTEXITCODE -ne 0) { throw "EF validation failed for $($proj.Name)" }
+          }
+
+
+      - name: Generate merged failure playlist from TRX
+        if: always()
+        uses: ./.github/actions/trx-playlist
+
+      - name: Upload failed test playlist
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ inputs.failed_playlist_artifact_prefix }}-${{ matrix.variant }}
+          path: test-results/failed-tests.playlist
+          if-no-files-found: ignore

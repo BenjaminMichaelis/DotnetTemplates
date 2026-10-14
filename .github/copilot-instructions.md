@@ -6,6 +6,7 @@ This repository builds and publishes `BenjaminMichaelis.Dotnet.Templates`, a NuG
 
 - `Templates.csproj` is the template-pack project. It packs files under `templates/**`.
 - `templates/Library/NuGet` contains the `bmichaelis.nuget` template.
+- `templates/Library/DotnetTool` contains the `bmichaelis.tool` template.
 - `templates/Quickstart/ConsoleApp` contains the `bmichaelis.quickstart.consoleapp` template.
 - `templates/Quickstart/BenchmarkApp` contains the `bmichaelis.quickstart.benchmarkconsole` template.
 - `templates/Aspire/MinimalApi` contains the `bmichaelis.aspire.minimalapi` template.
@@ -21,12 +22,12 @@ This repository builds and publishes `BenjaminMichaelis.Dotnet.Templates`, a NuG
 ## Template authoring guidelines
 
 - Keep `template.json` symbols and source modifiers covered by CI matrix variants.
-- When adding an option such as `no-sln` or `no-tests`, test both the default path and the option-enabled path.
+- When adding an option such as `no-sln` or `--tests None`, test both the default path and the option-enabled path.
 - Keep generated template files self-contained; do not rely on files outside the generated project.
 - Keep template `Directory.Packages.props` and `Directory.Build.props` consistent across similar templates unless a template has a clear reason to differ.
 - Copy root `.editorconfig` changes into templates with `CopyEditorConfigToTemplates.ps1`.
 
 ## Versioning and SDKs
 
-- The root package project currently targets `net9.0`, but the repository is pinned to the .NET 10 SDK by root `global.json` to match generated templates.
-- The Aspire template targets newer .NET/Aspire versions; do not downgrade it just to match the root packaging target framework.
+- The root package project and generated templates target latest stable .net version.
+- Keep templates on latest stable C# version unless a template has a specific reason to require a newer language version.

@@ -1,6 +1,6 @@
-using MinimalApi.Data;
-
 using Microsoft.EntityFrameworkCore;
+
+using MinimalApi.Data;
 
 namespace MinimalApi.Core.QA;
 
@@ -66,7 +66,7 @@ public class RoomService(IDbContextFactory<ApplicationDbContext> contextFactory)
 
         context.Rooms.Add(room);
         await context.SaveChangesAsync(cancellationToken);
-        
+
         return room;
     }
 
@@ -124,9 +124,9 @@ public class RoomService(IDbContextFactory<ApplicationDbContext> contextFactory)
 
         // Manually delete all questions first (due to Restrict delete behavior)
         context.Questions.RemoveRange(room.Questions);
-        
+
         context.Rooms.Remove(room);
         await context.SaveChangesAsync(cancellationToken);
-        
+
     }
 }
