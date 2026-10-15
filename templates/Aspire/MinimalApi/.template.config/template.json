@@ -44,7 +44,8 @@
           "MinimalApi.Core.Tests/MinimalApi.Core.Tests.csproj",
           "MinimalApi.Data/MinimalApi.Data.csproj",
           "MinimalApi.ServiceDefaults/MinimalApi.ServiceDefaults.csproj",
-          "MinimalApi.Aspire.Tests/MinimalApi.Aspire.Tests.csproj:integrationTests"
+          "MinimalApi.AppHost.Tests/MinimalApi.AppHost.Tests.csproj:integrationTests",
+          "MinimalApi.Api.Tests/MinimalApi.Api.Tests.csproj:integrationTests"
         ]
       }
     }
@@ -60,7 +61,7 @@
       "type": "parameter",
       "datatype": "bool",
       "defaultValue": "false",
-      "description": "Add Aspire integration tests using TUnit. Tests validate that the AppHost starts successfully and services respond to requests."
+      "description": "Add TUnit ASP.NET Core API integration tests and Aspire AppHost tests."
     }
   },
   "sources": [
@@ -69,7 +70,8 @@
         {
           "condition": "(!integrationTests)",
           "exclude": [
-            "MinimalApi.Aspire.Tests/**"
+            "MinimalApi.AppHost.Tests/**",
+            "MinimalApi.Api.Tests/**"
           ]
         }
       ]

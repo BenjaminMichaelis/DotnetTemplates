@@ -1,12 +1,12 @@
 using TUnit.Aspire;
 
-namespace MinimalApi.Aspire.Tests;
+namespace MinimalApi.AppHost.Tests;
 
 /// <summary>
 /// Custom fixture for MinimalApi AppHost integration tests.
 /// Provides lifecycle management and resource orchestration for testing the distributed application.
 /// </summary>
-public class AppFixture : AspireFixture<Projects.MinimalApi_AppHost>
+public class AppHostFixture : AspireFixture<Projects.MinimalApi_AppHost>
 {
     private const string SigningKey = "ThisIsATemplateDevelopmentSigningKeyAtLeast32Chars";
 

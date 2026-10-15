@@ -2,15 +2,15 @@ using Aspire.Hosting.Testing;
 
 using TUnit.Aspire;
 
-namespace MinimalApi.Aspire.Tests;
+namespace MinimalApi.AppHost.Tests;
 
 /// <summary>
 /// Integration tests for the MinimalApi AppHost.
 /// These tests validate that the distributed application components start correctly
 /// and respond to HTTP requests through the orchestrated host.
 /// </summary>
-[ClassDataSource<AppFixture>(Shared = SharedType.PerTestSession)]
-public class AppHostIntegrationTests(AppFixture fixture)
+[ClassDataSource<AppHostFixture>(Shared = SharedType.PerTestSession)]
+public class AppHostTests(AppHostFixture fixture)
 {
     /// <summary>
     /// Verifies that the backend is reachable through Aspire orchestration.
