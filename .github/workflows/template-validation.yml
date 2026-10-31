@@ -57,6 +57,19 @@ jobs:
         with:
           global-json-file: ${{ inputs.global_json_file }}
 
+      - name: Setup Node.js
+        if: inputs.template_short_name == 'aspire.app' && !contains(matrix.args, '--frontend none')
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - name: Install pinned pnpm
+        if: inputs.template_short_name == 'aspire.app' && !contains(matrix.args, '--frontend none')
+        run: |
+          $package = Get-Content templates/Aspire/AspireApp/AspireApp.Web/package.json -Raw | ConvertFrom-Json
+          npm install --global $package.packageManager
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Validate template (${{ matrix.variant }})
         id: validate
         env:
@@ -69,6 +82,7 @@ jobs:
 
           $projectName = "${{ inputs.project_name }}"
           dotnet new bmichaelis.${{ inputs.template_short_name }} ${{ matrix.args }} --name $projectName --output .
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
           $hasSln = Test-Path "$projectName.sln"
           $hasSlnx = Test-Path "$projectName.slnx"
@@ -89,6 +103,7 @@ jobs:
           if ($solutionPath) {
             & "$repoRoot/.github/scripts/Invoke-DotNetFormatStrict.ps1" -Targets $solutionPath -RestoreTargets
             dotnet build $solutionPath ${{ inputs.warnings_as_errors_msbuild_args }}
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           } else {
             & "$repoRoot/.github/scripts/Invoke-DotNetFormatStrict.ps1" -DiscoverFromCurrentDirectory -RestoreTargets
           }
@@ -110,12 +125,14 @@ jobs:
             # No post-build action requested.
           } elseif ($postBuildAction -eq "benchmark-run") {
             dotnet run --project "$projectName/$projectName.csproj" -c Release
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           } else {
             throw "Unknown post_build_command action '$postBuildAction'"
           }
 
           if ("${{ inputs.pack_project }}" -eq "true") {
             dotnet pack "$projectName/$projectName.csproj" --configuration Release ${{ inputs.warnings_as_errors_msbuild_args }} -o ./NuGet
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           }
 
       - name: Validate Aspire manifest
@@ -126,6 +143,7 @@ jobs:
           if (-not $appHostProj) { throw "AppHost project not found" }
           $manifestPath = Join-Path (Get-Location).Path "aspire-manifest.json"
           dotnet run --project $appHostProj.FullName -- --publisher manifest --output-path $manifestPath
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           if (-not (Test-Path $manifestPath)) {
             throw "Aspire manifest smoke check failed: $manifestPath was not created."
           }
@@ -160,6 +178,7 @@ jobs:
           if (-not $startupProj) { throw "No startup project found for EF validation" }
           
           dotnet tool restore
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           foreach ($proj in $efProjects) {
             Write-Host "Checking EF migrations for $($proj.Name) with startup $($startupProj.Name)"
             dotnet tool run dotnet-ef migrations has-pending-model-changes --project $proj.FullName --startup-project $startupProj.FullName --no-build

@@ -65,6 +65,16 @@ Both options together:
 
 ## Running locally
 
+The AppHost uses NuGet-restored orchestration dependencies, so `dotnet run` and IDE launches do not require an Aspire CLI bundle. Only the ASPIRE010 warning is suppressed; other build diagnostics remain enabled. The Aspire CLI is required for the `aspire` commands below.
+
+With the React frontend, install Node.js 24 and the pnpm version pinned in `AspireApp.Web/package.json`. From the solution root:
+
+```cli
+> npm install --global pnpm@11.1.3
+```
+
+Frontend builds restore dependencies using the frozen lockfile. The included build workflow provisions Node.js and the pinned pnpm automatically; API-only generated apps do not require either.
+
 ```cli
 > aspire run
 ```
