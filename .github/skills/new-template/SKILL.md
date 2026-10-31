@@ -47,10 +47,13 @@ Follow every item in this checklist. Do not open a PR until all items are done.
 - **`.github/workflows/build.yml`**:
   - Add a `test-<templatename>` matrix job covering all parameter variants (default + each opt-in/opt-out combination).
   - Add the new job to the `all-tests` gate job's `needs` list.
-- **`.github/dependabot.yml`** — add the template to **all three** ecosystems:
+- **`.github/dependabot.yml`** — add the template to every applicable ecosystem:
   - `github-actions` → add the template's `.github/workflows` directory to the `directories` list.
   - `nuget` → add the template root directory to the `directories` list.
   - `dotnet-sdk` → add the template root directory to the `directories` list.
+  - `docker` → add each Dockerfile directory.
+  - `terraform` → add each Terraform root directory containing `main.tf`.
+  - CI runs `.github/scripts/Test-DependabotCoverage.ps1` to verify coverage for dependency manifests in the repository and templates.
 - **Root `README.md`** — add a row for the new template in the templates table.
 - **`.github/copilot-instructions.md`** — add the template short name and path to the repository structure list.
 
