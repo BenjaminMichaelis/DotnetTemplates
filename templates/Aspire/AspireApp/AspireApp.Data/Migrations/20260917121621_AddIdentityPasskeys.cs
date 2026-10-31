@@ -10,6 +10,14 @@ namespace AspireApp.Data.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropPrimaryKey(
+                name: "PK_AspNetUserTokens",
+                table: "AspNetUserTokens");
+
+            migrationBuilder.DropPrimaryKey(
+                name: "PK_AspNetUserLogins",
+                table: "AspNetUserLogins");
+
             migrationBuilder.AlterColumn<string>(
                 name: "Name",
                 table: "AspNetUserTokens",
@@ -56,6 +64,16 @@ namespace AspireApp.Data.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(450)");
 
+            migrationBuilder.AddPrimaryKey(
+                name: "PK_AspNetUserTokens",
+                table: "AspNetUserTokens",
+                columns: new[] { "UserId", "LoginProvider", "Name" });
+
+            migrationBuilder.AddPrimaryKey(
+                name: "PK_AspNetUserLogins",
+                table: "AspNetUserLogins",
+                columns: new[] { "LoginProvider", "ProviderKey" });
+
             migrationBuilder.CreateTable(
                 name: "AspNetUserPasskeys",
                 columns: table => new
@@ -86,6 +104,14 @@ namespace AspireApp.Data.Migrations
         {
             migrationBuilder.DropTable(
                 name: "AspNetUserPasskeys");
+
+            migrationBuilder.DropPrimaryKey(
+                name: "PK_AspNetUserTokens",
+                table: "AspNetUserTokens");
+
+            migrationBuilder.DropPrimaryKey(
+                name: "PK_AspNetUserLogins",
+                table: "AspNetUserLogins");
 
             migrationBuilder.AlterColumn<string>(
                 name: "Name",
@@ -132,6 +158,16 @@ namespace AspireApp.Data.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(128)",
                 oldMaxLength: 128);
+
+            migrationBuilder.AddPrimaryKey(
+                name: "PK_AspNetUserTokens",
+                table: "AspNetUserTokens",
+                columns: new[] { "UserId", "LoginProvider", "Name" });
+
+            migrationBuilder.AddPrimaryKey(
+                name: "PK_AspNetUserLogins",
+                table: "AspNetUserLogins",
+                columns: new[] { "LoginProvider", "ProviderKey" });
         }
     }
 }
