@@ -27,7 +27,7 @@
     <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.6.0" />
     <PackageVersion Include="Microsoft.TypeScript.MSBuild" Version="7.0.1" />
     <PackageVersion Include="Microsoft.ApplicationInsights.Profiler.AspNetCore" Version="3.0.2" />
-    <PackageVersion Include="Moq.AutoMock" Version="4.0.2" />
+    <PackageVersion Include="Moq.AutoMock" Version="4.0.3" />
     <PackageVersion Include="TUnit" Version="1.51.0" />
     <PackageVersion Include="TUnit.Aspire" Version="1.44.39" />
     <!-- Transitive pin: patches GHSA-qhrr-8q5h-9q3h -->
