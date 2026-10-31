@@ -30,6 +30,7 @@ if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
 
 // Add CORS for cross-origin clients
@@ -120,20 +121,20 @@ var app = builder.Build();
 
 app.MapDefaultEndpoints();
 
+// Configure the HTTP request pipeline.
+app.UseExceptionHandler();
+
 // Enable CORS
 app.UseCors("AllowedOrigins");
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.MapScalarApiReference();
     app.UseMigrationsEndPoint();
-    app.UseDeveloperExceptionPage();
 }
 else
 {
-    app.UseExceptionHandler("/Error");
     app.UseHsts();
     app.UseHttpsRedirection();
 }
@@ -144,12 +145,14 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapGet("/", () => "API is running.");
+
 app.MapControllers();
 
 app.Run();
 
 // Simple no-op email sender
-internal class NoOpEmailSender<TUser> : IEmailSender<TUser> where TUser : class
+internal sealed class NoOpEmailSender<TUser> : IEmailSender<TUser> where TUser : class
 {
     public Task SendConfirmationLinkAsync(TUser user, string email, string confirmationLink) => Task.CompletedTask;
     public Task SendPasswordResetLinkAsync(TUser user, string email, string resetLink) => Task.CompletedTask;

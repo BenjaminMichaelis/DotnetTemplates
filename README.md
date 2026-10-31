@@ -8,6 +8,16 @@ Feedback and contributions are welcome via issues and pull requests.
 
 Use [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) or newer.
 
+## Updating .NET SDK version
+
+When bumping the SDK version used by templates:
+
+1. Update `/global.json` for repository-level build/pack workflows.
+2. Update each template `global.json` under `/templates/**/global.json`.
+3. Keep SDK versions aligned unless a template intentionally requires a different SDK/roll-forward policy.
+
+Template-validation workflows install .NET from each template's `global.json`, so CI exercises the same SDK expectations that generated projects use.
+
 ## Install
 
 Install the template pack:
