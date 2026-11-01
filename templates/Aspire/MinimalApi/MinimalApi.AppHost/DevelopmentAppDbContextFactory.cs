@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 using MinimalApi.Core;
 using MinimalApi.Data;
@@ -11,17 +13,22 @@ public class DesignTimeAppDbContextFactory : IDesignTimeDbContextFactory<Applica
 {
     public ApplicationDbContext CreateDbContext(string[] args)
     {
-        HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
-        var factory = new DefaultServiceProviderFactory(new ServiceProviderOptions()
-        {
-            ValidateOnBuild = false,
-            ValidateScopes = false
-        });
-        builder.ConfigureContainer(factory);
-        builder.AddDatabase();
+        var configuration = new ConfigurationBuilder()
+            .AddEnvironmentVariables()
+            .AddCommandLine(args)
+            .Build();
 
-        var host = builder.Build();
+        var connectionString = configuration.GetConnectionString(ConnectionStrings.DatabaseKey)
+            ?? $"Server=(localdb)\\mssqllocaldb;Database={nameof(MinimalApi)}DesignTime;Trusted_Connection=True;TrustServerCertificate=True";
 
-        return host.Services.GetRequiredService<ApplicationDbContext>();
+        // Mirror the Identity schema version used at runtime so that generated migrations
+        // include all tables (e.g. AspNetUserPasskeys added by Version3).
+        // Note: the ServiceProvider is intentionally not disposed here; this is design-time
+        // code that runs in a short-lived dotnet-ef process.
+        var services = new ServiceCollection();
+        services.Configure<IdentityOptions>(options =>
+            options.Stores.SchemaVersion = IdentitySchemaVersions.Version3);
+        services.AddDbContext<ApplicationDbContext>(options => options.UseAzureSql(connectionString));
+        return services.BuildServiceProvider().GetRequiredService<ApplicationDbContext>();
     }
 }

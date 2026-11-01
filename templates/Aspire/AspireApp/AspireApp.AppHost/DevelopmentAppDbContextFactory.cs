@@ -1,9 +1,11 @@
 using AspireApp.Core;
 using AspireApp.Data;
 
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 namespace AspireApp.AppHost;
 
@@ -11,17 +13,19 @@ public class DesignTimeAppDbContextFactory : IDesignTimeDbContextFactory<Applica
 {
     public ApplicationDbContext CreateDbContext(string[] args)
     {
-        HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
-        var factory = new DefaultServiceProviderFactory(new ServiceProviderOptions()
-        {
-            ValidateOnBuild = false,
-            ValidateScopes = false
-        });
-        builder.ConfigureContainer(factory);
-        builder.AddDatabase();
+        var configuration = new ConfigurationBuilder()
+            .AddEnvironmentVariables()
+            .AddCommandLine(args)
+            .Build();
 
-        var host = builder.Build();
+        var connectionString = configuration.GetConnectionString(ConnectionStrings.DatabaseKey)
+            ?? $"Server=(localdb)\\mssqllocaldb;Database={nameof(AspireApp)}DesignTime;Trusted_Connection=True;TrustServerCertificate=True";
 
-        return host.Services.GetRequiredService<ApplicationDbContext>();
+        // Match runtime Identity options so migrations use the same schema.
+        var services = new ServiceCollection();
+        services.Configure<IdentityOptions>(options =>
+            options.Stores.SchemaVersion = IdentitySchemaVersions.Version3);
+        services.AddDbContext<ApplicationDbContext>(options => options.UseAzureSql(connectionString));
+        return services.BuildServiceProvider().GetRequiredService<ApplicationDbContext>();
     }
 }
