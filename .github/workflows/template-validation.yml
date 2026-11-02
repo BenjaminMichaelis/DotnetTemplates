@@ -59,7 +59,7 @@ jobs:
 
       - name: Setup Node.js
         if: inputs.template_short_name == 'aspire.app' && !contains(matrix.args, '--frontend none')
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: '24'
 
