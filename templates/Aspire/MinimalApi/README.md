@@ -57,8 +57,6 @@ This template includes a `global.json` file. To update the SDK version used by g
 
 ## Running locally
 
-The AppHost SDK and Aspire hosting integrations target Aspire 13.6.5, including the matching preview EF Core hosting integration.
-
 The AppHost uses NuGet-restored orchestration dependencies, so `dotnet run` and IDE launches do not require an Aspire CLI bundle. Only the ASPIRE010 warning is suppressed; other build diagnostics remain enabled. The Aspire CLI is required for `aspire` commands.
 
 ```cli

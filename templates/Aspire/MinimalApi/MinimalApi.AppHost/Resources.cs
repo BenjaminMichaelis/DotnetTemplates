@@ -37,6 +37,8 @@ public static partial class Resources
 
                 // This pairs with the usage of .UseAzureSql() which has a compatibility level of 170.
                 .WithImageTag("2025-latest")
+                // Adds a run-mode dashboard REPL command (sqlcmd as sa); only trusted users should access the dashboard.
+                .WithRepl()
                 //Give the SQL server container a fixed port number. This can be useful if people want to use external tools 
                 // with re-usable port numbers to connect to the database. The expected range is between 1024-49151.
                 //.WithHostPort(00000)
