@@ -4,6 +4,10 @@ using AspireApp.Core;
 using AspireApp.Data;
 using AspireApp.Middleware;
 
+//#if (applicationInsights)
+using Azure.Monitor.OpenTelemetry.Profiler;
+
+//#endif
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -17,14 +21,12 @@ builder.AddServiceDefaults()
     .AddQAServices();
 
 //#if (applicationInsights)
-// The Application Insights Profiler captures CPU flame graphs and uploads them to App Insights.
-// It activates only when APPLICATIONINSIGHTS_CONNECTION_STRING is set (auto-injected by Aspire in Azure).
-// NOTE: Do NOT also call AddApplicationInsightsTelemetry() - that is the classic AI SDK and would
-// double-report telemetry. The Azure Monitor OTel exporter (UseAzureMonitor in ServiceDefaults) is
-// the sole App Insights integration path in this template.
-if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
+// The Azure Monitor OpenTelemetry Profiler (preview) captures CPU traces and uploads them to App Insights.
+// It extends the UseAzureMonitor() pipeline in ServiceDefaults, so it only runs when
+// APPLICATIONINSIGHTS_CONNECTION_STRING is set (auto-injected by Aspire in Azure).
+if (!string.IsNullOrEmpty(builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]))
 {
-    builder.Services.AddServiceProfiler();
+    builder.Services.AddOpenTelemetry().AddAzureMonitorProfiler();
 }
 //#endif
 

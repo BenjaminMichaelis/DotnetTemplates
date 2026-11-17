@@ -16,7 +16,7 @@
     </PackageReference>
     <PackageReference Include="Scalar.AspNetCore" />
     <!--#if (applicationInsights)-->
-    <PackageReference Include="Microsoft.ApplicationInsights.Profiler.AspNetCore" />
+    <PackageReference Include="Azure.Monitor.OpenTelemetry.Profiler" />
     <!--#endif-->
   </ItemGroup>
 

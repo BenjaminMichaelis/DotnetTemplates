@@ -161,8 +161,8 @@ When the template is generated with `--applicationInsights true`, the following 
 | Addition | What it does |
 |---|---|
 | `Aspire.Hosting.Azure.ApplicationInsights` | Aspire provisions an AI resource in Azure and injects `APPLICATIONINSIGHTS_CONNECTION_STRING` automatically into the API container |
-| `Microsoft.ApplicationInsights.Profiler.AspNetCore` | CPU flame-graph profiler; uploads traces to App Insights Performance blade |
-| `builder.Services.AddServiceProfiler()` | Registers the profiler on Windows/Linux (skipped on unsupported platforms such as macOS) |
+| `Azure.Monitor.OpenTelemetry.Profiler` (preview) | OpenTelemetry-native CPU profiler; uploads traces to the App Insights Performance blade and Code Optimizations |
+| `builder.Services.AddOpenTelemetry().AddAzureMonitorProfiler()` | Adds the profiler to the `UseAzureMonitor()` pipeline when `APPLICATIONINSIGHTS_CONNECTION_STRING` is set |
 
 ### How this works with Aspire's built-in telemetry
 
@@ -173,7 +173,9 @@ The template always configures a full OpenTelemetry pipeline in `ServiceDefaults
 | Local (`aspire run`) | **Aspire Dashboard** | Aspire injects `OTEL_EXPORTER_OTLP_ENDPOINT` automatically |
 | Azure (Aspire publish) | **Application Insights** | `APPLICATIONINSIGHTS_CONNECTION_STRING` injected by Aspire resource reference |
 
-The `UseAzureMonitor()` call in `ServiceDefaults/Extensions.cs` is already present and activates when the connection string env var is set — whether provided by Aspire or manually. **Do not also call `AddApplicationInsightsTelemetry()`** (the classic AI SDK); it conflicts with the OTel distro and double-reports all telemetry.
+The `UseAzureMonitor()` call in `ServiceDefaults/Extensions.cs` is already present and activates when the connection string env var is set — whether provided by Aspire or manually. This is the [Azure Monitor OpenTelemetry Distro](https://learn.microsoft.com/azure/azure-monitor/app/opentelemetry-enable?tabs=aspnetcore), which already includes ASP.NET Core, HttpClient, and SqlClient instrumentation plus Live Metrics. **Do not add the classic Application Insights SDK** (`AddApplicationInsightsTelemetry()` / `Microsoft.ApplicationInsights.*`); it is superseded by OpenTelemetry and would double-report telemetry. See [Migrate to OpenTelemetry](https://learn.microsoft.com/azure/azure-monitor/app/migrate-to-opentelemetry?tabs=dotnet).
+
+The React frontend intentionally keeps `@microsoft/applicationinsights-web`: the [Application Insights JavaScript SDK](https://learn.microsoft.com/azure/azure-monitor/app/javascript-sdk) is the supported browser path, and Azure Monitor does not support OpenTelemetry in browsers.
 
 ### Without the option (default)
 
