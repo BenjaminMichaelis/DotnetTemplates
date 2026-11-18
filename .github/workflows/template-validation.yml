@@ -124,7 +124,7 @@ jobs:
           if ($postBuildAction -eq "") {
             # No post-build action requested.
           } elseif ($postBuildAction -eq "benchmark-run") {
-            dotnet run --project "$projectName/$projectName.csproj" -c Release
+            dotnet run --project "$projectName.Benchmark/$projectName.Benchmark.csproj" -c Release -- --job Dry
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           } else {
             throw "Unknown post_build_command action '$postBuildAction'"

@@ -21,7 +21,7 @@ defaults:
     shell: pwsh
 
 env:
-  DOTNET_VERSION: '10.0.x'
+  DOTNET_VERSION: '11.0.x'
   TERRAFORM_VERSION: '1.14.6'
 
 jobs:

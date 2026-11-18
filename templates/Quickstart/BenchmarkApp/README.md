@@ -5,7 +5,7 @@ This template creates a [BenchmarkDotNet](https://github.com/dotnet/BenchmarkDot
 The point of this is so that you can easily create a benchmark project to test out different algorithms, or to test out different ways of doing things.
 
 ## Startup
-- To run the benchmarks, run `dotnet run -c Release` in the `BenchmarkApp` folder.
+- To run the benchmarks, run `dotnet run --project BenchmarkApp.Benchmark -c Release` from the generated solution folder.
 
 ## Template
 

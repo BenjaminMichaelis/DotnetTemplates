@@ -2,7 +2,7 @@
 
 A base template for .NET Global Tool packages, with unit tests and GitHub Actions. Supports RID-specific packaging so the tool installs a platform-optimized binary on `win-x64`, `linux-x64`, and `osx-arm64`, with a portable `any` CoreCLR fallback for all other platforms (e.g. `win-arm64`, `linux-arm64`).
 
-> **Requires .NET SDK 10.0 or later.** RID-specific tool packaging is a .NET SDK 10 feature.
+> **Requires .NET SDK 11.0 or later.** RID-specific tool packaging was introduced in .NET SDK 10.
 > See [RID-specific tools](https://learn.microsoft.com/en-us/dotnet/core/tools/rid-specific-tools) for background.
 
 ## Startup Steps
