@@ -120,6 +120,17 @@ jobs:
           }
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
+          $frontendPackages = @(Get-ChildItem -Recurse -Filter "package.json" |
+            Where-Object { $_.FullName -notmatch '[\\/]node_modules[\\/]' })
+          foreach ($package in $frontendPackages) {
+            Push-Location $package.DirectoryName
+            pnpm install --frozen-lockfile
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            pnpm run build
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            Pop-Location
+          }
+
           $postBuildAction = ([string]$env:POST_BUILD_COMMAND).Trim()
           if ($postBuildAction -eq "") {
             # No post-build action requested.
