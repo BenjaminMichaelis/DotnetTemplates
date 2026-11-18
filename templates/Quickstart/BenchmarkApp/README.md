@@ -19,8 +19,6 @@ Create a new app in your current directory by running.
 
 This template includes a `global.json` file. To update the SDK version used by generated projects and CI validation, update `global.json`.
 
-The projects target .NET 11 and C# 15. BenchmarkDotNet is pinned to `0.16.0-preview.2` because the latest stable release, `0.15.8`, cannot run .NET 11 benchmarks. See [the upstream .NET 11 support change](https://github.com/dotnet/BenchmarkDotNet/pull/2911).
-
 ### Parameters
 
 - `--sln`: Include a legacy `.sln` file instead of the default `.slnx` file.
