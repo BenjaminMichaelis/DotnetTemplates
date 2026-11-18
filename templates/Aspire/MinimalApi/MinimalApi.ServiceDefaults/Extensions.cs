@@ -92,7 +92,7 @@ public static class Extensions
                 builder.Services.AddOpenTelemetry().UseOtlpExporter();
             }
 
-            // Uncomment the following lines to enable the Azure Monitor exporter (requires the Azure.Monitor.OpenTelemetry.AspNetCore package)
+            // Exports to Application Insights through the Azure Monitor OpenTelemetry Distro when a connection string is configured.
             if (!string.IsNullOrEmpty(builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]))
             {
                 builder.Services.AddOpenTelemetry()

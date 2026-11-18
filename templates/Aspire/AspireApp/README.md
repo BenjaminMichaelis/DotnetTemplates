@@ -156,25 +156,8 @@ CI/CD deploys automatically on push to `main` via `.github/workflows/build-and-d
 
 ## Application Insights
 
-When the template is generated with `--applicationInsights true`, the following is added on top of the observability already included in `ServiceDefaults`:
+`--applicationInsights true` adds Aspire resource provisioning and `Azure.Monitor.OpenTelemetry.Profiler` (preview).
 
-| Addition | What it does |
-|---|---|
-| `Aspire.Hosting.Azure.ApplicationInsights` | Aspire provisions an AI resource in Azure and injects `APPLICATIONINSIGHTS_CONNECTION_STRING` automatically into the API container |
-| `Microsoft.ApplicationInsights.Profiler.AspNetCore` | CPU flame-graph profiler; uploads traces to App Insights Performance blade |
-| `builder.Services.AddServiceProfiler()` | Registers the profiler on Windows/Linux (skipped on unsupported platforms such as macOS) |
+ServiceDefaults already uses OpenTelemetry: local telemetry goes to the Aspire Dashboard; setting `APPLICATIONINSIGHTS_CONNECTION_STRING` enables Azure Monitor, even without the option.
 
-### How this works with Aspire's built-in telemetry
-
-The template always configures a full OpenTelemetry pipeline in `ServiceDefaults`:
-
-| Environment | Telemetry target | How |
-|---|---|---|
-| Local (`aspire run`) | **Aspire Dashboard** | Aspire injects `OTEL_EXPORTER_OTLP_ENDPOINT` automatically |
-| Azure (Aspire publish) | **Application Insights** | `APPLICATIONINSIGHTS_CONNECTION_STRING` injected by Aspire resource reference |
-
-The `UseAzureMonitor()` call in `ServiceDefaults/Extensions.cs` is already present and activates when the connection string env var is set — whether provided by Aspire or manually. **Do not also call `AddApplicationInsightsTelemetry()`** (the classic AI SDK); it conflicts with the OTel distro and double-reports all telemetry.
-
-### Without the option (default)
-
-The `UseAzureMonitor()` stub in `ServiceDefaults` still activates if you manually set `APPLICATIONINSIGHTS_CONNECTION_STRING` at runtime. You just won't have Aspire auto-provisioning or the profiler.
+Do not also call `AddApplicationInsightsTelemetry()`; it duplicates telemetry.
