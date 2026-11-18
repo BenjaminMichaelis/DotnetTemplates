@@ -9,8 +9,8 @@ Follow every item in this checklist. Do not open a PR until all items are done.
 
 ## 1. Versions — always use the latest
 
-- **.NET TFM**: use the latest stable version (e.g. `net10.0`) in every `.csproj`.
-- **C# LangVersion**: use the latest stable version (e.g. `14`) in `Directory.Build.props`.
+- **.NET TFM**: use the latest stable version (e.g. `net11.0`) in every `.csproj`.
+- **C# LangVersion**: use the latest stable version (e.g. `15`) in `Directory.Build.props`.
 - **SDK in `global.json`**: match the latest SDK version used by other templates in the repo; keep `rollForward: latestMinor`.
 - **NuGet packages in `Directory.Packages.props`**: check nuget.org for the latest stable version of every package before writing it. Do not copy an old version from another template without verifying it is current.
 

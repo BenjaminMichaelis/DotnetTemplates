@@ -30,7 +30,9 @@ Both options together:
 
 ## .NET SDK version
 
-This template includes a `global.json` file. To update the SDK version used by generated projects and CI validation, update `global.json`.
+Generated projects target .NET 11 and C# 15. This template includes a `global.json` file selecting SDK 11.0.100 with `latestFeature` roll-forward. To update the SDK version used by generated projects and CI validation, update `global.json`.
+
+Deployment hosts must meet .NET 11's CPU requirements: x86-64-v2 on x86/x64 and LSE on Windows Arm64.
 
 ### Parameters
 
@@ -54,6 +56,8 @@ This template includes a `global.json` file. To update the SDK version used by g
 - **AppHost tests** *(optional, `--integrationTests true`)* – Aspire orchestration tests in `MinimalApi.AppHost.Tests`, validating startup and distributed app behavior
 - **Terraform/Infra** – Azure Container Apps, Azure SQL, Application Insights, ACR
 - **GitHub Actions CI/CD** – Build, test, migrate DB, push container image
+
+The data project explicitly references `Microsoft.Data.SqlClient.Extensions.Azure` to retain Azure/Entra ID SQL authentication with SqlClient 7. EF tooling startup projects explicitly reference `Microsoft.EntityFrameworkCore.Design`, which is no longer supplied transitively by EF Tools.
 
 ## Running locally
 
@@ -82,19 +86,19 @@ Run all tests. Without `--integrationTests true`, only the Core unit test projec
 When generated with `--integrationTests true`, the solution includes the API and AppHost integration test projects. To run only Core unit tests:
 
 ```cli
-> dotnet test MinimalApi.Core.Tests/MinimalApi.Core.Tests.csproj
+> dotnet test --project MinimalApi.Core.Tests/MinimalApi.Core.Tests.csproj
 ```
 
 To run only the ASP.NET Core API tests (in-process; no Docker containers):
 
 ```cli
-> dotnet test MinimalApi.Api.Tests/MinimalApi.Api.Tests.csproj
+> dotnet test --project MinimalApi.Api.Tests/MinimalApi.Api.Tests.csproj
 ```
 
 To run only the Aspire AppHost tests:
 
 ```cli
-> dotnet test MinimalApi.AppHost.Tests/MinimalApi.AppHost.Tests.csproj
+> dotnet test --project MinimalApi.AppHost.Tests/MinimalApi.AppHost.Tests.csproj
 ```
 
 **Requirements for Aspire AppHost tests**:
@@ -129,7 +133,7 @@ docker run -p 8080:8080 \
 ```
 
 ### Security notes
-- Runtime image is `mcr.microsoft.com/dotnet/aspnet:10.0-noble-chiseled` — no shell, no package manager, non-root (`app`, UID 65532)
+- Runtime image is `mcr.microsoft.com/dotnet/aspnet:11.0-resolute-chiseled` — no shell, no package manager, non-root (`app`, UID 65532)
 - HTTPS is **not** terminated in the container; configure TLS at your ingress/load balancer
 - All secrets must be injected via environment variables or a secrets manager (Azure Key Vault, Kubernetes secrets, etc.)
 
