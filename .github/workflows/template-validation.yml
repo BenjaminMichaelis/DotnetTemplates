@@ -135,6 +135,15 @@ jobs:
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           }
 
+      - name: Typecheck generated frontend
+        if: inputs.template_short_name == 'aspire.app' && !contains(matrix.args, '--frontend none')
+        working-directory: ${{ inputs.output_dir_prefix }}-${{ matrix.variant }}/${{ inputs.project_name }}.Web
+        run: |
+          pnpm install --frozen-lockfile
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          pnpm run test:ts
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Validate Aspire manifest
         if: steps.validate.outputs.has_aspire_host == 'true'
         working-directory: ${{ inputs.output_dir_prefix }}-${{ matrix.variant }}

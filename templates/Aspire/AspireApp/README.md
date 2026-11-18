@@ -89,6 +89,13 @@ In development, the API exposes:
 
 ### Running tests
 
+For React apps, CI runs `pnpm run test:ts` to check the frontend source and Vite configuration without emitting JavaScript. To run the same check locally, from `AspireApp.Web`:
+
+```cli
+> pnpm install --frozen-lockfile
+> pnpm run test:ts
+```
+
 Run all tests (unit tests only when generated without `--integrationTests`):
 
 ```cli
