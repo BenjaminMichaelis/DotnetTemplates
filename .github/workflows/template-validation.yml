@@ -135,7 +135,7 @@ jobs:
           if ($postBuildAction -eq "") {
             # No post-build action requested.
           } elseif ($postBuildAction -eq "benchmark-run") {
-            dotnet run --project "$projectName/$projectName.csproj" -c Release
+            dotnet run --project "$projectName.Benchmark/$projectName.Benchmark.csproj" -c Release -- --job Dry
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           } else {
             throw "Unknown post_build_command action '$postBuildAction'"
@@ -145,6 +145,15 @@ jobs:
             dotnet pack "$projectName/$projectName.csproj" --configuration Release ${{ inputs.warnings_as_errors_msbuild_args }} -o ./NuGet
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           }
+
+      - name: Typecheck generated frontend
+        if: inputs.template_short_name == 'aspire.app' && !contains(matrix.args, '--frontend none')
+        working-directory: ${{ inputs.output_dir_prefix }}-${{ matrix.variant }}/${{ inputs.project_name }}.Web
+        run: |
+          pnpm install --frozen-lockfile
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          pnpm run test:ts
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Validate Aspire manifest
         if: steps.validate.outputs.has_aspire_host == 'true'

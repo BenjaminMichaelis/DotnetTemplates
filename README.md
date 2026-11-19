@@ -6,7 +6,7 @@ Feedback and contributions are welcome via issues and pull requests.
 
 ## Requirements
 
-Use [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) or newer.
+Use [.NET 11 SDK](https://dotnet.microsoft.com/download/dotnet/11.0) or newer. Generated projects target .NET 11 and C# 15.
 
 ## Updating .NET SDK version
 
