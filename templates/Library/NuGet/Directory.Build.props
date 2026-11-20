@@ -47,10 +47,6 @@ See: https://learn.microsoft.com/visualstudio/msbuild/customize-your-build
   </PropertyGroup>
 
   <PropertyGroup Label="SourceLink">
-    <!--
-    You will also need to ensure that the appropriate Microsoft.SourceLink.* package is referenced.
-    https://github.com/dotnet/sourcelink
-    -->
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     
     <!-- 
@@ -71,7 +67,6 @@ See: https://learn.microsoft.com/visualstudio/msbuild/customize-your-build
     https://github.com/dotnet/sourcelink
     -->
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
 
