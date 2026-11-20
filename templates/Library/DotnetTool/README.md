@@ -10,7 +10,7 @@ A base template for .NET Global Tool packages, with unit tests and GitHub Action
 - [ ] Search for all CHANGEME words — most are in `Directory.Build.props` and `deploy.yml`
 - [ ] Set `<ToolCommandName>` in `DotnetTool.csproj` to your desired CLI command name
 - [ ] Make sure the project compiles and tests pass
-- [ ] Add `NUGET_API_KEY` with your NuGet.org API key to the GitHub repository secrets
+- [ ] Configure NuGet trusted publishing and the `NUGET_USER` environment secret as described below
 
 ## Features
 
@@ -66,10 +66,27 @@ This creates:
 dotnet tool install --global DotnetTool --configfile ./NuGet.local.config
 ```
 
+## NuGet trusted publishing
+
+The deploy workflow uses [NuGet trusted publishing](https://learn.microsoft.com/en-us/nuget/nuget-org/trusted-publishing) with `NuGet/login@v1` and job-scoped `id-token: write` permission. It exchanges a GitHub OIDC token for a short-lived API key instead of storing a long-lived API key.
+
+1. In GitHub repository **Settings > Environments**, create the `Production` environment. Add an environment secret named `NUGET_USER` containing your nuget.org profile name, not your email address. Optionally add required reviewers.
+2. At [nuget.org/account/trustedpublishing](https://www.nuget.org/account/trustedpublishing), add a policy with these values, replacing the repository placeholders with your generated project's GitHub repository:
+
+   | Field | Value |
+   | --- | --- |
+   | Repository Owner | `CHANGEME_RepoOwner` |
+   | Repository | `CHANGEME_RepoName` |
+   | Workflow File | `deploy.yml` |
+   | Environment | `Production` |
+
+   Use the workflow filename, not its `name:` or full path. The policy's individual or organization account must own every package being published, including the RID-specific packages. For private repositories, the policy is temporarily active for seven days and becomes permanent after the first successful publish.
+3. Before your first publish, run `dotnet pack -c Release -o ./artifacts` to verify the `.nupkg` files are created correctly. Use the local installation instructions above with that output directory to check the tool before publishing.
+
+When migrating an existing repository, retain its old API key secret until a trusted-publishing release has succeeded.
+
 ## Generating Releases
 
-1. Create a release on GitHub
-2. Add your [NuGet.org](https://www.nuget.org/account/apikeys) API key to the GitHub repository secrets as `NUGET_API_KEY` with push scope permissions
-3. Tag the release following `v*.*.*` format, e.g. `v1.0.0`
+After confirming that the policy and environment secret are configured, create a GitHub release with a [SemVer](https://semver.org/) tag such as `v1.0.0`. The existing deploy workflow packs and publishes that version. Confirm the packages appear on nuget.org.
 
 The deploy workflow publishes RID-specific packages first, then the pointer package last. This ordering is required — if the pointer package is published before its sub-packages, installs will fail.
