@@ -23,7 +23,7 @@ jobs:
           global-json-file: "./global.json"
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore -warnaserror -p:CodeAnalysisTreatWarningsAsErrors=true -p:TreatWarningsAsErrors=true
 
       - name: Set Version
         run: |
@@ -41,15 +41,15 @@ jobs:
           # `dotnet pack -r <RID>` per platform in a matrix job and collect the output.
           # See the csproj packaging mode comments and:
           # https://learn.microsoft.com/en-us/dotnet/core/tools/rid-specific-tools#package-your-tool
-          $packOutput = & dotnet pack -p:PackageVersion=${{ env.nugetVersion }} --configuration Release -o ${{ github.workspace }}/PackedNuget 2>&1
+          $packOutput = & dotnet pack -warnaserror -p:CodeAnalysisTreatWarningsAsErrors=true -p:TreatWarningsAsErrors=true -p:PackageVersion=${{ env.nugetVersion }} --configuration Release -o ${{ github.workspace }}/PackedNuget 2>&1
           $exitCode = $LASTEXITCODE
-          $unexpectedErrors = $packOutput | Where-Object {
-            $_ -match 'error' -and
+          $unexpectedDiagnostics = $packOutput | Where-Object {
+            $_ -match '\b(error|warning)\b' -and
             $_ -notmatch 'NU5017' -and
             $_ -notmatch '^Build failed with \d+ error\(s\)'
           }
-          if ($exitCode -ne 0 -and $unexpectedErrors) {
-            $unexpectedErrors | ForEach-Object { Write-Error $_ }
+          if ($exitCode -ne 0 -and $unexpectedDiagnostics) {
+            $unexpectedDiagnostics | ForEach-Object { Write-Error $_ }
             throw "dotnet pack failed"
           }
           # NU5017 is a known false positive for RID-specific tool pointer packages (SDK 10 bug):

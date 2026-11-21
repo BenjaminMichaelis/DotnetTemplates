@@ -59,14 +59,14 @@ jobs:
           global-json-file: global.json
 
       - name: Restore .NET dependencies
-        run: dotnet restore
+        run: dotnet restore -warnaserror -p:CodeAnalysisTreatWarningsAsErrors=true -p:TreatWarningsAsErrors=true
 
       - name: Enforce formatting
         run: |
           .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -DiscoverFromCurrentDirectory
  
       - name: Build
-        run: dotnet build --no-restore --configuration Release
+        run: dotnet build -warnaserror -p:CodeAnalysisTreatWarningsAsErrors=true -p:TreatWarningsAsErrors=true --no-restore --configuration Release
 
       - name: Restore .NET Tools
         run: dotnet tool restore
@@ -141,7 +141,7 @@ jobs:
           retention-days: 7
 
       - name: Publish
-        run: dotnet publish --configuration Release --no-build
+        run: dotnet publish -warnaserror -p:CodeAnalysisTreatWarningsAsErrors=true -p:TreatWarningsAsErrors=true --configuration Release --no-build
 
       - name: Build Database Bundle
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
