@@ -44,14 +44,14 @@ jobs:
         global-json-file: ./global.json
 
     - name: Restore dependencies
-      run: dotnet restore Templates.csproj -p:CodeAnalysisTreatWarningsAsErrors=true -p:TreatWarningsAsErrors=true -p:MSBuildTreatWarningsAsErrors=true
+      run: dotnet restore Templates.csproj -warnaserror -p:CodeAnalysisTreatWarningsAsErrors=true -p:TreatWarningsAsErrors=true
 
     - name: Enforce formatting
       run: |
         .\.github\scripts\Invoke-DotNetFormatStrict.ps1 -Targets "Templates.csproj"
 
     - name: Pack
-      run: dotnet pack --configuration Release --no-restore -p:CodeAnalysisTreatWarningsAsErrors=true -p:TreatWarningsAsErrors=true -p:MSBuildTreatWarningsAsErrors=true -o .
+      run: dotnet pack --configuration Release --no-restore -warnaserror -p:CodeAnalysisTreatWarningsAsErrors=true -p:TreatWarningsAsErrors=true -o .
     
     - name: Upload Artifacts
       uses: actions/upload-artifact@v7
@@ -119,7 +119,7 @@ jobs:
       output_dir_prefix: ${{ matrix.template.output_dir_prefix }}
       variant_matrix_json: ${{ matrix.template.variant_matrix_json }}
       global_json_file: ${{ matrix.template.global_json_file }}
-      warnings_as_errors_msbuild_args: -p:CodeAnalysisTreatWarningsAsErrors=true -p:TreatWarningsAsErrors=true -p:MSBuildTreatWarningsAsErrors=true
+      warnings_as_errors_msbuild_args: -warnaserror -p:CodeAnalysisTreatWarningsAsErrors=true -p:TreatWarningsAsErrors=true
       post_build_command: ${{ matrix.template.post_build_command }}
       pack_project: ${{ matrix.template.pack_project }}
       failed_playlist_artifact_prefix: ${{ matrix.template.failed_playlist_artifact_prefix }}
