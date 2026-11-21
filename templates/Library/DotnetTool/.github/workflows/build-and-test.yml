@@ -69,10 +69,18 @@ jobs:
 
       - name: Test
         #if (USE_XUNIT)
-        run: dotnet test --no-build --configuration Release --verbosity normal --results-directory trx-data --report-xunit-trx --report-xunit-trx-filename tests.trx
+        run: dotnet test --no-build --configuration Release --verbosity normal --results-directory trx-data --report-xunit-trx --report-xunit-trx-filename tests.trx --report-gh --coverage --coverage-output-format cobertura
         #else
-        run: dotnet test --no-build --configuration Release --verbosity normal --results-directory trx-data --report-trx --report-trx-filename tests.trx
+        run: dotnet test --no-build --configuration Release --verbosity normal --results-directory trx-data --report-trx --report-trx-filename tests.trx --report-gh --coverage --coverage-output-format cobertura
         #endif
+
+      - name: Upload code coverage
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: code-coverage
+          path: trx-data/*.cobertura.xml
+          if-no-files-found: ignore
 
       - name: Generate merged failure playlist from TRX
         if: always()
