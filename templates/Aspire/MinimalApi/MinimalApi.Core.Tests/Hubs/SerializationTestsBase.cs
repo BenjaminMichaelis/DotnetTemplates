@@ -7,7 +7,7 @@ public abstract class SerializationTestsBase<TDto>
 {
     protected abstract TDto CreateTestDto();
 
-    protected abstract Task AssertAreEqual(TDto expected, TDto actual);
+    protected abstract Task AssertAreEqualAsync(TDto expected, TDto actual);
 
     [Test]
     public async Task CanSerializeToJson()
@@ -28,7 +28,7 @@ public abstract class SerializationTestsBase<TDto>
         var deserializedDto = JsonSerializer.Deserialize<TDto>(json);
 
         await Assert.That(deserializedDto).IsNotNull();
-        await AssertAreEqual(dto, deserializedDto!);
+        await AssertAreEqualAsync(dto, deserializedDto!);
     }
 }
 
