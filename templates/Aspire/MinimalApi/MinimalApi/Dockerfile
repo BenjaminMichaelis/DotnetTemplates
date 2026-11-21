@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # Build stage: full SDK image for compiling and publishing
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:11.0 AS build
 WORKDIR /src
 
 # Copy project files first for layer-cached restore.
@@ -24,9 +24,9 @@ RUN --mount=type=cache,id=minimalapi-nuget,target=/root/.nuget/packages,sharing=
     -c Release \
     -o /app/publish
 
-# Runtime stage: Ubuntu Noble Chiseled - distroless-like, minimal attack surface.
+# Runtime stage: Ubuntu Resolute Chiseled - distroless-like, minimal attack surface.
 # No shell, no package manager, no root; runs as UID 65532 (app) by default.
-FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble-chiseled AS final
+FROM mcr.microsoft.com/dotnet/aspnet:11.0-resolute-chiseled AS final
 WORKDIR /app
 EXPOSE 8080
 ENV ASPNETCORE_HTTP_PORTS=8080 \

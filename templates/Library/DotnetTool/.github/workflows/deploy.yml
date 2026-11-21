@@ -77,12 +77,21 @@ jobs:
       name: "Production"
       url: "https://www.nuget.org/packages/CHANGEME_Package_Name"
     name: Push NuGets
+    permissions:
+      id-token: write
+      contents: read
 
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v8
         with:
           name: NuGet
+
+      - name: NuGet login (OIDC)
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ secrets.NUGET_USER }}
 
       # RID-specific packages MUST be published before the top-level pointer package.
       # If the pointer package is published first, installs will fail until all sub-packages exist.
@@ -93,11 +102,11 @@ jobs:
           foreach ($rid in @("win-x64", "linux-x64", "osx-arm64", "any")) {
             $pkg = "CHANGEME_Package_Name.$rid.$version.nupkg"
             if (Test-Path $pkg) {
-              dotnet nuget push $pkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+              dotnet nuget push $pkg --source https://api.nuget.org/v3/index.json --api-key ${{ steps.login.outputs.NUGET_API_KEY }} --skip-duplicate
             }
           }
 
       - name: Push top-level pointer package
         run: |
           $version = "${{ github.ref }}".substring(11)
-          dotnet nuget push "CHANGEME_Package_Name.$version.nupkg" --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+          dotnet nuget push "CHANGEME_Package_Name.$version.nupkg" --source https://api.nuget.org/v3/index.json --api-key ${{ steps.login.outputs.NUGET_API_KEY }} --skip-duplicate

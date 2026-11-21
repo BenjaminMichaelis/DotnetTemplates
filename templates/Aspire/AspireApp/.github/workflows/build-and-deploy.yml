@@ -21,7 +21,7 @@ defaults:
     shell: pwsh
 
 env:
-  DOTNET_VERSION: '10.0.x'
+  DOTNET_VERSION: '11.0.x'
   TERRAFORM_VERSION: '1.14.6'
 
 jobs:
@@ -42,6 +42,14 @@ jobs:
           $package = Get-Content AspireApp.Web/package.json -Raw | ConvertFrom-Json
           npm install --global $package.packageManager
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Restore frontend dependencies
+        working-directory: AspireApp.Web
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck frontend
+        working-directory: AspireApp.Web
+        run: pnpm run test:ts
       #endif
 
       - name: Setup .NET

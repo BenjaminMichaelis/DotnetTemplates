@@ -2,6 +2,11 @@
 
 This template creates a full-stack .NET Aspire solution with an ASP.NET Core Web API backend, an optional React frontend, EF Core, ASP.NET Core Identity, and Azure deployment assets.
 
+## Requirements
+
+- .NET SDK 11.0.100 or a later .NET 11 feature band; generated projects target .NET 11 and C# 15.
+- Deployment hosts must support the .NET 11 CPU baseline: x86-64-v2 on x64, or LSE on Windows Arm64.
+
 ## Template
 
 Create a new app in your current directory by running:
@@ -89,6 +94,13 @@ In development, the API exposes:
 
 ### Running tests
 
+For React apps, CI runs `pnpm run test:ts` to check the frontend source and Vite configuration without emitting JavaScript. To run the same check locally, from `AspireApp.Web`:
+
+```cli
+> pnpm install --frozen-lockfile
+> pnpm run test:ts
+```
+
 Run all tests (unit tests only when generated without `--integrationTests`):
 
 ```cli
@@ -98,13 +110,13 @@ Run all tests (unit tests only when generated without `--integrationTests`):
 When generated with `--integrationTests true`, `AspireApp.Aspire.Tests` is part of the solution, so `dotnet test` runs both unit and integration tests. To run only unit tests without starting containers:
 
 ```cli
-> dotnet test AspireApp.Tests/AspireApp.Tests.csproj
+> dotnet test --project AspireApp.Core.Tests/AspireApp.Core.Tests.csproj
 ```
 
 To run only integration tests:
 
 ```cli
-> dotnet test AspireApp.Aspire.Tests/AspireApp.Aspire.Tests.csproj
+> dotnet test --project AspireApp.Aspire.Tests/AspireApp.Aspire.Tests.csproj
 ```
 
 **Requirements for Aspire integration tests**:
@@ -139,7 +151,7 @@ docker run -p 8080:8080 \
 ```
 
 ### Security notes
-- Runtime image is `mcr.microsoft.com/dotnet/aspnet:10.0-noble-chiseled` — no shell, no package manager, non-root (`app`, UID 65532)
+- Runtime image is `mcr.microsoft.com/dotnet/aspnet:11.0-resolute-chiseled` — no shell, no package manager, non-root (`app`, UID 65532)
 - HTTPS is **not** terminated in the container; configure TLS at your ingress/load balancer
 - All secrets must be injected via environment variables or a secrets manager (Azure Key Vault, Kubernetes secrets, etc.)
 
@@ -152,29 +164,14 @@ The included GitHub Actions workflow uses Docker Buildx with GitHub Actions cach
 
 Infrastructure is managed with Terraform under `Infra/`. See `Infra/README.md` for setup instructions.
 
+The data project explicitly references `Microsoft.Data.SqlClient.Extensions.Azure` to retain Microsoft Entra authentication support, which is separate from the core SQL client in EF Core 11.
+
 CI/CD deploys automatically on push to `main` via `.github/workflows/build-and-deploy.yml`.
 
 ## Application Insights
 
-When the template is generated with `--applicationInsights true`, the following is added on top of the observability already included in `ServiceDefaults`:
+`--applicationInsights true` adds Aspire resource provisioning and `Azure.Monitor.OpenTelemetry.Profiler` (preview).
 
-| Addition | What it does |
-|---|---|
-| `Aspire.Hosting.Azure.ApplicationInsights` | Aspire provisions an AI resource in Azure and injects `APPLICATIONINSIGHTS_CONNECTION_STRING` automatically into the API container |
-| `Microsoft.ApplicationInsights.Profiler.AspNetCore` | CPU flame-graph profiler; uploads traces to App Insights Performance blade |
-| `builder.Services.AddServiceProfiler()` | Registers the profiler on Windows/Linux (skipped on unsupported platforms such as macOS) |
+ServiceDefaults already uses OpenTelemetry: local telemetry goes to the Aspire Dashboard; setting `APPLICATIONINSIGHTS_CONNECTION_STRING` enables Azure Monitor, even without the option.
 
-### How this works with Aspire's built-in telemetry
-
-The template always configures a full OpenTelemetry pipeline in `ServiceDefaults`:
-
-| Environment | Telemetry target | How |
-|---|---|---|
-| Local (`aspire run`) | **Aspire Dashboard** | Aspire injects `OTEL_EXPORTER_OTLP_ENDPOINT` automatically |
-| Azure (Aspire publish) | **Application Insights** | `APPLICATIONINSIGHTS_CONNECTION_STRING` injected by Aspire resource reference |
-
-The `UseAzureMonitor()` call in `ServiceDefaults/Extensions.cs` is already present and activates when the connection string env var is set — whether provided by Aspire or manually. **Do not also call `AddApplicationInsightsTelemetry()`** (the classic AI SDK); it conflicts with the OTel distro and double-reports all telemetry.
-
-### Without the option (default)
-
-The `UseAzureMonitor()` stub in `ServiceDefaults` still activates if you manually set `APPLICATIONINSIGHTS_CONNECTION_STRING` at runtime. You just won't have Aspire auto-provisioning or the profiler.
+Do not also call `AddApplicationInsightsTelemetry()`; it duplicates telemetry.
