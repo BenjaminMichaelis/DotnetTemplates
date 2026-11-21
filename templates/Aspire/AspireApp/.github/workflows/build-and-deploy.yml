@@ -92,7 +92,18 @@ jobs:
             core.exportVariable('ACTIONS_RESULTS_URL', process.env['ACTIONS_RESULTS_URL']);
 
       - name: Test
-        run: dotnet test --no-build --configuration Release --verbosity normal --maximum-failed-tests 10 --results-directory trx-data --report-trx --report-trx-filename tests.trx
+        run: dotnet test --no-build --configuration Release --verbosity normal --maximum-failed-tests 10 --results-directory trx-data --report-trx --report-trx-filename tests.trx --report-gh
+
+      - name: Test coverage (unit tests)
+        run: dotnet test --project AspireApp.Core.Tests/AspireApp.Core.Tests.csproj --no-build --configuration Release --results-directory trx-data --coverage --coverage-output-format cobertura
+
+      - name: Upload code coverage
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: code-coverage
+          path: trx-data/*.cobertura.xml
+          if-no-files-found: ignore
 
       - name: Generate merged failure playlist from TRX
         if: always()
