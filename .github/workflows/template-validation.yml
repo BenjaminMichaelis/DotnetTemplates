@@ -21,7 +21,7 @@ on:
       warnings_as_errors_msbuild_args:
         required: false
         type: string
-        default: -p:CodeAnalysisTreatWarningsAsErrors=true -p:TreatWarningsAsErrors=true -p:MSBuildTreatWarningsAsErrors=true
+        default: -warnaserror -p:CodeAnalysisTreatWarningsAsErrors=true -p:TreatWarningsAsErrors=true
       post_build_command:
         required: false
         type: string
@@ -110,10 +110,12 @@ jobs:
 
           if ($hasTests) {
             if ($solutionPath) {
-              dotnet test $solutionPath ${{ inputs.warnings_as_errors_msbuild_args }} --no-build --results-directory trx-data ${{ matrix.reportTrxArgs }}
+              dotnet test --solution $solutionPath --no-build --results-directory trx-data ${{ matrix.reportTrxArgs }}
             } else {
               $testProj = Get-ChildItem -Recurse -Filter "*.Tests.csproj" | Select-Object -First 1
-              dotnet test $testProj.FullName ${{ inputs.warnings_as_errors_msbuild_args }} --results-directory trx-data ${{ matrix.reportTrxArgs }}
+              dotnet build $testProj.FullName ${{ inputs.warnings_as_errors_msbuild_args }}
+              if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+              dotnet test --project $testProj.FullName --no-build --results-directory trx-data ${{ matrix.reportTrxArgs }}
             }
           } else {
             dotnet build "$projectName/$projectName.csproj" ${{ inputs.warnings_as_errors_msbuild_args }}
@@ -135,7 +137,9 @@ jobs:
           if ($postBuildAction -eq "") {
             # No post-build action requested.
           } elseif ($postBuildAction -eq "benchmark-run") {
-            dotnet run --project "$projectName.Benchmark/$projectName.Benchmark.csproj" -c Release -- --job Dry
+            dotnet build "$projectName.Benchmark/$projectName.Benchmark.csproj" -c Release ${{ inputs.warnings_as_errors_msbuild_args }}
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            dotnet run --project "$projectName.Benchmark/$projectName.Benchmark.csproj" -c Release --no-build -- --job Dry
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           } else {
             throw "Unknown post_build_command action '$postBuildAction'"
@@ -162,7 +166,9 @@ jobs:
           $appHostProj = Get-ChildItem -Recurse -Filter "*.AppHost.csproj" | Select-Object -First 1
           if (-not $appHostProj) { throw "AppHost project not found" }
           $manifestPath = Join-Path (Get-Location).Path "aspire-manifest.json"
-          dotnet run --project $appHostProj.FullName -- --publisher manifest --output-path $manifestPath
+          dotnet build $appHostProj.FullName ${{ inputs.warnings_as_errors_msbuild_args }}
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet run --project $appHostProj.FullName --no-build -- --publisher manifest --output-path $manifestPath
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           if (-not (Test-Path $manifestPath)) {
             throw "Aspire manifest smoke check failed: $manifestPath was not created."
