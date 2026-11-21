@@ -10,7 +10,7 @@ public abstract class SerializationTestsBase<TDto>
     protected abstract Task AssertAreEqualAsync(TDto expected, TDto actual);
 
     [Test]
-    public async Task CanSerializeToJson()
+    public async Task SerializeToJson_ValidDto_ReturnsJson()
     {
         TDto dto = CreateTestDto();
 
@@ -21,7 +21,7 @@ public abstract class SerializationTestsBase<TDto>
     }
 
     [Test]
-    public async Task CanDeserializeFromJson()
+    public async Task DeserializeFromJson_ValidJson_ReturnsDto()
     {
         TDto dto = CreateTestDto();
         var json = JsonSerializer.Serialize(dto);
