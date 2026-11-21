@@ -11,6 +11,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
     <PackageReference Include="Moq.AutoMock" />
     <PackageReference Include="TUnit" />
+    <PackageReference Include="Microsoft.Testing.Extensions.GitHubActionsReport" />
   </ItemGroup>
 
   <ItemGroup>

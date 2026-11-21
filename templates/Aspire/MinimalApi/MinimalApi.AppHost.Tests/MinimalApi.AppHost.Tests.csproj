@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="TUnit.Aspire" />
+    <PackageReference Include="Microsoft.Testing.Extensions.GitHubActionsReport" />
   </ItemGroup>
 
   <ItemGroup>

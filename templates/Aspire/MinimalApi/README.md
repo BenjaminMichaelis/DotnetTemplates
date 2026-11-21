@@ -101,6 +101,12 @@ To run only the Aspire AppHost tests:
 > dotnet test --project MinimalApi.AppHost.Tests/MinimalApi.AppHost.Tests.csproj
 ```
 
+CI also collects Cobertura code coverage for the Core unit tests (uploaded as the `code-coverage` artifact) and publishes a GitHub Actions test report. Locally:
+
+```cli
+> dotnet test --project MinimalApi.Core.Tests/MinimalApi.Core.Tests.csproj --coverage --coverage-output-format cobertura
+```
+
 **Requirements for Aspire AppHost tests**:
 - Docker must be running (Aspire uses containers for infrastructure)
 - Sufficient disk space for SQL Server and other service containers

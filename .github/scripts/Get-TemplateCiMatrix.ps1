@@ -174,6 +174,13 @@ function New-StandardVariant {
         "--report-trx --report-trx-filename tests.trx"
     }
 
+    if ($tests -ne "None") {
+        $reportTrxArgs += " --report-gh"
+        if ($tests -ne "") {
+            $reportTrxArgs += " --coverage --coverage-output-format cobertura"
+        }
+    }
+
     return [ordered]@{
         variant       = $variantName
         args          = ($templateArgs -join " ")
