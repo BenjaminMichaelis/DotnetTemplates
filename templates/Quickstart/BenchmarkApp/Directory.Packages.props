@@ -22,6 +22,7 @@
     <PackageVersion Include="BenchmarkDotNet" Version="0.16.0-preview.2" />
     <PackageVersion Include="BenchmarkDotNet.Annotations" Version="0.16.0-preview.2" />
 	<PackageVersion Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.16.0-preview.2" />
+    <PackageVersion Include="Microsoft.VisualStudio.Threading.Analyzers" Version="18.12.1" />
     <!--#if (tests != "None") -->
     <PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.11.2">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

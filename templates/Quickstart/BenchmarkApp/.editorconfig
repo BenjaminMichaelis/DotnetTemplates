@@ -488,7 +488,7 @@ dotnet_diagnostic.INTL0303.severity = warning
 # VSTHRD200: Use Async suffix for async methods
 dotnet_diagnostic.VSTHRD200.severity = warning
 
-[*Tests.cs]
+[*Tests*.cs]
 # These settings are appropriate for test projects.
 
 # VSTHRD200: Use `Async` naming convention

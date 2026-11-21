@@ -17,7 +17,7 @@ public class RoomsController(
 {
     [HttpGet(Name = "GetAllRooms")]
     [ProducesResponseType<IEnumerable<RoomDto>>(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<RoomDto>>> GetAllRooms()
+    public async Task<ActionResult<IEnumerable<RoomDto>>> GetAllRoomsAsync()
     {
         var rooms = await roomService.GetAllRoomsAsync();
         return Ok(rooms.Select(r => (RoomDto)r!));
@@ -27,7 +27,7 @@ public class RoomsController(
     [Authorize]
     [ProducesResponseType<IEnumerable<RoomDto>>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<IEnumerable<RoomDto>>> GetMyRooms()
+    public async Task<ActionResult<IEnumerable<RoomDto>>> GetMyRoomsAsync()
     {
         var userId = userManager.GetUserId(User);
         if (string.IsNullOrEmpty(userId))
@@ -42,7 +42,7 @@ public class RoomsController(
     [HttpGet("{id:guid}", Name = "GetRoom")]
     [ProducesResponseType<RoomDto>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<RoomDto>> GetRoom(Guid id)
+    public async Task<ActionResult<RoomDto>> GetRoomAsync(Guid id)
     {
         var room = await roomService.GetRoomByIdAsync(id);
         if (room == null)
@@ -56,7 +56,7 @@ public class RoomsController(
     [HttpGet("name/{friendlyName}", Name = "GetRoomByName")]
     [ProducesResponseType<RoomDto>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<RoomDto>> GetRoomByName(string friendlyName)
+    public async Task<ActionResult<RoomDto>> GetRoomByNameAsync(string friendlyName)
     {
         var room = await roomService.GetRoomByFriendlyNameAsync(friendlyName);
         if (room == null)
@@ -72,7 +72,7 @@ public class RoomsController(
     [ProducesResponseType<RoomDto>(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<RoomDto>> CreateRoom([FromBody] CreateRoomRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult<RoomDto>> CreateRoomAsync([FromBody] CreateRoomRequest request, CancellationToken cancellationToken)
     {
         var userId = userManager.GetUserId(User);
         if (string.IsNullOrEmpty(userId))
@@ -81,7 +81,7 @@ public class RoomsController(
         }
 
         var room = await roomService.CreateRoomAsync(request.FriendlyName, userId, cancellationToken);
-        return CreatedAtAction(nameof(GetRoom), new { id = room.Id }, (RoomDto)room!);
+        return CreatedAtRoute("GetRoom", new { id = room.Id }, (RoomDto)room!);
     }
 
     [HttpDelete("{id:guid}", Name = "DeleteRoom")]
@@ -90,7 +90,7 @@ public class RoomsController(
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> DeleteRoom(Guid id, CancellationToken cancellationToken)
+    public async Task<IActionResult> DeleteRoomAsync(Guid id, CancellationToken cancellationToken)
     {
         var userId = userManager.GetUserId(User);
         if (string.IsNullOrEmpty(userId))
@@ -104,7 +104,7 @@ public class RoomsController(
 
     [HttpGet("{roomId:guid}/questions", Name = "GetQuestions")]
     [ProducesResponseType<IEnumerable<QuestionDto>>(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<QuestionDto>>> GetQuestions(Guid roomId)
+    public async Task<ActionResult<IEnumerable<QuestionDto>>> GetQuestionsAsync(Guid roomId)
     {
         var questions = await questionService.GetQuestionsByRoomIdAsync(roomId);
         return Ok(questions.Select(q => (QuestionDto)q));
@@ -112,7 +112,7 @@ public class RoomsController(
 
     [HttpGet("{roomId:guid}/questions/approved", Name = "GetApprovedQuestions")]
     [ProducesResponseType<IEnumerable<QuestionDto>>(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<QuestionDto>>> GetApprovedQuestions(Guid roomId)
+    public async Task<ActionResult<IEnumerable<QuestionDto>>> GetApprovedQuestionsAsync(Guid roomId)
     {
         var questions = await questionService.GetApprovedQuestionsByRoomIdAsync(roomId);
         return Ok(questions.Select(q => (QuestionDto)q));
@@ -122,7 +122,7 @@ public class RoomsController(
     [ProducesResponseType<QuestionDto>(StatusCodes.Status201Created)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<string>(StatusCodes.Status429TooManyRequests)]
-    public async Task<ActionResult<QuestionDto>> CreateQuestion(Guid roomId, [FromBody] CreateQuestionRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult<QuestionDto>> CreateQuestionAsync(Guid roomId, [FromBody] CreateQuestionRequest request, CancellationToken cancellationToken)
     {
         // Get client ID from header or generate one
         var clientId = Request.Headers["X-Client-Id"].FirstOrDefault() ?? Guid.NewGuid().ToString();
@@ -139,7 +139,7 @@ public class RoomsController(
             request.AuthorName,
             cancellationToken);
 
-        return CreatedAtAction(nameof(GetQuestions), new { roomId }, (QuestionDto)question);
+        return CreatedAtRoute("GetQuestions", new { roomId }, (QuestionDto)question);
     }
 
     [HttpPut("{roomId:guid}/questions/{questionId:guid}/approve", Name = "ApproveQuestion")]
@@ -148,7 +148,7 @@ public class RoomsController(
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> ApproveQuestion(Guid roomId, Guid questionId, CancellationToken cancellationToken)
+    public async Task<IActionResult> ApproveQuestionAsync(Guid roomId, Guid questionId, CancellationToken cancellationToken)
     {
         var userId = userManager.GetUserId(User);
         if (string.IsNullOrEmpty(userId))
@@ -166,7 +166,7 @@ public class RoomsController(
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> MarkQuestionAnswered(Guid roomId, Guid questionId, CancellationToken cancellationToken)
+    public async Task<IActionResult> MarkQuestionAnsweredAsync(Guid roomId, Guid questionId, CancellationToken cancellationToken)
     {
         var userId = userManager.GetUserId(User);
         if (string.IsNullOrEmpty(userId))
@@ -184,7 +184,7 @@ public class RoomsController(
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> DeleteQuestion(Guid roomId, Guid questionId, CancellationToken cancellationToken)
+    public async Task<IActionResult> DeleteQuestionAsync(Guid roomId, Guid questionId, CancellationToken cancellationToken)
     {
         var userId = userManager.GetUserId(User);
         if (string.IsNullOrEmpty(userId))
@@ -202,7 +202,7 @@ public class RoomsController(
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> SetCurrentQuestion(Guid roomId, Guid? questionId, CancellationToken cancellationToken)
+    public async Task<IActionResult> SetCurrentQuestionAsync(Guid roomId, Guid? questionId, CancellationToken cancellationToken)
     {
         var userId = userManager.GetUserId(User);
         if (string.IsNullOrEmpty(userId))
@@ -220,7 +220,7 @@ public class RoomsController(
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> ClearCurrentQuestion(Guid roomId, CancellationToken cancellationToken)
+    public async Task<IActionResult> ClearCurrentQuestionAsync(Guid roomId, CancellationToken cancellationToken)
     {
         var userId = userManager.GetUserId(User);
         if (string.IsNullOrEmpty(userId))

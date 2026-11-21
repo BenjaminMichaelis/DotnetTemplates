@@ -26,4 +26,8 @@ See: https://learn.microsoft.com/visualstudio/msbuild/customize-your-build
     <UserSecretsId>12345678-9abc-0123-4567-890abcdef123</UserSecretsId>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" PrivateAssets="all" />
+  </ItemGroup>
+
 </Project>

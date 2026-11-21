@@ -15,7 +15,7 @@ public class AuthController(
     [HttpPost("login", Name = "Login")]
     [ProducesResponseType<UserInfo>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<UserInfo>> Login([FromBody] LoginRequest request)
+    public async Task<ActionResult<UserInfo>> LoginAsync([FromBody] LoginRequest request)
     {
         var user = await userManager.FindByEmailAsync(request.Email);
         if (user is null)
@@ -50,7 +50,7 @@ public class AuthController(
     [HttpPost("register", Name = "Register")]
     [ProducesResponseType<UserInfo>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<UserInfo>> Register([FromBody] RegisterRequest request)
+    public async Task<ActionResult<UserInfo>> RegisterAsync([FromBody] RegisterRequest request)
     {
         var user = new ApplicationUser { UserName = request.Email, Email = request.Email };
         var result = await userManager.CreateAsync(user, request.Password);
@@ -87,7 +87,7 @@ public class AuthController(
     [Authorize]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> Logout()
+    public async Task<IActionResult> LogoutAsync()
     {
         await signInManager.SignOutAsync();
         return NoContent();
