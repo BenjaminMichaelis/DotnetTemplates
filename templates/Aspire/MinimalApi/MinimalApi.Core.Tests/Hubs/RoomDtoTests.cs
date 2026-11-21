@@ -5,7 +5,7 @@ namespace MinimalApi.Core.Tests.Hubs;
 [InheritsTests]
 public class RoomDtoTests : SerializationTestsBase<RoomDto>
 {
-    protected override async Task AssertAreEqualAsync(RoomDto expected, RoomDto actual)
+    protected override async Task AssertAreEqual(RoomDto expected, RoomDto actual)
     {
         await Assert.That(actual.Id).IsEqualTo(expected.Id);
         await Assert.That(actual.FriendlyName).IsEqualTo(expected.FriendlyName);

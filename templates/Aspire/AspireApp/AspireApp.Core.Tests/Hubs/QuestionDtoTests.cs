@@ -5,7 +5,7 @@ namespace AspireApp.Core.Tests.Hubs;
 [InheritsTests]
 public class QuestionDtoTests : SerializationTestsBase<QuestionDto>
 {
-    protected override async Task AssertAreEqualAsync(QuestionDto expected, QuestionDto actual)
+    protected override async Task AssertAreEqual(QuestionDto expected, QuestionDto actual)
     {
         await Assert.That(actual.RoomId).IsEqualTo(expected.RoomId);
         await Assert.That(actual.QuestionText).IsEqualTo(expected.QuestionText);
