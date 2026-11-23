@@ -24,7 +24,7 @@
 	<PackageVersion Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.16.0-preview.2" />
     <GlobalPackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="18.12.1" />
     <!--#if (tests != "None") -->
-    <PackageVersion Include="Microsoft.Testing.Extensions.GitHubActionsReport" Version="2.5.1">
+    <PackageVersion Include="Microsoft.Testing.Extensions.GitHubActionsReport" Version="2.5.3">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageVersion>
